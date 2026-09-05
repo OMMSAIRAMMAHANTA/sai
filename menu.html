@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omm Sairam Mahanta | Menu</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-accent: #00eaff;
+            --bg-dark: #03050a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* The Full Screen Menu Container */
+        .full-menu-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(3, 5, 10, 0.98); /* Deep dark background */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 40px; /* Space between links */
+            z-index: 9999;
+        }
+
+        /* Close Button (Top Right) */
+        .close-btn {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid var(--primary-accent);
+            color: var(--primary-accent);
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.1), inset 0 0 10px rgba(0, 234, 255, 0.1);
+        }
+
+        .close-btn:hover {
+            background: var(--primary-accent);
+            color: #000;
+            box-shadow: 0 0 25px rgba(0, 234, 255, 0.5);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Menu Links - Hollow Outline Effect */
+        .full-menu-container a {
+            font-size: 3rem; /* Large text */
+            color: transparent; /* Makes the fill transparent */
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            /* Creates the hollow outline */
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.4);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Hover and Active State - Solid Glowing Text */
+        .full-menu-container a:hover, 
+        .full-menu-container a.active {
+            color: var(--primary-accent);
+            -webkit-text-stroke: 0px transparent; /* Remove outline on hover */
+            text-shadow: 0 0 25px rgba(0, 234, 255, 0.8), 0 0 10px rgba(0, 234, 255, 0.5);
+            transform: scale(1.1); /* Slight pop-out effect */
+            letter-spacing: 6px;
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 768px) {
+            .full-menu-container a {
+                font-size: 2rem;
+            }
+            .close-btn {
+                top: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu UI -->
+    <div class="full-menu-container">
+        <!-- Close Button -->
+        <button class="close-btn" onclick="goBack()" title="Close Menu">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- Navigation Links -->
+        <a href="index.html" class="active">Biodata</a>
+        <a href="projects.html">Platforms</a>
+        <a href="games.html">Gaming Lab</a>
+        <a href="contact.html">Connect</a>
+    </div>
+
+    <script>
+        // Simple back function for the close button
+        function goBack() {
+            // Ideally this would hide the menu, but since it's a standalone page:
+            window.history.back();
+            // Alternatively, redirect to home: window.location.href = 'index.html';
+        }
+    </script>
+
+</body>
+</html>

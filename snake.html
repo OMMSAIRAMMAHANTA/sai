@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neon Snake | Gaming Lab</title>
+    
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts Merged -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-accent: #00eaff;
+            --text-main: #ffffff;
+            --bg-dark: #050b14;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            background: linear-gradient(135deg, rgba(5,11,20,0.92) 0%, rgba(10,25,47,0.85) 100%), url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Background FX */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+        .bg-glow {
+            position: fixed; top: 50%; left: 50%; width: 80vw; height: 80vw;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.05) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%; z-index: -2;
+        }
+
+        /* Navigation */
+        .top-nav {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,234,255,0.2);
+            z-index: 10;
+        }
+        .back-btn {
+            color: var(--text-main); text-decoration: none; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 10px; transition: 0.3s;
+        }
+        .back-btn:hover { color: var(--primary-accent); text-shadow: 0 0 10px var(--primary-accent); }
+
+        .game-wrapper {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-ui { 
+            text-align: center; 
+            animation: cinematicFocus 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
+            width: 100%; 
+            max-width: 500px; 
+            background: rgba(15,15,20,0.9); 
+            padding: 40px; 
+            border-radius: 30px; 
+            border: 1px solid rgba(0,234,255,0.3); 
+            box-shadow: 0 0 60px rgba(0,234,255,0.15), inset 0 0 30px rgba(0,234,255,0.05); 
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-hero {
+            padding: 15px 40px; border-radius: 15px; border: 1px solid var(--primary-accent); cursor: pointer;
+            background: transparent; color: #fff; font-weight: 700; font-size: 1.1rem; transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-hero:hover { 
+            background: var(--primary-accent); color: black; 
+            box-shadow: 0 0 20px rgba(0,234,255,0.4); transform: scale(1.02); 
+        }
+
+        /* Snake Game Canvas and Controls */
+        canvas#snakeCanvas { 
+            background: #050508; 
+            border: 4px solid var(--primary-accent); 
+            box-shadow: 0 0 40px rgba(0,234,255,0.2); 
+            display: block; 
+            margin: 0 auto; 
+            max-width: 100%; 
+            border-radius: 15px;
+        }
+        
+        .controls { margin-top: 25px; display: flex; justify-content: center; gap: 20px; }
+        .ctrl-btn { 
+            width: 65px; height: 65px; border-radius: 50%; font-size: 26px; 
+            background: rgba(255,255,255,0.05); border: 2px solid var(--primary-accent); 
+            color: white; cursor: pointer; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
+        }
+        .ctrl-btn:active { transform: scale(0.8) translateY(5px); background: rgba(0,234,255,0.3); box-shadow: 0 0 30px rgba(0,234,255,0.6); }
+        .ctrl-btn:hover { background: rgba(0,234,255,0.1); transform: scale(1.1); }
+
+        @keyframes cinematicFocus {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+        }
+
+        @media (max-width: 500px) {
+            .game-ui { padding: 30px 20px; }
+            .ctrl-btn { width: 55px; height: 55px; font-size: 20px; }
+            .controls { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+    <div class="bg-glow"></div>
+
+    <nav class="top-nav">
+        <a href="games.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Lab Terminal</a>
+        <h2 style="margin:0; font-weight: 700; letter-spacing: 2px; color: var(--primary-accent); text-transform: uppercase; font-size: 1.2rem;">Neon Snake</h2>
+    </nav>
+
+    <div class="game-wrapper">
+        <div class="game-ui">
+            <h2 style="color:var(--primary-accent); margin-top:0; font-size:2.5rem; text-transform:uppercase; font-weight: 800;">Neon Snake</h2>
+            
+            <p style="font-weight:bold; margin-bottom:10px; font-size:1.2rem;">
+                Score Frame: <span id="snakeScore" style="color:#fff; font-size:1.8rem; text-shadow:0 0 15px #fff;">0</span>
+            </p>
+            <p id="snakeStatus" style="color:#ff4444; font-weight:bold; height:24px; margin-bottom:10px; font-size:1.1rem;"></p>
+
+            <canvas id="snakeCanvas" width="300" height="300"></canvas>
+            
+            <div class="controls">
+                <button class="ctrl-btn" onclick="changeDirection('LEFT')"><i class="fa-solid fa-arrow-left"></i></button>
+                <button class="ctrl-btn" onclick="changeDirection('UP')"><i class="fa-solid fa-arrow-up"></i></button>
+                <button class="ctrl-btn" onclick="changeDirection('DOWN')"><i class="fa-solid fa-arrow-down"></i></button>
+                <button class="ctrl-btn" onclick="changeDirection('RIGHT')"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            
+            <div style="display:flex; gap:15px; justify-content:center; margin-top:30px;">
+                <button class="btn-hero" style="width: 100%;" onclick="startSnake()"><i class="fa-solid fa-play"></i> Init Loop</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("snakeCanvas");
+        const ctx = canvas.getContext("2d");
+        const statusText = document.getElementById("snakeStatus");
+        let snake, food, direction, gameLoop, score, speed = 200;
+
+        function startSnake() {
+            snake = [{x: 10, y: 10}]; 
+            food = {x: 15, y: 15}; 
+            direction = "RIGHT"; 
+            score = 0; 
+            speed = 200;
+            
+            document.getElementById("snakeScore").innerText = score;
+            statusText.innerText = "";
+            
+            clearInterval(gameLoop); 
+            gameLoop = setInterval(drawSnake, speed);
+        }
+
+        function drawSnake() {
+            // Draw background
+            ctx.fillStyle = "#050508"; 
+            ctx.fillRect(0, 0, 300, 300);
+            
+            // Draw Food (Neon Red)
+            ctx.fillStyle = "#ff0000"; 
+            ctx.shadowBlur = 15; 
+            ctx.shadowColor = "red"; 
+            ctx.fillRect(food.x * 15, food.y * 15, 15, 15);
+
+            // Calculate new head position
+            let head = {x: snake[0].x, y: snake[0].y};
+            if(direction === "LEFT") head.x--; 
+            if(direction === "UP") head.y--;
+            if(direction === "RIGHT") head.x++; 
+            if(direction === "DOWN") head.y++;
+
+            // Collision Detection (Walls & Self)
+            if(head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.some(s => s.x === head.x && s.y === head.y)) {
+                clearInterval(gameLoop); 
+                statusText.innerText = "CRITICAL FAILURE!";
+                return; 
+            }
+            
+            // Move Snake
+            snake.unshift(head);
+            
+            // Eat Food
+            if(head.x === food.x && head.y === food.y) {
+                score += 10; 
+                document.getElementById("snakeScore").innerText = score;
+                food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+                
+                // Increase speed dynamically
+                if(speed > 50) { 
+                    clearInterval(gameLoop); 
+                    speed -= 5; 
+                    gameLoop = setInterval(drawSnake, speed); 
+                }
+            } else { 
+                snake.pop(); 
+            }
+
+            // Draw Snake (Neon Blue)
+            ctx.fillStyle = "var(--primary-accent)"; 
+            ctx.shadowBlur = 10; 
+            ctx.shadowColor = "rgba(0,234,255,0.6)";
+            snake.forEach(part => ctx.fillRect(part.x * 15, part.y * 15, 13, 13)); 
+            ctx.shadowBlur = 0;
+        }
+
+        function changeDirection(dir) {
+            if(dir === "LEFT" && direction !== "RIGHT") direction = "LEFT";
+            if(dir === "UP" && direction !== "DOWN") direction = "UP";
+            if(dir === "RIGHT" && direction !== "LEFT") direction = "RIGHT";
+            if(dir === "DOWN" && direction !== "UP") direction = "DOWN";
+        }
+
+        document.addEventListener("keydown", e => {
+            // Prevent default scrolling when playing game
+            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+                e.preventDefault();
+            }
+            if(e.key === "ArrowLeft") changeDirection("LEFT");
+            if(e.key === "ArrowUp") changeDirection("UP");
+            if(e.key === "ArrowRight") changeDirection("RIGHT");
+            if(e.key === "ArrowDown") changeDirection("DOWN");
+        });
+
+        // Initialize game on load
+        window.onload = startSnake;
+    </script>
+</body>
+</html>

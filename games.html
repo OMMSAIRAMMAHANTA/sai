@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Omm Sairam Mahanta | Gaming Lab</title>
+    
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts Merged -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --primary-accent: #00eaff;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --glass-bg: rgba(10, 10, 15, 0.45);
+            --card-border: rgba(0, 234, 255, 0.15);
+            --bg-dark: #050b14;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            background: linear-gradient(135deg, rgba(5,11,20,0.92) 0%, rgba(10,25,47,0.85) 100%), url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, p { margin: 0; }
+        .btn, .btn-hero { background-color: transparent; }
+        
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: 9998; pointer-events: none; opacity: 0.5;
+        }
+
+        #reptileCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none; opacity: 0.6;
+        }
+
+        .bg-glow {
+            position: fixed; top: -15%; left: -10%; width: 55vw; height: 55vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.08) 0%, rgba(0,0,0,0) 65%);
+            border-radius: 50%; z-index: 0; animation: pulse-glow 10s infinite alternate;
+        }
+        .bg-glow-2 {
+            position: fixed; bottom: -10%; right: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.06) 0%, rgba(0,0,0,0) 60%);
+            border-radius: 50%; z-index: 0; animation: pulse-glow 12s infinite alternate-reverse;
+        }
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(2%, -2%); }
+        }
+
+        .content-wrapper {
+            position: relative; z-index: 10; 
+            min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+
+        .hamburger-btn {
+            position: fixed; top: 40px; right: 40px;
+            width: 55px; height: 55px; border-radius: 50%;
+            background: transparent; backdrop-filter: blur(10px);
+            border: 2px solid var(--primary-accent);
+            color: var(--primary-accent); font-size: 20px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 10000;
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .hamburger-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+            background: var(--primary-accent); color: #000;
+            box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+        }
+
+        .music-btn {
+            position: fixed; bottom: 40px; right: 40px;
+            width: 55px; height: 55px; border-radius: 50%;
+            background: transparent; backdrop-filter: blur(10px);
+            border: 2px solid var(--primary-accent);
+            color: var(--primary-accent); font-size: 20px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 9997; 
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .music-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary-accent); color: #000;
+            box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+        }
+
+        .full-menu {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 5, 10, 0.98); backdrop-filter: blur(25px);
+            z-index: 9999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; gap: 35px;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+        }
+        .full-menu.open { opacity: 1; pointer-events: all; }
+        .full-menu a {
+            font-size: 2.5rem; color: transparent; text-decoration: none; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 4px; 
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0; transform: translateY(30px);
+        }
+        .full-menu a:hover, .full-menu a.active-link {
+            color: var(--primary-accent); -webkit-text-stroke: 1.5px var(--primary-accent);
+            text-shadow: 0 0 20px rgba(0,234,255,0.5);
+            transform: scale(1.05) !important; letter-spacing: 6px;
+        }
+
+        .page-section {
+            display: flex; padding: 100px 8%; min-height: 100vh;
+            box-sizing: border-box; flex-direction: column; justify-content: center; align-items: center;
+            animation: cinematicFocus 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes cinematicFocus {
+            from { opacity: 0; transform: scale(1.02) translateY(15px); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+        }
+
+        .section-title { font-size: 2.5rem; margin-bottom: 50px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; width: 100%; max-width: 1200px; perspective: 1000px; }
+        
+        .project-card {
+            background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--card-border);
+            border-radius: 20px; padding: 40px; text-align: center; 
+            transform-style: preserve-3d; transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s;
+            position: relative;
+        }
+        .project-card:hover { border-color: var(--primary-accent); box-shadow: 0 20px 50px rgba(0, 234, 255, 0.2); z-index: 10; }
+        .project-icon { font-size: 4rem; color: var(--primary-accent); margin-bottom: 20px; text-shadow: 0 0 25px rgba(0,234,255,0.6); transform: translateZ(50px); }
+        .project-title { font-size: 1.8rem; margin-bottom: 15px; font-weight: 700; transform: translateZ(30px); }
+        .project-desc { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; margin-bottom: 25px; transform: translateZ(20px); }
+        
+        .btn {
+            padding: 15px 40px; border-radius: 30px; border: none; cursor: pointer;
+            background: linear-gradient(45deg, var(--primary-accent), #0099aa);
+            color: #000; font-weight: 800; text-decoration: none; transition: 0.3s;
+            display: inline-block; box-shadow: 0 0 20px rgba(0, 234, 255, 0.4); text-transform: uppercase;
+        }
+        .btn:hover { background: #fff; box-shadow: 0 0 30px #fff; transform: translateZ(30px) scale(1.05); }
+
+        footer { text-align: center; padding: 25px; background: transparent; color: #555; font-size: 0.9rem; width: 100%; position: absolute; bottom: 0; left: 0; right: 0; letter-spacing: 1px;}
+
+        @media (max-width: 600px) {
+            .full-menu a { font-size: 1.6rem; letter-spacing: 2px; }
+            .hamburger-btn { top: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px;}
+            .music-btn { bottom: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px; }
+            .section-title { font-size: 1.8rem; }
+            .project-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAYS -->
+    <div class="scanlines"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="bgMusic" loop>
+        <source src="dreamss.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- BACKGROUND ENGINE -->
+    <canvas id="reptileCanvas"></canvas>
+
+    <!-- HAMBURGER MENU BUTTON -->
+    <div class="hamburger-btn" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars" id="menu-icon"></i>
+    </div>
+
+    <!-- MUSIC TOGGLE BUTTON -->
+    <div class="music-btn" onclick="toggleMusic()" title="Play/Pause Background Music">
+        <i class="fa-solid fa-volume-xmark" id="music-icon"></i>
+    </div>
+
+    <!-- FULL SCREEN MENU -->
+    <div class="full-menu" id="fullMenu">
+        <a href="index.html">Biodata</a>
+        <a href="projects.html">Platforms</a>
+        <a href="games.html" class="active-link">Gaming Lab</a>
+        <a href="contact.html">Connect</a>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-wrapper">
+        <section id="games" class="page-section">
+            <h2 class="section-title"><span style="color:var(--primary-accent)">Interactive Gaming Lab</span></h2>
+            <div class="project-grid">
+                <div class="project-card">
+                    <i class="fa-solid fa-chess-knight project-icon"></i>
+                    <div class="project-title">Sai's Chess</div>
+                    <div class="project-desc">Custom JavaScript Engine. Features Pro AI, 3D Board Graphics & Dynamic Timers.</div>
+                    <!-- Linked to chess.html -->
+                    <button class="btn btn-hero" onclick="window.location.href='chess.html'" style="padding: 10px 25px; font-size: 0.95rem;">Initialize</button>
+                </div>
+                <div class="project-card">
+                    <i class="fa-solid fa-gamepad project-icon"></i>
+                    <div class="project-title">Super Tic Tac Toe</div>
+                    <div class="project-desc">Classic logic game rewritten with 3 responsive AI difficulty algorithms.</div>
+                    <!-- Linked to tictactoe.html -->
+                    <button class="btn btn-hero" onclick="window.location.href='tictactoe.html'" style="padding: 10px 25px; font-size: 0.95rem;">Initialize</button>
+                </div>
+                <div class="project-card">
+                    <i class="fa-solid fa-brain project-icon"></i>
+                    <div class="project-title">Memory Master</div>
+                    <div class="project-desc">3D animated card flips. Test your cognitive recall in this high-speed matching game!</div>
+                    <!-- Linked to memory.html -->
+                    <button class="btn btn-hero" onclick="window.location.href='memory.html'" style="padding: 10px 25px; font-size: 0.95rem;">Initialize</button>
+                </div>
+                <div class="project-card">
+                    <i class="fa-solid fa-staff-snake project-icon"></i>
+                    <div class="project-title">Neon Snake</div>
+                    <div class="project-desc">Canvas-based arcade action utilizing precise coordinate rendering and scaling speed.</div>
+                    <!-- Linked to snake.html -->
+                    <button class="btn btn-hero" onclick="window.location.href='snake.html'" style="padding: 10px 25px; font-size: 0.95rem;">Initialize</button>
+                </div>
+            </div>
+            <footer>&copy; 2026 Omm Sairam Mahanta | AstraGoo Network. All Rights Reserved.</footer>
+        </section>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        let isMusicPlaying = sessionStorage.getItem('musicPlaying') === 'true';
+        const bgMusic = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('music-icon');
+
+        if(isMusicPlaying) {
+            bgMusic.play().catch(()=> { isMusicPlaying = false; sessionStorage.setItem('musicPlaying', 'false'); });
+            musicIcon.classList.replace('fa-volume-xmark', 'fa-volume-high');
+        }
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicIcon.classList.replace('fa-volume-high', 'fa-volume-xmark');
+                sessionStorage.setItem('musicPlaying', 'false');
+            } else {
+                bgMusic.play().catch(e => console.log("Audio play blocked by browser:", e));
+                musicIcon.classList.replace('fa-volume-xmark', 'fa-volume-high');
+                sessionStorage.setItem('musicPlaying', 'true');
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('fullMenu');
+            const icon = document.getElementById('menu-icon');
+            const links = document.querySelectorAll('.full-menu a');
+            
+            menu.classList.toggle('open');
+            
+            if (menu.classList.contains('open')) {
+                icon.classList.replace('fa-bars', 'fa-xmark');
+                links.forEach((link, idx) => {
+                    link.style.animation = `slideInLink 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards ${idx * 0.1}s`;
+                });
+            } else {
+                icon.classList.replace('fa-xmark', 'fa-bars');
+                links.forEach(link => { link.style.animation = 'none'; link.style.opacity = '0'; link.style.transform = 'translateY(40px)'; });
+            }
+        }
+
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes slideInLink {
+                from { opacity: 0; transform: translateY(40px); filter: blur(5px); }
+                to { opacity: 1; transform: translateY(0); filter: blur(0px); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Card 3D Effect
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                let rect = card.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+                let xOffset = (x / rect.width - 0.5) * 30; 
+                let yOffset = (y / rect.height - 0.5) * -30;
+                card.style.transform = `perspective(1000px) rotateX(${yOffset}deg) rotateY(${xOffset}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+            });
+        });
+
+        // Reptile Canvas
+        const rCanvas = document.getElementById('reptileCanvas');
+        const rCtx = rCanvas.getContext('2d');
+        let rWidth, rHeight, rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 }, rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        const rSegments = [], rSegCount = 45, rSegDist = 12; let rWalkCycle = 0;
+        for (let i = 0; i < rSegCount; i++) { rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 }); }
+        function rResize() { rWidth = rCanvas.width = window.innerWidth; rHeight = rCanvas.height = window.innerHeight; }
+        window.addEventListener('mousemove', e => { rMouse.x = e.clientX; rMouse.y = e.clientY; });
+        function drawReptileEngine() {
+            rCtx.clearRect(0, 0, rWidth, rHeight);
+            rHead.x += (rMouse.x - rHead.x) * 0.12; rHead.y += (rMouse.y - rHead.y) * 0.12;
+            let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
+            if (dHead > 1) rWalkCycle += dHead * 0.08;
+            rSegments[0].x = rHead.x; rSegments[0].y = rHead.y;
+            for (let i = 1; i < rSegCount; i++) {
+                let s1 = rSegments[i - 1], s2 = rSegments[i];
+                let dx = s1.x - s2.x, dy = s1.y - s2.y;
+                s2.angle = Math.atan2(dy, dx);
+                s2.x = s1.x - Math.cos(s2.angle) * rSegDist; s2.y = s1.y - Math.sin(s2.angle) * rSegDist;
+                renderReptileBody(s2, i);
+            }
+            requestAnimationFrame(drawReptileEngine);
+        }
+        function renderReptileBody(seg, i) {
+            rCtx.save(); rCtx.translate(seg.x, seg.y); rCtx.rotate(seg.angle);
+            let hue = 190 + (i * 2); rCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`; rCtx.lineWidth = 1.5; rCtx.shadowBlur = 12; rCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+            let bW = Math.sin((i / rSegCount) * Math.PI) * 22;
+            rCtx.beginPath(); rCtx.moveTo(0, -bW / 2); rCtx.lineTo(0, bW / 2); rCtx.stroke();
+            rCtx.fillStyle = "white"; rCtx.shadowBlur = 0; rCtx.beginPath(); rCtx.arc(0, 0, 1.5, 0, Math.PI * 2); rCtx.fill();
+            rCtx.restore();
+        }
+        window.addEventListener('resize', rResize); rResize(); drawReptileEngine();
+    </script>
+</body>
+</html>
