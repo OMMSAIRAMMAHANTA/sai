@@ -80,8 +80,9 @@
             display: flex; flex-direction: column; justify-content: center;
         }
 
+        /* Fixed Hamburger Position */
         .hamburger-btn {
-            position: fixed; top: 40px; right: 40px;
+            position: fixed; top: 50px; right: 50px;
             width: 55px; height: 55px; border-radius: 50%;
             background: transparent; backdrop-filter: blur(10px);
             border: 2px solid var(--primary-accent);
@@ -168,9 +169,80 @@
 
         .hero-desc {
             font-size: 1.05rem; line-height: 1.8; color: var(--text-muted);
-            max-width: 680px; margin-bottom: 35px; text-align: justify; font-weight: 400;
+            max-width: 680px; margin-bottom: 25px; text-align: justify; font-weight: 400;
         }
         .hero-desc strong { color: #fff; font-weight: 600;}
+
+        /* --- UPGRADED SKILLS SECTION STYLES --- */
+        .skills-wrapper { margin-bottom: 40px; }
+        .skills-title {
+            color: var(--primary-accent); font-size: 0.85rem; font-weight: 700; 
+            letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+        }
+        .skills-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .skill-badge {
+            background: rgba(0, 234, 255, 0.05); border: 1px solid rgba(0, 234, 255, 0.2);
+            color: #fff; padding: 8px 18px; border-radius: 20px; font-size: 0.85rem;
+            font-weight: 500; backdrop-filter: blur(5px);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            animation: popIn 0.6s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+            cursor: pointer;
+        }
+        .skill-badge:hover {
+            background: var(--primary-accent); color: #000;
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.5); transform: translateY(-3px) scale(1.05);
+        }
+        .skill-badge:nth-child(1) { animation-delay: 0.4s; }
+        .skill-badge:nth-child(2) { animation-delay: 0.5s; }
+        .skill-badge:nth-child(3) { animation-delay: 0.6s; }
+        .skill-badge:nth-child(4) { animation-delay: 0.7s; }
+        .skill-badge:nth-child(5) { animation-delay: 0.8s; }
+        .skill-badge:nth-child(6) { animation-delay: 0.9s; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8) translateY(15px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* SKILL INFO MODAL STYLES */
+        .skill-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(15px);
+            z-index: 40000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .skill-modal-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .skill-modal-box {
+            background: rgba(10, 15, 25, 0.9); border: 1px solid var(--primary-accent);
+            border-radius: 20px; padding: 40px; text-align: center;
+            box-shadow: 0 0 30px rgba(0, 234, 255, 0.15), inset 0 0 20px rgba(0, 234, 255, 0.05);
+            transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 90%; max-width: 450px; position: relative;
+        }
+        .skill-modal-overlay.active .skill-modal-box { transform: scale(1) translateY(0); }
+        
+        .skill-modal-close {
+            position: absolute; top: 15px; right: 15px;
+            background: transparent; border: none; color: var(--text-muted);
+            font-size: 1.5rem; cursor: pointer; transition: 0.3s;
+        }
+        .skill-modal-close:hover { color: var(--primary-accent); transform: rotate(90deg); }
+        
+        .skill-modal-icon {
+            font-size: 3.5rem; color: var(--primary-accent); margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
+        }
+        
+        .skill-modal-title {
+            color: #fff; font-size: 1.8rem; font-weight: 700; margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .skill-modal-desc {
+            color: var(--text-muted); font-size: 1rem; line-height: 1.7; font-weight: 400; text-align: justify;
+        }
 
         .hero-socials { display: flex; gap: 20px; margin-bottom: 45px; }
         .hero-socials a {
@@ -225,15 +297,8 @@
         /* Styling for the invisible button over the image */
         .secret-image-btn {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            z-index: 10;
+            top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background: transparent; border: none; cursor: pointer; z-index: 10;
         }
 
         @keyframes floatGlow {
@@ -299,6 +364,75 @@
         .btn-cancel { background: rgba(255, 68, 68, 0.1); color: #ff4444; border-color: #ff4444; }
         .btn-cancel:hover { background: #ff4444; color: #fff; box-shadow: 0 0 20px #ff4444; }
 
+        /* --- GLITCH NOTICE MODAL STYLES --- */
+        .glitch-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 5, 10, 0.92); backdrop-filter: blur(10px);
+            z-index: 45000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+        }
+        .glitch-overlay.active { opacity: 1; pointer-events: all; }
+
+        .glitch-box {
+            background: rgba(15, 5, 25, 0.95); border: 2px solid #b900ff;
+            border-radius: 15px; padding: 40px 30px; text-align: center;
+            box-shadow: 0 0 40px rgba(185, 0, 255, 0.4), inset 0 0 20px rgba(185, 0, 255, 0.1);
+            max-width: 500px; width: 90%; position: relative;
+            transform: scale(0.9); transition: all 0.4s ease;
+            overflow: hidden;
+        }
+        .glitch-overlay.active .glitch-box { 
+            transform: scale(1); 
+            animation: boxGlitch 0.4s cubic-bezier(0.25, 46.1, 0.19, 1.14) forwards; 
+        }
+
+        .glitch-text {
+            color: #fff; font-size: 1.8rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 2px; margin-bottom: 20px; position: relative; display: inline-block;
+            text-shadow: 0.05em 0 0 rgba(255,0,0,0.75), -0.025em -0.05em 0 rgba(0,255,0,0.75), 0.025em 0.05em 0 rgba(0,0,255,0.75);
+            animation: glitch 1.5s infinite;
+        }
+
+        .glitch-icon {
+            font-size: 3rem; color: #b900ff; margin-bottom: 15px;
+            animation: pulse-red 2s infinite; text-shadow: 0 0 20px #b900ff;
+        }
+
+        .glitch-desc {
+            color: #ccc; font-size: 0.95rem; line-height: 1.7; text-align: left;
+            background: rgba(0,0,0,0.4); padding: 20px; border-radius: 10px; border: 1px solid rgba(185,0,255,0.3);
+            margin-bottom: 25px;
+        }
+        .glitch-desc span { color: var(--primary-accent); font-weight: bold; }
+        .glitch-desc .code { color: #b900ff; font-weight: bold; font-size: 1.1rem; letter-spacing: 2px; }
+
+        .btn-glitch {
+            background: linear-gradient(45deg, #b900ff, #00eaff);
+            color: #000; padding: 12px 35px; border-radius: 5px; font-weight: 800; font-size: 1rem;
+            border: none; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(185, 0, 255, 0.4);
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .btn-glitch:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 234, 255, 0.6); color: #fff; }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 rgba(255,0,0,0.75), -0.05em -0.025em 0 rgba(0,255,0,0.75), -0.025em 0.05em 0 rgba(0,0,255,0.75); }
+            14% { text-shadow: 0.05em 0 0 rgba(255,0,0,0.75), -0.05em -0.025em 0 rgba(0,255,0,0.75), -0.025em 0.05em 0 rgba(0,0,255,0.75); }
+            15% { text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75), 0.025em 0.025em 0 rgba(0,255,0,0.75), -0.05em -0.05em 0 rgba(0,0,255,0.75); }
+            49% { text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75), 0.025em 0.025em 0 rgba(0,255,0,0.75), -0.05em -0.05em 0 rgba(0,0,255,0.75); }
+            50% { text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75), 0.05em 0 0 rgba(0,255,0,0.75), 0 -0.05em 0 rgba(0,0,255,0.75); }
+            99% { text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75), 0.05em 0 0 rgba(0,255,0,0.75), 0 -0.05em 0 rgba(0,0,255,0.75); }
+            100% { text-shadow: -0.025em 0 0 rgba(255,0,0,0.75), -0.025em -0.025em 0 rgba(0,255,0,0.75), -0.025em -0.05em 0 rgba(0,0,255,0.75); }
+        }
+        
+        @keyframes boxGlitch {
+            0% { transform: translate(0) scale(0.9); }
+            20% { transform: translate(-5px, 5px) scale(0.95); }
+            40% { transform: translate(-5px, -5px) scale(0.98); }
+            60% { transform: translate(5px, 5px) scale(1.02); }
+            80% { transform: translate(5px, -5px) scale(0.99); }
+            100% { transform: translate(0) scale(1); }
+        }
+
         footer { text-align: center; padding: 25px; background: transparent; color: #555; font-size: 0.9rem; width: 100%; position: absolute; bottom: 0; left: 0; right: 0; letter-spacing: 1px;}
 
         @media (max-width: 1100px) {
@@ -317,8 +451,10 @@
             .hero-desc { font-size: 0.85rem; line-height: 1.6; margin-bottom: 25px; text-align: center; }
             .glow-circle { width: 240px; height: 240px; padding: 10px;}
             .full-menu a { font-size: 1.6rem; letter-spacing: 2px; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
-            .hamburger-btn { top: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px;}
+            /* Hamburger Position Fix for Mobile */
+            .hamburger-btn { top: 35px; right: 25px; width: 45px; height: 45px; font-size: 18px;}
             .music-btn { bottom: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px; }
+            .skills-grid { justify-content: center; }
         }
     </style>
 </head>
@@ -377,6 +513,19 @@
                         crafting solutions that are not just functional, but visionary.
                     </p>
 
+                    <!-- UPGRADED FULLSTACK SKILLS SECTION -->
+                    <div class="skills-wrapper">
+                        <div class="skills-title"><i class="fa-solid fa-code"></i> Core Expertise</div>
+                        <div class="skills-grid">
+                            <span class="skill-badge" onclick="openSkillModal('fullstack')"><i class="fa-solid fa-layer-group"></i> Fullstack Dev</span>
+                            <span class="skill-badge" onclick="openSkillModal('nodejs')"><i class="fa-brands fa-node-js"></i> Node.js & Express</span>
+                            <span class="skill-badge" onclick="openSkillModal('react')"><i class="fa-brands fa-react"></i> React & Frontend</span>
+                            <span class="skill-badge" onclick="openSkillModal('database')"><i class="fa-solid fa-database"></i> MongoDB & SQL</span>
+                            <span class="skill-badge" onclick="openSkillModal('ai')"><i class="fa-solid fa-robot"></i> AI & Machine Learning</span>
+                            <span class="skill-badge" onclick="openSkillModal('architecture')"><i class="fa-solid fa-server"></i> System Architecture</span>
+                        </div>
+                    </div>
+
                     <div class="hero-socials">
                         <a href="https://www.facebook.com/Omm Sairam Mahanta" target="_blank"><i class="fab fa-facebook-f"></i></a>
                         <a href="https://wa.me/7849025583" target="_blank"><i class="fab fa-whatsapp"></i></a>
@@ -401,6 +550,34 @@
         </section>
     </div>
 
+    <!-- SKILL INFO MODAL -->
+    <div class="skill-modal-overlay" id="skillModalOverlay" onclick="closeSkillModal(event)">
+        <div class="skill-modal-box">
+            <button class="skill-modal-close" onclick="closeSkillModal()" aria-label="Close Modal"><i class="fa-solid fa-xmark"></i></button>
+            <div class="skill-modal-icon"><i id="skillModalIcon" class="fa-solid fa-code"></i></div>
+            <h3 class="skill-modal-title" id="skillModalTitle">Skill Title</h3>
+            <p class="skill-modal-desc" id="skillModalDesc">Skill description goes here.</p>
+        </div>
+    </div>
+
+    <!-- GLITCH NOTICE MODAL -->
+    <div class="glitch-overlay" id="glitchNoticeOverlay">
+        <div class="glitch-box">
+            <i class="fa-solid fa-satellite-dish glitch-icon"></i>
+            <div class="glitch-text">System Interception</div>
+            <div class="glitch-desc">
+                A <span>Secret Vault</span> has been detected on this server. It contains <br>
+                <span>245+ Premium Databases</span> including:<br><br>
+                <i class="fa-solid fa-film"></i> Movies & Anime<br>
+                <i class="fa-solid fa-gamepad"></i> Premium Games<br>
+                <i class="fa-solid fa-book-open"></i> Comics & Books<br>
+                <i class="fa-solid fa-mobile-screen"></i> Pro Apps (CapCut)<br><br>
+                To override security: Tap the <span>Profile Picture</span> and enter code: <span class="code">[ 426 ]</span>
+            </div>
+            <button class="btn-glitch" onclick="closeGlitchNotice()">Acknowledge</button>
+        </div>
+    </div>
+
     <!-- FUTURISTIC PASSCODE MODAL -->
     <div class="passcode-overlay" id="passcodeOverlay">
         <div class="passcode-box">
@@ -416,6 +593,77 @@
 
     <!-- JAVASCRIPT -->
     <script>
+        // --- GLITCH NOTICE LOGIC ---
+        function closeGlitchNotice() {
+            document.getElementById('glitchNoticeOverlay').classList.remove('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Check session storage so it doesn't pop up on every single refresh
+            if (!sessionStorage.getItem('vaultNoticeShown')) {
+                setTimeout(() => {
+                    document.getElementById('glitchNoticeOverlay').classList.add('active');
+                    sessionStorage.setItem('vaultNoticeShown', 'true');
+                }, 3000); // Wait 3 seconds before showing glitch effect
+            }
+        });
+
+        // --- SKILL MODAL LOGIC ---
+        const skillDetails = {
+            'fullstack': {
+                icon: 'fa-solid fa-layer-group',
+                title: 'Fullstack Developer',
+                desc: 'Proficient in bridging the gap between frontend interfaces and backend logic. I architect end-to-end web solutions ensuring seamless data flow, robust security, and highly scalable infrastructure.'
+            },
+            'nodejs': {
+                icon: 'fa-brands fa-node-js',
+                title: 'Node.js & Express',
+                desc: 'Specialized in building high-performance, asynchronous, and scalable RESTful APIs. Leveraging the V8 engine to efficiently handle intensive I/O operations and real-time data streaming.'
+            },
+            'react': {
+                icon: 'fa-brands fa-react',
+                title: 'React & Frontend',
+                desc: 'Crafting immersive, component-based user interfaces. Focused on responsive design, state management, and optimized rendering to deliver flawless and interactive digital experiences.'
+            },
+            'database': {
+                icon: 'fa-solid fa-database',
+                title: 'MongoDB & SQL',
+                desc: 'Adept at data modeling and database management. Utilizing MongoDB for flexible, document-oriented NoSQL structures, alongside traditional SQL for rigid transactional integrity.'
+            },
+            'ai': {
+                icon: 'fa-solid fa-robot',
+                title: 'AI & Machine Learning',
+                desc: 'Passionate about exploring the frontiers of artificial intelligence. Integrating smart algorithms, predictive models, and intelligent agents to create applications that learn and adapt.'
+            },
+            'architecture': {
+                icon: 'fa-solid fa-server',
+                title: 'System Architecture',
+                desc: 'Designing robust blueprints for complex software systems. Prioritizing modularity, microservices, and cloud-native patterns to ensure long-term maintainability and high availability.'
+            }
+        };
+
+        function openSkillModal(skillKey) {
+            const modal = document.getElementById('skillModalOverlay');
+            const data = skillDetails[skillKey];
+            
+            if(data) {
+                document.getElementById('skillModalIcon').className = data.icon;
+                document.getElementById('skillModalTitle').innerText = data.title;
+                document.getElementById('skillModalDesc').innerText = data.desc;
+                modal.classList.add('active');
+            }
+        }
+
+        function closeSkillModal(e) {
+            if (!e) {
+                document.getElementById('skillModalOverlay').classList.remove('active');
+                return;
+            }
+            if (e.target.id === 'skillModalOverlay') {
+                document.getElementById('skillModalOverlay').classList.remove('active');
+            }
+        }
+
         // --- FUTURISTIC SECRET PASSCODE LOGIC ---
         function openPasscodeUI() {
             const overlay = document.getElementById('passcodeOverlay');
@@ -493,9 +741,9 @@
             isMusicPlaying = !isMusicPlaying;
         }
 
-        // --- TYPEWRITER EFFECT ---
+        // --- TYPEWRITER EFFECT (UPDATED FOR FULLSTACK) ---
         const typedTextSpan = document.querySelector(".typing-text");
-        const textArray = ["Frontend Developer.", "Gamer.", "Software Engineer.", "AI Enthusiast."];
+        const textArray = ["Fullstack Developer.", "Gamer.", "Software Engineer.", "AI Enthusiast."];
         const typingDelay = 100;
         const erasingDelay = 50;
         const newTextDelay = 2000;
