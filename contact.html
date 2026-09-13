@@ -75,45 +75,56 @@
             100% { transform: scale(1.1) translate(2%, -2%); }
         }
 
+        /* Ambient floating particles */
+        .ambient-particle {
+            position: fixed;
+            background: rgba(0, 234, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+            animation: floatParticle linear infinite;
+        }
+        @keyframes floatParticle {
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
         .content-wrapper {
             position: relative; z-index: 10; 
             min-height: 100vh;
             display: flex; flex-direction: column; justify-content: center;
         }
 
-        .hamburger-btn {
-            position: fixed; top: 40px; right: 40px;
+        .hamburger-btn, .music-btn {
+            position: fixed; right: 40px;
             width: 55px; height: 55px; border-radius: 50%;
-            background: transparent; backdrop-filter: blur(10px);
+            background: rgba(10, 15, 25, 0.5); backdrop-filter: blur(10px);
             border: 2px solid var(--primary-accent);
             color: var(--primary-accent); font-size: 20px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 10000;
             box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: buttonPulse 3s infinite alternate;
         }
-        .hamburger-btn:hover {
-            transform: scale(1.1) rotate(180deg);
-            background: var(--primary-accent); color: #000;
-            box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+        .hamburger-btn { top: 40px; }
+        .music-btn { bottom: 40px; z-index: 9997; animation-delay: 1.5s; }
+
+        @keyframes buttonPulse {
+            0% { box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1); }
+            100% { box-shadow: 0 0 25px rgba(0, 234, 255, 0.5), inset 0 0 15px rgba(0, 234, 255, 0.2); }
         }
 
-        .music-btn {
-            position: fixed; bottom: 40px; right: 40px;
-            width: 55px; height: 55px; border-radius: 50%;
-            background: transparent; backdrop-filter: blur(10px);
-            border: 2px solid var(--primary-accent);
-            color: var(--primary-accent); font-size: 20px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 9997; 
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .music-btn:hover {
+        .hamburger-btn:hover, .music-btn:hover {
             transform: scale(1.1);
             background: var(--primary-accent); color: #000;
-            box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+            box-shadow: 0 0 25px rgba(0, 234, 255, 0.8);
+            animation: none;
         }
+        .hamburger-btn:hover { transform: scale(1.1) rotate(180deg); }
 
         .full-menu {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -139,35 +150,79 @@
         .page-section {
             display: flex; padding: 100px 8%; min-height: 100vh;
             box-sizing: border-box; flex-direction: column; justify-content: center; align-items: center;
-            animation: cinematicFocus 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-        @keyframes cinematicFocus {
-            from { opacity: 0; transform: scale(1.02) translateY(15px); filter: blur(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
         }
 
-        .section-title { font-size: 2.5rem; margin-bottom: 50px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        .section-title { 
+            font-size: 2.5rem; margin-bottom: 50px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            animation: slideDown 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0; transform: translateY(-30px);
+        }
+        
+        .shimmer-text {
+            color: rgba(255,255,255,0.1);
+            background: -webkit-gradient(linear, left top, right top, from(#222), to(#222), color-stop(0.5, var(--primary-accent)));
+            background: -webkit-linear-gradient(left, #ffffff 0%, var(--primary-accent) 50%, #ffffff 100%);
+            background-size: 125px 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 3s infinite linear;
+            background-repeat: no-repeat;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 500px 0; }
+        }
+
+        /* Wrapper for floating animation so it doesn't conflict with JS tilt */
+        .card-levitate-wrapper {
+            animation: floatCard 6s ease-in-out infinite;
+            opacity: 0; transform: scale(0.9);
+            animation: popIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.3s, floatCard 6s ease-in-out infinite 1.3s;
+        }
+        
+        @keyframes popIn {
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideDown {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
 
         .glass-card-contact {
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--card-border); border-radius: 30px;
             padding: 50px; text-align: center; max-width: 650px; margin: 0 auto;
             width: 100%; box-sizing: border-box;
-            transform-style: preserve-3d; transition: 0.3s; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d; transition: transform 0.2s ease-out; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
         .contact-text { font-size: 1.15rem; line-height: 2; font-weight: 300; transform: translateZ(20px); margin-bottom: 15px; word-break: break-word; }
         .contact-socials-wrapper { transform: translateZ(40px); }
+        
         .social-bar-contact { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         .social-icon-contact {
             width: 80px; height: 80px; border-radius: 50%; background: rgba(0,0,0,0.6);
             display: flex; justify-content: center; align-items: center; text-decoration: none;
             color: var(--text-main); font-size: 2.5rem; border: 2px solid var(--card-border); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
         }
         .social-icon-contact:hover { color: #000; background: var(--primary-accent); border-color: var(--primary-accent); transform: scale(1.2) translateY(-10px); box-shadow: 0 15px 30px rgba(0,234,255,0.6); }
 
+        /* Staggered entry for card items */
+        .stagger-item { opacity: 0; transform: translateY(20px) translateZ(20px); animation: fadeInUp 0.6s forwards; }
+        .delay-1 { animation-delay: 0.8s; } .delay-2 { animation-delay: 1.0s; } .delay-3 { animation-delay: 1.2s; }
+        .delay-4 { animation-delay: 1.4s; } .delay-5 { animation-delay: 1.5s; } .delay-6 { animation-delay: 1.6s; } .delay-7 { animation-delay: 1.7s; }
+        
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0) translateZ(20px); }
+        }
+
         footer { text-align: center; padding: 25px; background: transparent; color: #555; font-size: 0.9rem; width: 100%; position: absolute; bottom: 0; left: 0; right: 0; letter-spacing: 1px;}
 
+        /* Mobile Adjustments for Main Page */
         @media (max-width: 600px) {
             .full-menu a { font-size: 1.6rem; letter-spacing: 2px; }
             .hamburger-btn { top: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px;}
@@ -179,14 +234,236 @@
             .social-bar-contact { gap: 15px; flex-wrap: wrap; }
             .social-icon-contact { width: 60px; height: 60px; font-size: 1.8rem; }
         }
+
+        .insta-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 100000; /* Super high to be over everything */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .insta-modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .insta-modal-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateY(50px) scale(0.95);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .insta-modal-overlay.active .insta-modal-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100001;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal-btn:hover {
+            background: rgba(255, 50, 50, 0.8);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* The Instagram Profile Card Embedded Styles */
+        .embedded-glass-profile {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+        
+        .embedded-glass-profile .glass-card {
+            position: relative;
+            width: 90%;
+            max-width: 480px;
+            aspect-ratio: 4 / 3;
+            max-height: 80vh;
+            background: rgba(25, 30, 40, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.05), 0 0 20px rgba(0, 234, 255, 0.3);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease;
+        }
+
+        .embedded-glass-profile .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 20%, transparent 80%, rgba(255,255,255,0.1) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .embedded-glass-profile .hologram-sweep {
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(to bottom right, transparent 40%, rgba(255, 255, 255, 0.15) 50%, transparent 60%);
+            transform: rotate(45deg) translateY(-100%);
+            animation: sweep 6s infinite linear;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes sweep {
+            0% { transform: rotate(45deg) translateY(-100%); }
+            100% { transform: rotate(45deg) translateY(100%); }
+        }
+
+        .embedded-glass-profile .card-content {
+            position: relative; z-index: 5; height: 100%; display: flex; flex-direction: column; text-align: left;
+        }
+
+        .embedded-glass-profile .card-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+        }
+
+        .embedded-glass-profile .header-icon {
+            font-size: 1.25rem; color: white; cursor: pointer; text-shadow: 0 0 5px rgba(255,255,255,0.5); transition: transform 0.2s;
+        }
+        .embedded-glass-profile .header-icon:hover { transform: scale(1.1); }
+
+        .embedded-glass-profile .username-container {
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+
+        .embedded-glass-profile .username {
+            font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(255,255,255,0.3); margin:0;
+        }
+
+        .embedded-glass-profile .profile-section {
+            display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;
+        }
+
+        .embedded-glass-profile .profile-pic-container {
+            position: relative; width: 85px; height: 85px; flex-shrink: 0; border-radius: 50%; padding: 4px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); box-shadow: 0 0 15px rgba(220, 39, 67, 0.4);
+        }
+
+        .embedded-glass-profile .profile-pic-inner {
+            width: 100%; height: 100%; border-radius: 50%; background-color: rgba(25, 30, 40, 0.4); padding: 3px;
+        }
+
+        .embedded-glass-profile .profile-image {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background-color: #333;
+        }
+
+        .embedded-glass-profile .stats-container {
+            display: flex; justify-content: space-between; flex-grow: 1; padding-right: 1rem;
+        }
+
+        .embedded-glass-profile .stat-box {
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .embedded-glass-profile .stat-value {
+            font-size: 1.1rem; font-weight: 700; margin:0;
+        }
+
+        .embedded-glass-profile .stat-label {
+            font-size: 0.8rem; font-weight: 400; color: rgba(255, 255, 255, 0.8); margin:0;
+        }
+
+        .embedded-glass-profile .bio-section {
+            flex-grow: 1; display: flex; flex-direction: column; justify-content: center; text-align: left;
+        }
+
+        .embedded-glass-profile .bio-name {
+            font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; text-shadow: 0 0 5px rgba(255,255,255,0.2); margin:0;
+        }
+
+        .embedded-glass-profile .bio-text {
+            font-size: 0.9rem; line-height: 1.4; color: rgba(255, 255, 255, 0.9); margin-bottom: 0.5rem;
+        }
+
+        .embedded-glass-profile .link-section {
+            margin-top: auto; display: flex; align-items: center; gap: 0.5rem;
+        }
+
+        .embedded-glass-profile .link-icon {
+            color: #00eaff; font-size: 1rem; text-shadow: 0 0 5px rgba(0, 234, 255, 0.3);
+        }
+
+        .embedded-glass-profile .profile-link {
+            color: #00eaff; text-decoration: none; font-size: 0.9rem; font-weight: 500; text-shadow: 0 0 5px rgba(0, 234, 255, 0.3); transition: opacity 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        
+        .embedded-glass-profile .profile-link:hover { opacity: 0.8; }
+
+        /* Follow / Unfollow buttons inside profile */
+        .embedded-glass-profile .follow-btn-small {
+            background: rgba(25, 35, 50, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: white; text-decoration: none; font-size: 0.75rem; font-weight: 500; padding: 0.35rem 0.8rem; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; box-shadow: 0 0 15px rgba(0, 150, 255, 0.25); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .embedded-glass-profile .follow-btn-small:hover {
+            transform: scale(1.05); background: rgba(35, 50, 70, 0.9); box-shadow: 0 0 20px rgba(0, 150, 255, 0.4);
+        }
+
+        .embedded-glass-profile .unfollow-btn-small {
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.8); cursor: pointer; font-size: 0.75rem; font-weight: 500; padding: 0.35rem 0.8rem; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; transition: all 0.2s;
+        }
+
+        .embedded-glass-profile .unfollow-btn-small:hover {
+            background: rgba(255, 50, 50, 0.15); border-color: rgba(255, 50, 50, 0.3); color: white; transform: scale(1.05); box-shadow: 0 4px 15px rgba(255, 50, 50, 0.2);
+        }
+
+        @media (max-width: 400px) {
+            .embedded-glass-profile .glass-card {
+                aspect-ratio: auto; min-height: 450px; padding: 1rem;
+            }
+            .embedded-glass-profile .profile-section {
+                flex-direction: column; gap: 1rem;
+            }
+            .embedded-glass-profile .stats-container {
+                width: 100%; padding-right: 0;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAYS -->
     <div class="scanlines"></div>
     <div class="bg-glow"></div>
     <div class="bg-glow-2"></div>
+    <div id="particles-container"></div> <!-- New Particle Layer -->
 
     <!-- AUDIO ELEMENT -->
     <audio id="bgMusic" loop>
@@ -217,25 +494,175 @@
     <!-- CONTENT -->
     <div class="content-wrapper">
         <section id="contact" class="page-section">
-            <h2 class="section-title"><span style="color:var(--primary-accent)">Initiate Contact</span></h2>
-            <div class="glass-card-contact" id="contact-card">
-                <p class="contact-text"><i class="fa-solid fa-location-dot" style="color:var(--primary-accent); margin-right:15px;"></i> Tihadiposi, Keonjhar, Odisha</p>
-                <p class="contact-text"><i class="fa-solid fa-phone" style="color:var(--primary-accent); margin-right:15px;"></i> 7849025583</p>
-                <p class="contact-text"><i class="fa-solid fa-envelope" style="color:var(--primary-accent); margin-right:15px;"></i> saimahanta3@gmail.com</p>
-                
-                <div class="social-bar-contact contact-socials-wrapper">
-                    <a href="https://www.youtube.com/@Lostt426" target="_blank" class="social-icon-contact"><i class="fab fa-youtube"></i></a>
-                    <a href="https://twitter.com" target="_blank" class="social-icon-contact"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a href="https://www.instagram.com/s_ensei_426" target="_blank" class="social-icon-contact"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/" target="_blank" class="social-icon-contact"><i class="fab fa-facebook-f"></i></a>
+            
+            <h2 class="section-title">
+                <span class="shimmer-text">Initiate Contact</span>
+            </h2>
+            
+            <!-- Wrapper added to animate float independently of mouse 3D tracking -->
+            <div class="card-levitate-wrapper">
+                <div class="glass-card-contact" id="contact-card">
+                    <!-- Added stagger animation classes -->
+                    <p class="contact-text stagger-item delay-1">
+                        <i class="fa-solid fa-location-dot" style="color:var(--primary-accent); margin-right:15px;"></i> 
+                        Tihadiposi, Keonjhar, Odisha
+                    </p>
+                    <p class="contact-text stagger-item delay-2">
+                        <i class="fa-solid fa-phone" style="color:var(--primary-accent); margin-right:15px;"></i> 
+                        7849025583
+                    </p>
+                    <p class="contact-text stagger-item delay-3">
+                        <i class="fa-solid fa-envelope" style="color:var(--primary-accent); margin-right:15px;"></i> 
+                        saimahanta3@gmail.com
+                    </p>
+                    
+                    <div class="social-bar-contact contact-socials-wrapper">
+                        <!-- Icons are also staggered individually -->
+                        <a href="https://www.youtube.com/@Lostt426" target="_blank" class="social-icon-contact stagger-item delay-4">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" class="social-icon-contact stagger-item delay-5">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </a>
+                        <!-- Clicking this now opens the interactive modal -->
+                        <a href="#" onclick="openInstaModal(event)" class="social-icon-contact stagger-item delay-6">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://www.facebook.com/" target="_blank" class="social-icon-contact stagger-item delay-7">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
+
             <footer>&copy; 2026 Omm Sairam Mahanta | AstraGoo Network. All Rights Reserved.</footer>
         </section>
     </div>
 
-    <!-- JAVASCRIPT -->
+    <div id="instaModalOverlay" class="insta-modal-overlay" onclick="closeInstaModal(event)">
+        <div class="close-modal-btn" onclick="closeInstaModal(event, true)">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        
+        <div class="insta-modal-container" id="instaModalContainer">
+            
+            <div class="embedded-glass-profile">
+                <!-- The Main Card Container -->
+                <div class="glass-card" id="hologramCard">
+                    <!-- The sweeping light effect -->
+                    <div class="hologram-sweep"></div>
+
+                    <div class="card-content">
+                        <!-- Header (Back, Username, Actions) -->
+                        <div class="card-header">
+                            <i class="fa-solid fa-chevron-left header-icon" onclick="closeInstaModal(event, true)"></i>
+                            
+                            <div class="username-container">
+                                <span class="username">s_ensei_426</span>
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <i class="fa-regular fa-bell header-icon relative">
+                                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-[rgba(25,30,40,0.8)]"></span>
+                                </i>
+                                <i class="fa-solid fa-ellipsis-vertical header-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Profile Picture and Stats Row -->
+                        <div class="profile-section">
+                            <div class="profile-pic-container">
+                                <div class="profile-pic-inner">
+                                    <img src="https://avatars.githubusercontent.com/u/108272551?v=4" alt="Profile" class="profile-image" onerror="this.src='https://placehold.co/100x100/333/fff?text=SAI'">
+                                </div>
+                            </div>
+
+                            <div class="stats-container">
+                                <div class="stat-box">
+                                    <span class="stat-value">20</span>
+                                    <span class="stat-label">posts</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-value">1,366</span>
+                                    <span class="stat-label">followers</span>
+                                    <div class="flex items-center gap-2 mt-[0.35rem]">
+                                        <a href="https://www.instagram.com/s_ensei_426" target="_blank" class="follow-btn-small" title="Follow on Instagram">
+                                            <i class="fa-solid fa-user-plus text-[0.65rem]"></i> Follow
+                                        </a>
+                                        <button onclick="showUnfollowPopup()" class="unfollow-btn-small" title="Why Unfollow?">
+                                            <i class="fa-solid fa-user-xmark text-[0.65rem]"></i> Unfollow
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-value">590</span>
+                                    <span class="stat-label">following</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Biography Details -->
+                        <div class="bio-section">
+                            <div class="bio-name">SAI</div>
+                            
+                            <div class="bio-text">
+                                Life = { Code, Debug, Learn, Repeat }
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mt-1 mb-3">
+                                <span class="bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-full px-3 py-1 text-xs flex items-center gap-1 backdrop-blur-sm">
+                                    <span class="text-white">@</span> s_ensei_426
+                                </span>
+                                <span class="bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-full px-3 py-1 text-xs flex items-center gap-1 backdrop-blur-sm">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> Gentle Guide
+                                </span>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                <span class="bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-full px-3 py-1 text-xs flex items-center gap-1 backdrop-blur-sm">
+                                    <i class="fa-solid fa-music text-xs"></i> Omm Sairam Maha...
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Link Section -->
+                        <div class="link-section">
+                            <div class="bg-[rgba(255,255,255,0.1)] rounded-full w-6 h-6 flex items-center justify-center border border-[rgba(255,255,255,0.2)]">
+                                 <i class="fa-solid fa-link link-icon text-xs"></i>
+                            </div>
+                            <a href="https://ommsairammahanta.github.io/sai/" target="_blank" class="profile-link">
+                                ommsairammahanta.github.io/sai/
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Custom Unfollow Popup Modal -->
+    <div id="unfollowPopup" class="fixed inset-0 z-[100005] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <!-- Blurred background overlay -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-md" onclick="closeUnfollowPopup()"></div>
+        
+        <!-- Modal Card -->
+        <div id="unfollowContent" class="relative bg-[rgba(25,30,40,0.85)] border border-[rgba(255,50,50,0.3)] rounded-2xl p-6 w-[90%] max-w-sm text-center shadow-[0_10px_40px_rgba(255,0,0,0.25)] transform scale-90 transition-transform duration-300 backdrop-blur-xl">
+            <!-- Animated Emoji -->
+            <div class="text-5xl mb-3 animate-bounce drop-shadow-lg" style="margin:0 auto 10px auto;">😡</div>
+            
+            <h3 class="text-white text-lg font-semibold mb-5 leading-relaxed tracking-wide" style="margin:0 0 20px 0;">
+                bro why touch unfollow button <br/> touch follow button
+            </h3>
+            
+            <button onclick="closeUnfollowPopup()" class="bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold py-2 px-6 rounded-full shadow-[0_0_15px_rgba(0,234,255,0.4)] hover:scale-105 transition-transform">
+                My Bad, I'll Follow!
+            </button>
+        </div>
+    </div>
+
     <script>
+        // Music Logic
         let isMusicPlaying = sessionStorage.getItem('musicPlaying') === 'true';
         const bgMusic = document.getElementById('bgMusic');
         const musicIcon = document.getElementById('music-icon');
@@ -258,6 +685,7 @@
             isMusicPlaying = !isMusicPlaying;
         }
 
+        // Full Screen Menu Logic
         function toggleMenu() {
             const menu = document.getElementById('fullMenu');
             const icon = document.getElementById('menu-icon');
@@ -288,31 +716,62 @@
         // Card 3D Effect
         const card = document.getElementById('contact-card');
         card.addEventListener('mousemove', e => {
-            let rect = card.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
-            let xOffset = (x / rect.width - 0.5) * 30; 
-            let yOffset = (y / rect.height - 0.5) * -30;
-            card.style.transform = `perspective(1000px) rotateX(${yOffset}deg) rotateY(${xOffset}deg) scale3d(1.02, 1.02, 1.02)`;
+            if (window.innerWidth > 600) { // Keep disabled on mobile for better performance
+                let rect = card.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+                let xOffset = (x / rect.width - 0.5) * 30; 
+                let yOffset = (y / rect.height - 0.5) * -30;
+                card.style.transform = `perspective(1000px) rotateX(${yOffset}deg) rotateY(${xOffset}deg) scale3d(1.02, 1.02, 1.02)`;
+            }
         });
         card.addEventListener('mouseleave', () => {
             card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
         });
 
-        // Reptile Canvas
+        // New: Particle Generation Engine
+        function initParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 25; // Number of glowing orbs
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'ambient-particle';
+                
+                // Randomize properties
+                const size = Math.random() * 5 + 2; // 2px to 7px
+                const left = Math.random() * 100; // 0% to 100% width
+                const duration = Math.random() * 6 + 6; // 6s to 12s
+                const delay = Math.random() * 5; // 0s to 5s delay
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${left}vw`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        initParticles();
+
         const rCanvas = document.getElementById('reptileCanvas');
         const rCtx = rCanvas.getContext('2d');
         let rWidth, rHeight, rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 }, rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
         const rSegments = [], rSegCount = 45, rSegDist = 12; let rWalkCycle = 0;
+        
         for (let i = 0; i < rSegCount; i++) { rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 }); }
+        
         function rResize() { rWidth = rCanvas.width = window.innerWidth; rHeight = rCanvas.height = window.innerHeight; }
         window.addEventListener('mousemove', e => { rMouse.x = e.clientX; rMouse.y = e.clientY; });
+        
         function drawReptileEngine() {
             rCtx.clearRect(0, 0, rWidth, rHeight);
             rHead.x += (rMouse.x - rHead.x) * 0.12; rHead.y += (rMouse.y - rHead.y) * 0.12;
             let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
             if (dHead > 1) rWalkCycle += dHead * 0.08;
             rSegments[0].x = rHead.x; rSegments[0].y = rHead.y;
+            
             for (let i = 1; i < rSegCount; i++) {
                 let s1 = rSegments[i - 1], s2 = rSegments[i];
                 let dx = s1.x - s2.x, dy = s1.y - s2.y;
@@ -322,15 +781,83 @@
             }
             requestAnimationFrame(drawReptileEngine);
         }
+        
         function renderReptileBody(seg, i) {
             rCtx.save(); rCtx.translate(seg.x, seg.y); rCtx.rotate(seg.angle);
-            let hue = 190 + (i * 2); rCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`; rCtx.lineWidth = 1.5; rCtx.shadowBlur = 12; rCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+            let hue = 190 + (i * 2); 
+            rCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`; 
+            rCtx.lineWidth = 1.5; rCtx.shadowBlur = 12; rCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
             let bW = Math.sin((i / rSegCount) * Math.PI) * 22;
             rCtx.beginPath(); rCtx.moveTo(0, -bW / 2); rCtx.lineTo(0, bW / 2); rCtx.stroke();
             rCtx.fillStyle = "white"; rCtx.shadowBlur = 0; rCtx.beginPath(); rCtx.arc(0, 0, 1.5, 0, Math.PI * 2); rCtx.fill();
             rCtx.restore();
         }
-        window.addEventListener('resize', rResize); rResize(); drawReptileEngine();
+        
+        window.addEventListener('resize', rResize); 
+        rResize(); 
+        drawReptileEngine();
+
+        function openInstaModal(e) {
+            e.preventDefault(); // Prevent default link behavior
+            const overlay = document.getElementById('instaModalOverlay');
+            overlay.classList.add('active');
+        }
+
+        function closeInstaModal(e, force = false) {
+            // Close if background is clicked OR if forced (x button clicked)
+            if (force || e.target === document.getElementById('instaModalOverlay')) {
+                const overlay = document.getElementById('instaModalOverlay');
+                overlay.classList.remove('active');
+            }
+        }
+
+        // 3D Tilt Effect for embedded Instagram card
+        const holoCard = document.getElementById('hologramCard');
+
+        document.getElementById('instaModalOverlay').addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768 && document.getElementById('instaModalOverlay').classList.contains('active')) {
+                const rect = holoCard.getBoundingClientRect();
+                // Check if mouse is actually over the card to prevent weird distant rotations
+                if (e.clientX >= rect.left && e.clientX <= rect.right && 
+                    e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    
+                    const xAxis = (rect.left + rect.width/2 - e.clientX) / 25;
+                    const yAxis = (rect.top + rect.height/2 - e.clientY) / 25;
+                    
+                    const clampX = Math.max(-10, Math.min(10, xAxis));
+                    const clampY = Math.max(-10, Math.min(10, yAxis));
+
+                    holoCard.style.transform = `perspective(1000px) rotateY(${clampX}deg) rotateX(${clampY}deg)`;
+                    holoCard.style.transition = 'none';
+                } else {
+                     holoCard.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+                     holoCard.style.transition = 'transform 0.5s ease';
+                }
+            }
+        });
+
+        // Unfollow Popup Logic
+        const popup = document.getElementById('unfollowPopup');
+        const popupContent = document.getElementById('unfollowContent');
+
+        function showUnfollowPopup() {
+            popup.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('opacity-0');
+                popupContent.classList.remove('scale-90');
+                popupContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeUnfollowPopup() {
+            popup.classList.add('opacity-0');
+            popupContent.classList.remove('scale-100');
+            popupContent.classList.add('scale-90');
+            
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 300);
+        }
     </script>
 </body>
 </html>
