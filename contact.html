@@ -414,35 +414,80 @@
             font-size: 0.9rem; line-height: 1.4; color: rgba(255, 255, 255, 0.9); margin-bottom: 0.5rem;
         }
 
-        .embedded-glass-profile .link-section {
-            margin-top: auto; display: flex; align-items: center; gap: 0.5rem;
+        .unfollow-btn-small:hover {
+            background: rgba(255, 50, 50, 0.15);
+            border-color: rgba(255, 50, 50, 0.3);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 50, 50, 0.2);
         }
 
-        .embedded-glass-profile .link-icon {
-            color: #00eaff; font-size: 1rem; text-shadow: 0 0 5px rgba(0, 234, 255, 0.3);
+        /* YouTube Modal Button Styles */
+        .yt-subscribe-btn-small {
+            background: rgba(255, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.8rem;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .yt-subscribe-btn-small:hover {
+            transform: scale(1.05);
+            background: rgba(255, 20, 20, 1);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
         }
 
-        .embedded-glass-profile .profile-link {
-            color: #00eaff; text-decoration: none; font-size: 0.9rem; font-weight: 500; text-shadow: 0 0 5px rgba(0, 234, 255, 0.3); transition: opacity 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        /* WhatsApp & Mail Button Styles */
+        .wa-btn-small {
+            background: rgba(37, 211, 102, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.8rem;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            box-shadow: 0 0 15px rgba(37, 211, 102, 0.3);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
-        .embedded-glass-profile .profile-link:hover { opacity: 0.8; }
+        .wa-btn-small:hover {
+            transform: scale(1.05);
+            background: rgba(37, 211, 102, 1);
+            box-shadow: 0 0 20px rgba(37, 211, 102, 0.5);
+        }
 
-        /* Follow / Unfollow buttons inside profile */
-        .embedded-glass-profile .follow-btn-small {
-            background: rgba(25, 35, 50, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: white; text-decoration: none; font-size: 0.75rem; font-weight: 500; padding: 0.35rem 0.8rem; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; box-shadow: 0 0 15px rgba(0, 150, 255, 0.25); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .mail-btn-small {
+            background: rgba(234, 67, 53, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.8rem;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            box-shadow: 0 0 15px rgba(234, 67, 53, 0.3);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
-        .embedded-glass-profile .follow-btn-small:hover {
-            transform: scale(1.05); background: rgba(35, 50, 70, 0.9); box-shadow: 0 0 20px rgba(0, 150, 255, 0.4);
-        }
-
-        .embedded-glass-profile .unfollow-btn-small {
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.8); cursor: pointer; font-size: 0.75rem; font-weight: 500; padding: 0.35rem 0.8rem; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; transition: all 0.2s;
-        }
-
-        .embedded-glass-profile .unfollow-btn-small:hover {
-            background: rgba(255, 50, 50, 0.15); border-color: rgba(255, 50, 50, 0.3); color: white; transform: scale(1.05); box-shadow: 0 4px 15px rgba(255, 50, 50, 0.2);
+        .mail-btn-small:hover {
+            transform: scale(1.05);
+            background: rgba(234, 67, 53, 1);
+            box-shadow: 0 0 20px rgba(234, 67, 53, 0.5);
         }
 
         /* Improved Mobile View for Instagram Modal */
@@ -545,19 +590,21 @@
                     </p>
                     
                     <div class="social-bar-contact contact-socials-wrapper">
-                        <!-- Icons are also staggered individually -->
-                        <a href="https://www.youtube.com/@ThePiccX" target="_blank" class="social-icon-contact stagger-item delay-4">
+                        <!-- YouTube Modal Trigger -->
+                        <a href="#" onclick="openYtModal(event)" class="social-icon-contact stagger-item delay-4" title="YouTube">
                             <i class="fab fa-youtube"></i>
                         </a>
-                        <a href="https://twitter.com" target="_blank" class="social-icon-contact stagger-item delay-5">
-                            <i class="fa-brands fa-x-twitter"></i>
-                        </a>
-                        <!-- Clicking this now opens the interactive modal -->
-                        <a href="#" onclick="openInstaModal(event)" class="social-icon-contact stagger-item delay-6">
+                        <!-- Instagram Modal Trigger -->
+                        <a href="#" onclick="openInstaModal(event)" class="social-icon-contact stagger-item delay-5" title="Instagram">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="https://www.facebook.com/" target="_blank" class="social-icon-contact stagger-item delay-7">
-                            <i class="fab fa-facebook-f"></i>
+                        <!-- WhatsApp Modal Trigger -->
+                        <a href="#" onclick="openWaModal(event)" class="social-icon-contact stagger-item delay-6" title="WhatsApp">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                        <!-- Mail Modal Trigger -->
+                        <a href="#" onclick="openMailModal(event)" class="social-icon-contact stagger-item delay-7" title="Email">
+                            <i class="fa-solid fa-envelope"></i>
                         </a>
                     </div>
                 </div>
@@ -685,6 +732,267 @@
             
             <button onclick="closeUnfollowPopup()" class="bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold py-2 px-6 rounded-full shadow-[0_0_15px_rgba(0,234,255,0.4)] hover:scale-105 transition-transform">
                 My Bad, I'll Follow!
+            </button>
+        </div>
+    </div>
+
+    <!-- YouTube Glassmorphism Profile Modal -->
+    <div id="ytModalOverlay" class="insta-modal-overlay" onclick="closeYtModal(event)">
+        <div class="close-modal-btn" onclick="closeYtModal(event, true)">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        
+        <div class="insta-modal-container" id="ytModalContainer">
+            <div class="embedded-glass-profile">
+                <div class="glass-card" id="ytHologramCard">
+                    <div class="hologram-sweep"></div>
+                    <div class="card-content">
+                        <!-- Header -->
+                        <div class="card-header">
+                            <i class="fa-solid fa-chevron-left header-icon" onclick="closeYtModal(event, true)"></i>
+                            <div class="username-container">
+                                <span class="username" style="text-shadow: 0 0 10px rgba(255,0,0,0.4);">Lostt</span>
+                            </div>
+                            <div class="flex gap-4">
+                                <i class="fa-brands fa-youtube header-icon" style="color: #ff0000; text-shadow: 0 0 10px rgba(255,0,0,0.5);"></i>
+                                <i class="fa-solid fa-ellipsis-vertical header-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Profile Section -->
+                        <div class="profile-section">
+                            <div class="profile-pic-container" style="background: linear-gradient(45deg, #ff0000 0%, #aa0000 100%); box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);">
+                                <div class="profile-pic-inner">
+                                    <img src="https://avatars.githubusercontent.com/u/108272551?v=4" alt="YouTube Avatar" class="profile-image" onerror="this.src='https://placehold.co/100x100/333/fff?text=YT'">
+                                </div>
+                            </div>
+
+                            <div class="stats-container">
+                                <div class="stat-box">
+                                    <span class="stat-value">1.2K</span>
+                                    <span class="stat-label">subscribers</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-value">45</span>
+                                    <span class="stat-label">videos</span>
+                                    <div class="flex items-center gap-2 mt-[0.35rem]">
+                                        <a href="https://www.youtube.com/@Lostt426" target="_blank" class="yt-subscribe-btn-small" title="Subscribe on YouTube">
+                                            <i class="fa-brands fa-youtube text-[0.65rem]"></i> Subscribe
+                                        </a>
+                                        <button onclick="showUnsubscribePopup()" class="unfollow-btn-small" title="Why Unsubscribe?">
+                                            <i class="fa-solid fa-user-xmark text-[0.65rem]"></i> Unsubscribe
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-value">25K</span>
+                                    <span class="stat-label">views</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bio Section -->
+                        <div class="bio-section">
+                            <div class="bio-name">Omm Sairam Mahanta</div>
+                            <div class="bio-text">
+                                Cinematic edits, Coding guides, and immersive experiences. 🎥💻✨
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-1 mb-3">
+                                <span class="bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-full px-3 py-1 text-xs flex items-center gap-1 backdrop-blur-sm">
+                                    <i class="fa-solid fa-video text-xs"></i> Content Creator
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Link Section -->
+                        <div class="link-section">
+                            <div class="bg-[rgba(255,255,255,0.1)] rounded-full w-6 h-6 flex items-center justify-center border border-[rgba(255,255,255,0.2)]">
+                                 <i class="fa-solid fa-link link-icon text-xs" style="color: #ff4444; text-shadow: 0 0 5px rgba(255,0,0,0.3);"></i>
+                            </div>
+                            <a href="https://www.youtube.com/@Lostt426" target="_blank" class="profile-link" style="color: #ff4444; text-shadow: 0 0 5px rgba(255,0,0,0.3);">
+                                youtube.com/@Lostt426
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Unsubscribe Popup Modal -->
+    <div id="unsubscribePopup" class="fixed inset-0 z-[100005] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-md" onclick="closeUnsubscribePopup()"></div>
+        <div id="unsubscribeContent" class="relative bg-[rgba(25,30,40,0.85)] border border-[rgba(255,50,50,0.3)] rounded-2xl p-6 w-[90%] max-w-sm text-center shadow-[0_10px_40px_rgba(255,0,0,0.25)] transform scale-90 transition-transform duration-300 backdrop-blur-xl">
+            <div class="text-5xl mb-3 animate-bounce drop-shadow-lg" style="margin:0 auto 10px auto;">🤬</div>
+            <h3 class="text-white text-lg font-semibold mb-5 leading-relaxed tracking-wide" style="margin:0 0 20px 0;">
+                bro why touch unsubscribe button <br/> touch subscribe button
+            </h3>
+            <button onclick="closeUnsubscribePopup()" class="bg-gradient-to-r from-red-500 to-red-700 text-white font-bold py-2 px-6 rounded-full shadow-[0_0_15px_rgba(255,0,0,0.4)] hover:scale-105 transition-transform">
+                My Bad, I'll Subscribe!
+            </button>
+        </div>
+    </div>
+
+    <!-- WhatsApp Glassmorphism Profile Modal -->
+    <div id="waModalOverlay" class="insta-modal-overlay" onclick="closeWaModal(event)">
+        <div class="close-modal-btn" onclick="closeWaModal(event, true)">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        
+        <div class="insta-modal-container" id="waModalContainer">
+            <div class="embedded-glass-profile">
+                <div class="glass-card" id="waHologramCard">
+                    <div class="hologram-sweep"></div>
+                    <div class="card-content">
+                        <!-- Header -->
+                        <div class="card-header">
+                            <i class="fa-solid fa-chevron-left header-icon" onclick="closeWaModal(event, true)"></i>
+                            <div class="username-container">
+                                <span class="username" style="text-shadow: 0 0 10px rgba(37,211,102,0.4);">Omm Sairam Mahanta</span>
+                            </div>
+                            <div class="flex gap-4">
+                                <i class="fa-brands fa-whatsapp header-icon" style="color: #25D366; text-shadow: 0 0 10px rgba(37,211,102,0.5);"></i>
+                                <i class="fa-solid fa-ellipsis-vertical header-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Profile Section -->
+                        <div class="profile-section">
+                            <div class="profile-pic-container" style="background: linear-gradient(45deg, #128C7E 0%, #25D366 100%); box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);">
+                                <div class="profile-pic-inner">
+                                    <img src="https://avatars.githubusercontent.com/u/108272551?v=4" alt="WhatsApp Avatar" class="profile-image" onerror="this.src='https://placehold.co/100x100/333/fff?text=WA'">
+                                </div>
+                            </div>
+
+                            <div class="stats-container">
+                                <div class="stat-box" style="flex-grow: 1;">
+                                    <div class="flex items-center justify-center gap-2 mt-[0.35rem]">
+                                        <a href="https://wa.me/917849025583" target="_blank" class="wa-btn-small" title="Message on WhatsApp">
+                                            <i class="fa-solid fa-message text-[0.65rem]"></i> Message
+                                        </a>
+                                        <button onclick="showWaBlockPopup()" class="unfollow-btn-small" title="Block Contact">
+                                            <i class="fa-solid fa-ban text-[0.65rem]"></i> Block
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bio Section -->
+                        <div class="bio-section">
+                            <div class="bio-name">+91 78490 25583</div>
+                            <div class="bio-text">
+                                Available. Always ready to debug and build! 🟢💻
+                            </div>
+                        </div>
+
+                        <!-- Link Section -->
+                        <div class="link-section">
+                            <div class="bg-[rgba(255,255,255,0.1)] rounded-full w-6 h-6 flex items-center justify-center border border-[rgba(255,255,255,0.2)]">
+                                 <i class="fa-brands fa-whatsapp link-icon text-xs" style="color: #25D366; text-shadow: 0 0 5px rgba(37,211,102,0.3);"></i>
+                            </div>
+                            <a href="https://wa.me/917849025583" target="_blank" class="profile-link" style="color: #25D366; text-shadow: 0 0 5px rgba(37,211,102,0.3);">
+                                Chat on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom WhatsApp Block Popup Modal -->
+    <div id="waBlockPopup" class="fixed inset-0 z-[100005] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-md" onclick="closeWaBlockPopup()"></div>
+        <div id="waBlockContent" class="relative bg-[rgba(25,30,40,0.85)] border border-[rgba(37,211,102,0.3)] rounded-2xl p-6 w-[90%] max-w-sm text-center shadow-[0_10px_40px_rgba(37,211,102,0.25)] transform scale-90 transition-transform duration-300 backdrop-blur-xl">
+            <div class="text-5xl mb-3 animate-bounce drop-shadow-lg" style="margin:0 auto 10px auto;">😒</div>
+            <h3 class="text-white text-lg font-semibold mb-5 leading-relaxed tracking-wide" style="margin:0 0 20px 0;">
+                bro why touch block button <br/> touch message button
+            </h3>
+            <button onclick="closeWaBlockPopup()" class="bg-gradient-to-r from-green-400 to-green-600 text-white font-bold py-2 px-6 rounded-full shadow-[0_0_15px_rgba(37,211,102,0.4)] hover:scale-105 transition-transform">
+                My Bad, I'll Message!
+            </button>
+        </div>
+    </div>
+
+    <!-- Mail Glassmorphism Profile Modal -->
+    <div id="mailModalOverlay" class="insta-modal-overlay" onclick="closeMailModal(event)">
+        <div class="close-modal-btn" onclick="closeMailModal(event, true)">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        
+        <div class="insta-modal-container" id="mailModalContainer">
+            <div class="embedded-glass-profile">
+                <div class="glass-card" id="mailHologramCard">
+                    <div class="hologram-sweep"></div>
+                    <div class="card-content">
+                        <!-- Header -->
+                        <div class="card-header">
+                            <i class="fa-solid fa-chevron-left header-icon" onclick="closeMailModal(event, true)"></i>
+                            <div class="username-container">
+                                <span class="username" style="text-shadow: 0 0 10px rgba(234,67,53,0.4);">Email Connection</span>
+                            </div>
+                            <div class="flex gap-4">
+                                <i class="fa-solid fa-envelope header-icon" style="color: #EA4335; text-shadow: 0 0 10px rgba(234,67,53,0.5);"></i>
+                                <i class="fa-solid fa-ellipsis-vertical header-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Profile Section -->
+                        <div class="profile-section">
+                            <div class="profile-pic-container" style="background: linear-gradient(45deg, #EA4335 0%, #FBBC05 100%); box-shadow: 0 0 15px rgba(234, 67, 53, 0.4);">
+                                <div class="profile-pic-inner">
+                                    <img src="https://avatars.githubusercontent.com/u/108272551?v=4" alt="Mail Avatar" class="profile-image" onerror="this.src='https://placehold.co/100x100/333/fff?text=MAIL'">
+                                </div>
+                            </div>
+
+                            <div class="stats-container">
+                                <div class="stat-box" style="flex-grow: 1;">
+                                    <div class="flex items-center justify-center gap-2 mt-[0.35rem]">
+                                        <a href="mailto:saimahanta3@gmail.com" class="mail-btn-small" title="Send Email">
+                                            <i class="fa-solid fa-paper-plane text-[0.65rem]"></i> Compose
+                                        </a>
+                                        <button onclick="showMailSpamPopup()" class="unfollow-btn-small" title="Mark as Spam">
+                                            <i class="fa-solid fa-triangle-exclamation text-[0.65rem]"></i> Spam
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bio Section -->
+                        <div class="bio-section">
+                            <div class="bio-name">saimahanta3@gmail.com</div>
+                            <div class="bio-text">
+                                Drop a mail for collaborations, project inquiries, or just to say hi! 📩🚀
+                            </div>
+                        </div>
+
+                        <!-- Link Section -->
+                        <div class="link-section">
+                            <div class="bg-[rgba(255,255,255,0.1)] rounded-full w-6 h-6 flex items-center justify-center border border-[rgba(255,255,255,0.2)]">
+                                 <i class="fa-solid fa-envelope link-icon text-xs" style="color: #EA4335; text-shadow: 0 0 5px rgba(234,67,53,0.3);"></i>
+                            </div>
+                            <a href="mailto:saimahanta3@gmail.com" class="profile-link" style="color: #EA4335; text-shadow: 0 0 5px rgba(234,67,53,0.3);">
+                                saimahanta3@gmail.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Mail Spam Popup Modal -->
+    <div id="mailSpamPopup" class="fixed inset-0 z-[100005] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-md" onclick="closeMailSpamPopup()"></div>
+        <div id="mailSpamContent" class="relative bg-[rgba(25,30,40,0.85)] border border-[rgba(234,67,53,0.3)] rounded-2xl p-6 w-[90%] max-w-sm text-center shadow-[0_10px_40px_rgba(234,67,53,0.25)] transform scale-90 transition-transform duration-300 backdrop-blur-xl">
+            <div class="text-5xl mb-3 animate-bounce drop-shadow-lg" style="margin:0 auto 10px auto;">🤨</div>
+            <h3 class="text-white text-lg font-semibold mb-5 leading-relaxed tracking-wide" style="margin:0 0 20px 0;">
+                bro why touch spam button <br/> touch compose button
+            </h3>
+            <button onclick="closeMailSpamPopup()" class="bg-gradient-to-r from-red-400 to-red-600 text-white font-bold py-2 px-6 rounded-full shadow-[0_0_15px_rgba(234,67,53,0.4)] hover:scale-105 transition-transform">
+                My Bad, I'll Mail!
             </button>
         </div>
     </div>
@@ -886,6 +1194,168 @@
                 popup.classList.add('hidden');
             }, 300);
         }
+
+        // --- YOUTUBE MODAL LOGIC ---
+        function openYtModal(e) {
+            e.preventDefault();
+            const overlay = document.getElementById('ytModalOverlay');
+            overlay.classList.add('active');
+        }
+
+        function closeYtModal(e, force = false) {
+            if (force || e.target === document.getElementById('ytModalOverlay')) {
+                const overlay = document.getElementById('ytModalOverlay');
+                overlay.classList.remove('active');
+            }
+        }
+
+        // 3D Tilt Effect for YouTube Card
+        const ytHoloCard = document.getElementById('ytHologramCard');
+        document.getElementById('ytModalOverlay').addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768 && document.getElementById('ytModalOverlay').classList.contains('active')) {
+                const rect = ytHoloCard.getBoundingClientRect();
+                if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    const xAxis = (rect.left + rect.width/2 - e.clientX) / 25;
+                    const yAxis = (rect.top + rect.height/2 - e.clientY) / 25;
+                    const clampX = Math.max(-10, Math.min(10, xAxis));
+                    const clampY = Math.max(-10, Math.min(10, yAxis));
+                    ytHoloCard.style.transform = `perspective(1000px) rotateY(${clampX}deg) rotateX(${clampY}deg)`;
+                    ytHoloCard.style.transition = 'none';
+                } else {
+                     ytHoloCard.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+                     ytHoloCard.style.transition = 'transform 0.5s ease';
+                }
+            }
+        });
+
+        // Unsubscribe Popup Logic
+        const unsubPopup = document.getElementById('unsubscribePopup');
+        const unsubPopupContent = document.getElementById('unsubscribeContent');
+
+        function showUnsubscribePopup() {
+            unsubPopup.classList.remove('hidden');
+            setTimeout(() => {
+                unsubPopup.classList.remove('opacity-0');
+                unsubPopupContent.classList.remove('scale-90');
+                unsubPopupContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeUnsubscribePopup() {
+            unsubPopup.classList.add('opacity-0');
+            unsubPopupContent.classList.remove('scale-100');
+            unsubPopupContent.classList.add('scale-90');
+            setTimeout(() => {
+                unsubPopup.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- WHATSAPP MODAL LOGIC ---
+        function openWaModal(e) {
+            e.preventDefault();
+            const overlay = document.getElementById('waModalOverlay');
+            overlay.classList.add('active');
+        }
+
+        function closeWaModal(e, force = false) {
+            if (force || e.target === document.getElementById('waModalOverlay')) {
+                const overlay = document.getElementById('waModalOverlay');
+                overlay.classList.remove('active');
+            }
+        }
+
+        const waHoloCard = document.getElementById('waHologramCard');
+        document.getElementById('waModalOverlay').addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768 && document.getElementById('waModalOverlay').classList.contains('active')) {
+                const rect = waHoloCard.getBoundingClientRect();
+                if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    const xAxis = (rect.left + rect.width/2 - e.clientX) / 25;
+                    const yAxis = (rect.top + rect.height/2 - e.clientY) / 25;
+                    const clampX = Math.max(-10, Math.min(10, xAxis));
+                    const clampY = Math.max(-10, Math.min(10, yAxis));
+                    waHoloCard.style.transform = `perspective(1000px) rotateY(${clampX}deg) rotateX(${clampY}deg)`;
+                    waHoloCard.style.transition = 'none';
+                } else {
+                     waHoloCard.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+                     waHoloCard.style.transition = 'transform 0.5s ease';
+                }
+            }
+        });
+
+        const waBlockPopup = document.getElementById('waBlockPopup');
+        const waBlockContent = document.getElementById('waBlockContent');
+
+        function showWaBlockPopup() {
+            waBlockPopup.classList.remove('hidden');
+            setTimeout(() => {
+                waBlockPopup.classList.remove('opacity-0');
+                waBlockContent.classList.remove('scale-90');
+                waBlockContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeWaBlockPopup() {
+            waBlockPopup.classList.add('opacity-0');
+            waBlockContent.classList.remove('scale-100');
+            waBlockContent.classList.add('scale-90');
+            setTimeout(() => {
+                waBlockPopup.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- MAIL MODAL LOGIC ---
+        function openMailModal(e) {
+            e.preventDefault();
+            const overlay = document.getElementById('mailModalOverlay');
+            overlay.classList.add('active');
+        }
+
+        function closeMailModal(e, force = false) {
+            if (force || e.target === document.getElementById('mailModalOverlay')) {
+                const overlay = document.getElementById('mailModalOverlay');
+                overlay.classList.remove('active');
+            }
+        }
+
+        const mailHoloCard = document.getElementById('mailHologramCard');
+        document.getElementById('mailModalOverlay').addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768 && document.getElementById('mailModalOverlay').classList.contains('active')) {
+                const rect = mailHoloCard.getBoundingClientRect();
+                if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    const xAxis = (rect.left + rect.width/2 - e.clientX) / 25;
+                    const yAxis = (rect.top + rect.height/2 - e.clientY) / 25;
+                    const clampX = Math.max(-10, Math.min(10, xAxis));
+                    const clampY = Math.max(-10, Math.min(10, yAxis));
+                    mailHoloCard.style.transform = `perspective(1000px) rotateY(${clampX}deg) rotateX(${clampY}deg)`;
+                    mailHoloCard.style.transition = 'none';
+                } else {
+                     mailHoloCard.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+                     mailHoloCard.style.transition = 'transform 0.5s ease';
+                }
+            }
+        });
+
+        const mailSpamPopup = document.getElementById('mailSpamPopup');
+        const mailSpamContent = document.getElementById('mailSpamContent');
+
+        function showMailSpamPopup() {
+            mailSpamPopup.classList.remove('hidden');
+            setTimeout(() => {
+                mailSpamPopup.classList.remove('opacity-0');
+                mailSpamContent.classList.remove('scale-90');
+                mailSpamContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeMailSpamPopup() {
+            mailSpamPopup.classList.add('opacity-0');
+            mailSpamContent.classList.remove('scale-100');
+            mailSpamContent.classList.add('scale-90');
+            setTimeout(() => {
+                mailSpamPopup.classList.add('hidden');
+            }, 300);
+        }
+
     </script>
 </body>
 </html>
