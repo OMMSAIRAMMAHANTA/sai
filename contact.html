@@ -449,6 +449,12 @@
 
         .embedded-glass-profile .stat-value {
             font-size: 1.1rem; font-weight: 700; margin:0;
+        }
+
+        .embedded-glass-profile .stat-label {
+            font-size: 0.8rem; font-weight: 400; color: rgba(255, 255, 255, 0.8);
+        }
+
         .bio-name {
             font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; text-shadow: 0 0 5px rgba(255,255,255,0.2); margin:0;
         }
@@ -462,6 +468,48 @@
             will-change: transform, opacity;
             transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
             transition-duration: 0.5s !important;
+        }
+
+        /* Follow and Unfollow Base Styles */
+        .follow-btn-small {
+            background: rgba(25, 35, 50, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.8rem;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            box-shadow: 0 0 15px rgba(0, 150, 255, 0.25);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform, box-shadow, background-color;
+        }
+        
+        .follow-btn-small:hover {
+            transform: scale3d(1.05, 1.05, 1);
+            background: rgba(35, 50, 70, 0.9);
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.4);
+        }
+
+        .unfollow-btn-small {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.8rem;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform, box-shadow, background-color, border-color;
         }
 
         .unfollow-btn-small:hover {
