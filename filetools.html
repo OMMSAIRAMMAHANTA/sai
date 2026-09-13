@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Omm Sairam Mahanta | File Tools</title>
+    
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts Merged -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-accent: #00eaff;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --glass-bg: rgba(10, 10, 15, 0.45);
+            --card-border: rgba(0, 234, 255, 0.15);
+            --bg-dark: #050b14;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            background: linear-gradient(135deg, rgba(5,11,20,0.92) 0%, rgba(10,25,47,0.85) 100%), url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, p { margin: 0; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 234, 255, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 234, 255, 0.6); }
+
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+
+        #reptileCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; opacity: 0.6;
+        }
+
+        .bg-glow {
+            position: fixed; top: -15%; left: -10%; width: 55vw; height: 55vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.08) 0%, rgba(0,0,0,0) 65%);
+            border-radius: 50%; z-index: -1; animation: pulse-glow 10s infinite alternate;
+        }
+        .bg-glow-2 {
+            position: fixed; bottom: -10%; right: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.06) 0%, rgba(0,0,0,0) 60%);
+            border-radius: 50%; z-index: -1; animation: pulse-glow 12s infinite alternate-reverse;
+        }
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(2%, -2%); }
+        }
+
+        .top-nav {
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border); z-index: 50; position: sticky; top: 0;
+        }
+        .back-btn { 
+            color: var(--text-main); text-decoration: none; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 10px; transition: 0.3s;
+        }
+        .back-btn:hover { color: var(--primary-accent); text-shadow: 0 0 10px var(--primary-accent); }
+
+        .content-wrapper { padding: 40px 5%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10;}
+        .section-title { font-size: 2.2rem; margin-bottom: 40px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+
+        .tools-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+            perspective: 1000px;
+        }
+        
+        .tool-card {
+            background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 25px 20px; 
+            transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 15px;
+        }
+        
+        .tool-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg); transition: 0.5s;
+        }
+
+        .tool-card:hover { 
+            transform: translateY(-5px); border-color: var(--primary-accent); 
+            box-shadow: 0 10px 30px rgba(0, 234, 255, 0.2); 
+        }
+        .tool-card:hover::before { left: 200%; }
+
+        .icon-box {
+            width: 45px; height: 45px; border-radius: 12px; 
+            display: flex; justify-content: center; align-items: center; font-size: 1.3rem;
+            background: rgba(0, 234, 255, 0.1); color: var(--primary-accent);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            flex-shrink: 0; transition: 0.3s;
+        }
+        .tool-card:hover .icon-box { transform: scale(1.1); box-shadow: 0 0 15px rgba(0, 234, 255, 0.4); }
+
+        .tool-info { flex-grow: 1; }
+        .tool-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px; font-family: 'Outfit', sans-serif;}
+        .tool-desc { color: var(--text-muted); font-size: 0.75rem; line-height: 1.4; font-weight: 400; }
+
+        /* Specific Card Colors */
+        .card-compress .icon-box { color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2);}
+        .card-compress:hover { border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2); }
+        .card-compress:hover .icon-box { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+
+        .card-resize .icon-box { color: #3b82f6; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2);}
+        .card-resize:hover { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2); }
+        .card-resize:hover .icon-box { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+
+        .card-j2c .icon-box { color: #f59e0b; background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);}
+        .card-j2c:hover { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2); }
+        .card-j2c:hover .icon-box { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+
+        .card-c2j .icon-box { color: #ec4899; background: rgba(236, 72, 153, 0.1); border-color: rgba(236, 72, 153, 0.2);}
+        .card-c2j:hover { border-color: rgba(236, 72, 153, 0.5); box-shadow: 0 10px 30px rgba(236, 72, 153, 0.2); }
+        .card-c2j:hover .icon-box { box-shadow: 0 0 15px rgba(236, 72, 153, 0.4); }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(12px);
+            z-index: 100000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .modal-content {
+            background: rgba(15, 20, 30, 0.95);
+            border: 1px solid rgba(0, 234, 255, 0.3); border-radius: 24px; 
+            padding: 35px; width: 100%; max-width: 550px; position: relative;
+            transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 234, 255, 0.1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        
+        .modal-close {
+            position: absolute; top: 20px; right: 20px;
+            width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .modal-close:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: #ef4444; transform: rotate(90deg); }
+
+        .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .modal-header i { font-size: 1.5rem; color: var(--primary-accent); text-shadow: 0 0 10px rgba(0,234,255,0.5); }
+        .modal-header h3 { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; color: #fff;}
+
+        /* Premium Inputs */
+        .input-group { margin-bottom: 15px; position: relative;}
+        .input-group label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;}
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; left: 15px; color: #64748b; font-size: 0.9rem; transition: 0.3s; top: 14px;}
+        .input-group input[type="text"], .input-group input[type="number"], .input-group textarea { 
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; font-size: 0.95rem; padding: 12px 15px 12px 40px; border-radius: 12px; outline: none; transition: 0.3s;
+            font-family: 'Courier New', monospace; font-weight: 500;
+        }
+        .input-group input[type="file"] {
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.3);
+            color: #fff; font-size: 0.85rem; padding: 15px; border-radius: 12px; outline: none; cursor: pointer; text-align: center;
+        }
+        .input-group textarea { min-height: 120px; resize: vertical; }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--primary-accent); box-shadow: 0 0 15px rgba(0, 234, 255, 0.15); background: rgba(0,0,0,0.6);}
+        .input-group input:focus + i, .input-group textarea:focus + i, .input-wrapper:focus-within i { color: var(--primary-accent); }
+
+        /* Sliders */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--primary-accent); cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(0, 234, 255, 0.5); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        /* Action Buttons */
+        .btn-calc {
+            width: 100%; padding: 14px; border-radius: 12px; border: none; cursor: pointer;
+            background: linear-gradient(135deg, var(--primary-accent), #0099aa);
+            color: #000; font-weight: 800; font-size: 0.9rem; transition: 0.3s; 
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0, 234, 255, 0.2);
+            font-family: 'Outfit', sans-serif;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-calc:hover { box-shadow: 0 10px 25px rgba(0, 234, 255, 0.4); transform: translateY(-2px); background: #fff;}
+        .btn-download { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); box-shadow: none; margin-top: 10px; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; transition: 0.3s; display: none;}
+        .btn-download:hover { background: var(--primary-accent); color: #000; border-color: var(--primary-accent); }
+
+        /* Glowing Result Box */
+        .result-box {
+            margin-top: 20px; padding: 15px; border-radius: 12px; 
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1); 
+            display: none; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            position: relative;
+        }
+        .result-box pre { margin: 0; color: #10b981; font-family: 'Courier New', monospace; font-size: 0.85rem; white-space: pre-wrap; word-wrap: break-word; max-height: 200px; overflow-y: auto;}
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .copy-btn:hover { background: var(--primary-accent); color: #000; }
+
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        @media (max-width: 600px) {
+            .tools-grid { grid-template-columns: 1fr; gap: 15px;}
+            .content-wrapper { padding: 30px 5%; }
+            .top-nav { padding: 15px 20px; }
+            .section-title { font-size: 1.8rem; margin-bottom: 25px;}
+            .modal-content { padding: 25px 20px; }
+            .tool-card { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+    <canvas id="reptileCanvas"></canvas>
+
+    <nav class="top-nav">
+        <a href="projects.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Platforms Hub</a>
+        <h2 style="margin:0; font-weight: 700; letter-spacing: 2px; color: var(--primary-accent); text-transform: uppercase; font-size: 1.2rem;">File Tools</h2>
+    </nav>
+
+    <div class="content-wrapper">
+        <h2 class="section-title"><span style="color:var(--primary-accent)">File Utilities</span></h2>
+        
+        <div class="tools-grid">
+            
+            <!-- Tool 1: Image Compressor -->
+            <div class="tool-card card-compress" onclick="openModal('compress')">
+                <div class="icon-box"><i class="fa-solid fa-compress-arrows-alt"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Image Compressor</h3>
+                    <p class="tool-desc">Reduce image file size efficiently without losing major quality.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 2: Image Resizer -->
+            <div class="tool-card card-resize" onclick="openModal('resize')">
+                <div class="icon-box"><i class="fa-solid fa-crop-simple"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Image Resizer</h3>
+                    <p class="tool-desc">Change image dimensions (width & height) instantly.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 3: JSON -> CSV -->
+            <div class="tool-card card-j2c" onclick="openModal('j2c')">
+                <div class="icon-box"><i class="fa-solid fa-file-csv"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">JSON to CSV</h3>
+                    <p class="tool-desc">Convert JSON arrays to comma-separated values format.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 4: CSV -> JSON -->
+            <div class="tool-card card-c2j" onclick="openModal('c2j')">
+                <div class="icon-box"><i class="fa-solid fa-file-code"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">CSV to JSON</h3>
+                    <p class="tool-desc">Parse CSV text and convert it into a structured JSON array.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
+    <!-- 1. Compressor Modal -->
+    <div class="modal-overlay" id="modal-compress" onclick="closeModal(event, 'modal-compress')">
+        <div class="modal-content" style="border-color: rgba(16, 185, 129, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-compress')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-compress-arrows-alt" style="color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);"></i>
+                <h3>Image Compressor</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Select Image</label>
+                <input type="file" id="comp-input" accept="image/*">
+            </div>
+            
+            <div class="input-group">
+                <label class="flex justify-between"><span>Quality</span> <span id="comp-val" style="color:#10b981;">80%</span></label>
+                <input type="range" id="comp-slider" min="0.1" max="1" step="0.05" value="0.8" oninput="document.getElementById('comp-val').innerText = Math.round(this.value * 100) + '%'">
+            </div>
+            
+            <button class="btn-calc" onclick="compressImage()" style="background: linear-gradient(135deg, #10b981, #059669); color: white;"><i class="fa-solid fa-compress"></i> Compress Image</button>
+            
+            <div class="result-box mt-4 text-center" id="result-compress" style="border-color: #10b981;">
+                <p id="comp-msg" style="color: #6ee7b7; font-size: 0.9rem; margin-bottom: 10px;"></p>
+                <a id="comp-download" class="btn-download" style="display:inline-block; border-color:#10b981;"><i class="fa-solid fa-download"></i> Download Compressed</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Resizer Modal -->
+    <div class="modal-overlay" id="modal-resize" onclick="closeModal(event, 'modal-resize')">
+        <div class="modal-content" style="border-color: rgba(59, 130, 246, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-resize')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-crop-simple" style="color: #3b82f6; text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></i>
+                <h3>Image Resizer</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Select Image</label>
+                <input type="file" id="res-input" accept="image/*" onchange="loadOriginalSize()">
+            </div>
+            
+            <div class="flex gap-4">
+                <div class="input-group flex-1">
+                    <label>Width (px)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <input type="number" id="res-w" placeholder="Width">
+                    </div>
+                </div>
+                <div class="input-group flex-1">
+                    <label>Height (px)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-arrows-up-down"></i>
+                        <input type="number" id="res-h" placeholder="Height">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="resizeImage()" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;"><i class="fa-solid fa-expand"></i> Resize Image</button>
+            
+            <div class="result-box mt-4 text-center" id="result-resize" style="border-color: #3b82f6;">
+                <p id="res-msg" style="color: #93c5fd; font-size: 0.9rem; margin-bottom: 10px;"></p>
+                <a id="res-download" class="btn-download" style="display:inline-block; border-color:#3b82f6;"><i class="fa-solid fa-download"></i> Download Resized</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. JSON to CSV Modal -->
+    <div class="modal-overlay" id="modal-j2c" onclick="closeModal(event, 'modal-j2c')">
+        <div class="modal-content" style="border-color: rgba(245, 158, 11, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-j2c')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-file-csv" style="color: #f59e0b; text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);"></i>
+                <h3>JSON to CSV</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Input JSON Array</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-code"></i>
+                    <textarea id="j2c-input" placeholder='[{"name": "Omm", "age": 20}]'></textarea>
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="convertJ2C()" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;"><i class="fa-solid fa-arrow-right-arrow-left"></i> Convert to CSV</button>
+            
+            <div class="result-box mt-4" id="result-j2c" style="border-color: #f59e0b;">
+                <button class="copy-btn" onclick="copyResult('j2c-output')"><i class="fa-regular fa-copy"></i></button>
+                <pre id="j2c-output" style="color: #fcd34d;"></pre>
+                <button id="j2c-download" class="btn-download" style="border-color:#f59e0b;"><i class="fa-solid fa-download"></i> Download CSV File</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CSV to JSON Modal -->
+    <div class="modal-overlay" id="modal-c2j" onclick="closeModal(event, 'modal-c2j')">
+        <div class="modal-content" style="border-color: rgba(236, 72, 153, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-c2j')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-file-code" style="color: #ec4899; text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);"></i>
+                <h3>CSV to JSON</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Input CSV Data</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-table"></i>
+                    <textarea id="c2j-input" placeholder="name,age&#10;Omm,20"></textarea>
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="convertC2J()" style="background: linear-gradient(135deg, #ec4899, #db2777); color: white;"><i class="fa-solid fa-arrow-right-arrow-left"></i> Convert to JSON</button>
+            
+            <div class="result-box mt-4" id="result-c2j" style="border-color: #ec4899;">
+                <button class="copy-btn" onclick="copyResult('c2j-output')"><i class="fa-regular fa-copy"></i></button>
+                <pre id="c2j-output" style="color: #f9a8d4;"></pre>
+                <button id="c2j-download" class="btn-download" style="border-color:#ec4899;"><i class="fa-solid fa-download"></i> Download JSON File</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal UI Controls
+        function openModal(toolName) {
+            const modal = document.getElementById('modal-' + toolName);
+            if(modal) {
+                const resultBox = document.getElementById('result-' + toolName);
+                if(resultBox) resultBox.style.display = 'none';
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(e, modalId) {
+            if (e && e.target.id !== modalId && !e.target.closest('.modal-close')) return;
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function copyResult(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            if(!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.currentTarget;
+                const og = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check text-green-400"></i>';
+                setTimeout(() => btn.innerHTML = og, 1500);
+            });
+        }
+
+        function showError(elementId, msg) {
+            const out = document.getElementById(elementId);
+            out.innerText = msg;
+            out.style.color = '#ef4444';
+            document.getElementById('result-' + elementId.split('-')[0]).style.display = 'block';
+            
+            const dlBtn = document.getElementById(elementId.split('-')[0] + '-download');
+            if(dlBtn) dlBtn.style.display = 'none';
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024, dm = decimals < 0 ? 0 : decimals, sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        function triggerDownload(dataURI, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataURI;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function createTextFileDownload(text, filename, type, btnId) {
+            const blob = new Blob([text], { type: type });
+            const url = URL.createObjectURL(blob);
+            const btn = document.getElementById(btnId);
+            btn.style.display = 'inline-block';
+            btn.onclick = () => {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+            };
+        }
+
+        // --- 1. Image Compressor ---
+        function compressImage() {
+            const fileInput = document.getElementById('comp-input');
+            const quality = parseFloat(document.getElementById('comp-slider').value);
+            const msgOut = document.getElementById('comp-msg');
+            const resultBox = document.getElementById('result-compress');
+            const dlBtn = document.getElementById('comp-download');
+
+            if (fileInput.files.length === 0) {
+                msgOut.innerText = "Please select an image first.";
+                msgOut.style.color = '#ef4444';
+                resultBox.style.display = 'block';
+                dlBtn.style.display = 'none';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const originalSize = file.size;
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Compress to JPEG
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // Estimate new size (Base64 length * 0.75)
+                    const newSize = Math.round((compressedDataUrl.length - 'data:image/jpeg;base64,'.length) * 3/4);
+                    
+                    msgOut.innerText = `Original: ${formatBytes(originalSize)} \n Compressed: ~${formatBytes(newSize)}`;
+                    msgOut.style.color = '#6ee7b7';
+                    resultBox.style.display = 'block';
+                    
+                    dlBtn.style.display = 'inline-block';
+                    dlBtn.onclick = () => triggerDownload(compressedDataUrl, 'compressed_' + file.name);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- 2. Image Resizer ---
+        function loadOriginalSize() {
+            const fileInput = document.getElementById('res-input');
+            if (fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        document.getElementById('res-w').value = img.width;
+                        document.getElementById('res-h').value = img.height;
+                    }
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function resizeImage() {
+            const fileInput = document.getElementById('res-input');
+            const targetW = parseInt(document.getElementById('res-w').value);
+            const targetH = parseInt(document.getElementById('res-h').value);
+            const msgOut = document.getElementById('res-msg');
+            const resultBox = document.getElementById('result-resize');
+            const dlBtn = document.getElementById('res-download');
+
+            if (fileInput.files.length === 0 || isNaN(targetW) || isNaN(targetH)) {
+                msgOut.innerText = "Select image and provide valid dimensions.";
+                msgOut.style.color = '#ef4444';
+                resultBox.style.display = 'block';
+                dlBtn.style.display = 'none';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = targetW;
+                    canvas.height = targetH;
+                    
+                    // Draw resized
+                    ctx.drawImage(img, 0, 0, targetW, targetH);
+                    
+                    const resizedDataUrl = canvas.toDataURL(file.type || 'image/png');
+                    
+                    msgOut.innerText = `Successfully resized to ${targetW}x${targetH}px`;
+                    msgOut.style.color = '#93c5fd';
+                    resultBox.style.display = 'block';
+                    
+                    dlBtn.style.display = 'inline-block';
+                    dlBtn.onclick = () => triggerDownload(resizedDataUrl, 'resized_' + file.name);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- 3. JSON to CSV ---
+        function convertJ2C() {
+            const input = document.getElementById('j2c-input').value.trim();
+            try {
+                if(!input) throw new Error("Input is empty.");
+                let arr = JSON.parse(input);
+                if (!Array.isArray(arr)) {
+                    // Try to wrap single object in array
+                    if(typeof arr === 'object') arr = [arr];
+                    else throw new Error("Input must be a JSON array of objects.");
+                }
+                
+                if(arr.length === 0) throw new Error("JSON array is empty.");
+
+                // Get Headers
+                const headers = Object.keys(arr[0]);
+                let csv = headers.join(',') + '\n';
+
+                // Get Rows
+                arr.forEach(obj => {
+                    let row = headers.map(header => {
+                        let val = obj[header];
+                        if (val === null || val === undefined) val = '';
+                        // Escape quotes and wrap in quotes if contains comma or newline
+                        val = val.toString().replace(/"/g, '""');
+                        if (val.search(/("|,|\n)/g) >= 0) val = `"${val}"`;
+                        return val;
+                    });
+                    csv += row.join(',') + '\n';
+                });
+
+                document.getElementById('j2c-output').innerText = csv;
+                document.getElementById('j2c-output').style.color = '#fcd34d';
+                document.getElementById('result-j2c').style.display = 'block';
+                
+                createTextFileDownload(csv, 'converted.csv', 'text/csv', 'j2c-download');
+
+            } catch(e) {
+                showError('j2c-output', "Invalid JSON: " + e.message);
+            }
+        }
+
+        // --- 4. CSV to JSON ---
+        function convertC2J() {
+            const input = document.getElementById('c2j-input').value.trim();
+            try {
+                if(!input) throw new Error("Input is empty.");
+                
+                // Simple CSV Parser (Splits by newline, then comma, basic handling)
+                const lines = input.split('\n');
+                if(lines.length < 2) throw new Error("CSV requires at least a header row and one data row.");
+                
+                const headers = lines[0].split(',').map(h => h.trim());
+                const result = [];
+
+                for(let i = 1; i < lines.length; i++) {
+                    if(!lines[i].trim()) continue;
+                    // Simple split by comma (does not perfectly handle commas inside quotes for complex CSVs, but works for basic)
+                    // Upgraded regex split to handle quotes
+                    const obj = {};
+                    const currentLine = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+
+                    headers.forEach((header, index) => {
+                        let val = currentLine[index] || '';
+                        val = val.trim();
+                        if (val.startsWith('"') && val.endsWith('"')) {
+                            val = val.slice(1, -1).replace(/""/g, '"');
+                        }
+                        // Try to convert to number if it looks like one
+                        if(!isNaN(val) && val !== '') val = Number(val);
+                        obj[header] = val;
+                    });
+                    result.push(obj);
+                }
+
+                const jsonStr = JSON.stringify(result, null, 4);
+                document.getElementById('c2j-output').innerText = jsonStr;
+                document.getElementById('c2j-output').style.color = '#f9a8d4';
+                document.getElementById('result-c2j').style.display = 'block';
+                
+                createTextFileDownload(jsonStr, 'converted.json', 'application/json', 'c2j-download');
+
+            } catch(e) {
+                showError('c2j-output', "Parse Error: " + e.message);
+            }
+        }
+
+        const rCanvas = document.getElementById('reptileCanvas');
+        const rCtx = rCanvas.getContext('2d');
+
+        let rWidth, rHeight;
+        let rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        let rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+        const rSegments = [];
+        const rSegCount = 45; 
+        const rSegDist = 12; 
+        let rWalkCycle = 0;
+
+        for (let i = 0; i < rSegCount; i++) { rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 }); }
+
+        function rResize() {
+            rWidth = rCanvas.width = window.innerWidth;
+            rHeight = rCanvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('mousemove', e => {
+            rMouse.x = e.clientX;
+            rMouse.y = e.clientY;
+        });
+
+        function drawReptileEngine() {
+            rCtx.clearRect(0, 0, rWidth, rHeight);
+
+            rHead.x += (rMouse.x - rHead.x) * 0.12;
+            rHead.y += (rMouse.y - rHead.y) * 0.12;
+
+            let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
+            if (dHead > 1) rWalkCycle += dHead * 0.08;
+
+            rSegments[0].x = rHead.x;
+            rSegments[0].y = rHead.y;
+
+            for (let i = 1; i < rSegCount; i++) {
+                let s1 = rSegments[i - 1];
+                let s2 = rSegments[i];
+                let dx = s1.x - s2.x;
+                let dy = s1.y - s2.y;
+                s2.angle = Math.atan2(dy, dx);
+                s2.x = s1.x - Math.cos(s2.angle) * rSegDist;
+                s2.y = s1.y - Math.sin(s2.angle) * rSegDist;
+                renderReptileBody(s2, i);
+            }
+            requestAnimationFrame(drawReptileEngine);
+        }
+
+        function renderReptileBody(seg, i) {
+            rCtx.save();
+            rCtx.translate(seg.x, seg.y);
+            rCtx.rotate(seg.angle);
+
+            let hue = 190 + (i * 2); 
+            rCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`; 
+            rCtx.lineWidth = 1.5;
+            rCtx.shadowBlur = 12;
+            rCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+
+            let bW = Math.sin((i / rSegCount) * Math.PI) * 22;
+
+            rCtx.beginPath();
+            rCtx.moveTo(0, -bW / 2);
+            rCtx.lineTo(0, bW / 2);
+            rCtx.stroke();
+
+            if (i === 10 || i === 25) {
+                let lStep = Math.sin(rWalkCycle) * 20;
+                let rStep = Math.sin(rWalkCycle + Math.PI) * 20;
+                rCtx.beginPath();
+                rCtx.moveTo(0, bW / 2);
+                rCtx.lineTo(rStep, bW / 2 + 15);
+                rCtx.lineTo(rStep + 5, bW / 2 + 18);
+                rCtx.moveTo(0, -bW / 2);
+                rCtx.lineTo(lStep, -bW / 2 - 15);
+                rCtx.lineTo(lStep + 5, -bW / 2 - 18);
+                rCtx.stroke();
+            }
+
+            rCtx.fillStyle = "white";
+            rCtx.shadowBlur = 0;
+            rCtx.beginPath();
+            rCtx.arc(0, 0, 1.5, 0, Math.PI * 2);
+            rCtx.fill();
+
+            rCtx.restore();
+        }
+        window.addEventListener('resize', rResize);
+        rResize();
+        drawReptileEngine();
+    </script>
+</body>
+</html>
