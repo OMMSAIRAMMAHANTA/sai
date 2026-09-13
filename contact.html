@@ -445,15 +445,43 @@
             background: rgba(255, 50, 50, 0.15); border-color: rgba(255, 50, 50, 0.3); color: white; transform: scale(1.05); box-shadow: 0 4px 15px rgba(255, 50, 50, 0.2);
         }
 
-        @media (max-width: 400px) {
+        /* Improved Mobile View for Instagram Modal */
+        @media (max-width: 768px) {
             .embedded-glass-profile .glass-card {
-                aspect-ratio: auto; min-height: 450px; padding: 1rem;
+                aspect-ratio: auto !important; 
+                height: auto;
+                min-height: auto;
+                max-height: 88vh; /* Keeps it inside screen bounds */
+                width: 95%; /* Maximizes space without touching sides */
+                padding: 1.25rem 1rem;
+                overflow-y: auto; /* Fixes bottom cut off by allowing scroll if needed */
+                overflow-x: hidden;
+            }
+            /* Clean scrollbar for mobile */
+            .embedded-glass-profile .glass-card::-webkit-scrollbar {
+                width: 4px;
+            }
+            .embedded-glass-profile .glass-card::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
             }
             .embedded-glass-profile .profile-section {
-                flex-direction: column; gap: 1rem;
+                flex-direction: column; 
+                gap: 1.2rem;
+                margin-bottom: 1rem;
             }
             .embedded-glass-profile .stats-container {
-                width: 100%; padding-right: 0;
+                width: 100%; 
+                padding-right: 0;
+                justify-content: space-around; /* Distribute stat blocks evenly */
+            }
+            .close-modal-btn {
+                top: 15px; /* Moved slightly inward so it doesn't cut off */
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                background: rgba(255, 255, 255, 0.15); /* Slightly more visible on mobile */
             }
         }
     </style>
@@ -518,7 +546,7 @@
                     
                     <div class="social-bar-contact contact-socials-wrapper">
                         <!-- Icons are also staggered individually -->
-                        <a href="https://www.youtube.com/@Lostt426" target="_blank" class="social-icon-contact stagger-item delay-4">
+                        <a href="https://www.youtube.com/@ThePiccX" target="_blank" class="social-icon-contact stagger-item delay-4">
                             <i class="fab fa-youtube"></i>
                         </a>
                         <a href="https://twitter.com" target="_blank" class="social-icon-contact stagger-item delay-5">
