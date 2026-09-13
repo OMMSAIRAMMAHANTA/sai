@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Omm Sairam Mahanta | Student Tools</title>
+    
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts Merged -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-accent: #00eaff;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --glass-bg: rgba(10, 10, 15, 0.45);
+            --card-border: rgba(0, 234, 255, 0.15);
+            --bg-dark: #050b14;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            /* EXACT THEME BACKGROUND */
+            background: linear-gradient(135deg, rgba(5,11,20,0.92) 0%, rgba(10,25,47,0.85) 100%), url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, p { margin: 0; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 234, 255, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 234, 255, 0.6); }
+
+        /* Ambient Background FX */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+
+        #reptileCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; opacity: 0.6;
+        }
+
+        .bg-glow {
+            position: fixed; top: -15%; left: -10%; width: 55vw; height: 55vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.08) 0%, rgba(0,0,0,0) 65%);
+            border-radius: 50%; z-index: -1; animation: pulse-glow 10s infinite alternate;
+        }
+        .bg-glow-2 {
+            position: fixed; bottom: -10%; right: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.06) 0%, rgba(0,0,0,0) 60%);
+            border-radius: 50%; z-index: -1; animation: pulse-glow 12s infinite alternate-reverse;
+        }
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(2%, -2%); }
+        }
+
+        /* Navigation */
+        .top-nav {
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border); z-index: 50; position: sticky; top: 0;
+        }
+        .back-btn { 
+            color: var(--text-main); text-decoration: none; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 10px; transition: 0.3s;
+        }
+        .back-btn:hover { color: var(--primary-accent); text-shadow: 0 0 10px var(--primary-accent); }
+
+        .content-wrapper { padding: 40px 5%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10;}
+        
+        .section-title { font-size: 2.2rem; margin-bottom: 40px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Ultra Compact App-Style Grid for Tools */
+        .tools-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+            perspective: 1000px;
+        }
+        
+        .tool-card {
+            background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 25px 20px; 
+            transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 15px; /* Side by side layout */
+        }
+        
+        .tool-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg); transition: 0.5s;
+        }
+
+        .tool-card:hover { 
+            transform: translateY(-5px); border-color: var(--primary-accent); 
+            box-shadow: 0 10px 30px rgba(0, 234, 255, 0.2); 
+        }
+        .tool-card:hover::before { left: 200%; }
+
+        /* Small Icons as requested */
+        .icon-box {
+            width: 45px; height: 45px; border-radius: 12px; 
+            display: flex; justify-content: center; align-items: center; font-size: 1.3rem;
+            background: rgba(0, 234, 255, 0.1); color: var(--primary-accent);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            flex-shrink: 0; transition: 0.3s;
+        }
+        .tool-card:hover .icon-box { transform: scale(1.1); box-shadow: 0 0 15px rgba(0, 234, 255, 0.4); }
+
+        .tool-info { flex-grow: 1; }
+        .tool-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px; font-family: 'Outfit', sans-serif;}
+        .tool-desc { color: var(--text-muted); font-size: 0.75rem; line-height: 1.4; font-weight: 400; }
+
+        /* Specific Colors for variety */
+        .card-att .icon-box { color: #f59e0b; background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);}
+        .card-att:hover { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2); }
+        .card-att:hover .icon-box { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+
+        .card-perc .icon-box { color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2);}
+        .card-perc:hover { border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2); }
+        .card-perc:hover .icon-box { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+
+        .card-age .icon-box { color: #ec4899; background: rgba(236, 72, 153, 0.1); border-color: rgba(236, 72, 153, 0.2);}
+        .card-age:hover { border-color: rgba(236, 72, 153, 0.5); box-shadow: 0 10px 30px rgba(236, 72, 153, 0.2); }
+        .card-age:hover .icon-box { box-shadow: 0 0 15px rgba(236, 72, 153, 0.4); }
+
+        .card-time .icon-box { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2);}
+        .card-time:hover { border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2); }
+        .card-time:hover .icon-box { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+
+        /* Advanced Modal UI */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(12px);
+            z-index: 100000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .modal-content {
+            background: rgba(15, 20, 30, 0.95);
+            border: 1px solid rgba(0, 234, 255, 0.3); border-radius: 24px; 
+            padding: 35px; width: 100%; max-width: 450px; position: relative;
+            transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 234, 255, 0.1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        
+        .modal-close {
+            position: absolute; top: 20px; right: 20px;
+            width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .modal-close:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: #ef4444; transform: rotate(90deg); }
+
+        .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .modal-header i { font-size: 1.5rem; color: var(--primary-accent); text-shadow: 0 0 10px rgba(0,234,255,0.5); }
+        .modal-header h3 { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; color: #fff;}
+
+        /* Premium Inputs */
+        .input-group { margin-bottom: 15px; position: relative;}
+        .input-group label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;}
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; left: 15px; color: #64748b; font-size: 0.9rem; transition: 0.3s;}
+        .input-group input { 
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; font-size: 0.95rem; padding: 12px 15px 12px 40px; border-radius: 12px; outline: none; transition: 0.3s;
+            font-family: 'Poppins', sans-serif; font-weight: 500;
+        }
+        .input-group input:focus { border-color: var(--primary-accent); box-shadow: 0 0 15px rgba(0, 234, 255, 0.15); background: rgba(0,0,0,0.6);}
+        .input-group input:focus + i, .input-wrapper:focus-within i { color: var(--primary-accent); }
+
+        /* Action Buttons */
+        .btn-calc {
+            width: 100%; padding: 14px; border-radius: 12px; border: none; cursor: pointer;
+            background: linear-gradient(135deg, var(--primary-accent), #0099aa);
+            color: #000; font-weight: 800; font-size: 0.9rem; transition: 0.3s; 
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0, 234, 255, 0.2);
+            font-family: 'Outfit', sans-serif;
+        }
+        .btn-calc:hover { box-shadow: 0 10px 25px rgba(0, 234, 255, 0.4); transform: translateY(-2px); background: #fff;}
+
+        /* Glowing Result Box */
+        .result-box {
+            margin-top: 20px; padding: 20px; border-radius: 16px; 
+            background: linear-gradient(145deg, rgba(0, 234, 255, 0.05), rgba(0,0,0,0.5));
+            border: 1px dashed rgba(0, 234, 255, 0.3); text-align: center; 
+            display: none; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        .result-value { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900; color: var(--primary-accent); text-shadow: 0 0 15px rgba(0,234,255,0.5); line-height: 1.1;}
+        .result-sub { font-size: 0.8rem; font-weight: 500; color: #cbd5e1; margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 8px;}
+
+        /* Timer Result Grid */
+        .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .timer-box { background: rgba(0,0,0,0.5); padding: 12px 5px; border-radius: 10px; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .timer-num { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; color: #8b5cf6; text-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+        .timer-lbl { font-size: 0.55rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
+
+        @media (max-width: 600px) {
+            .tools-grid { grid-template-columns: 1fr; gap: 15px;}
+            .content-wrapper { padding: 30px 5%; }
+            .top-nav { padding: 15px 20px; }
+            .section-title { font-size: 1.8rem; margin-bottom: 25px;}
+            .modal-content { padding: 25px 20px; }
+            .result-value { font-size: 2rem; }
+            .timer-num { font-size: 1.2rem; }
+            .tool-card { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Background -->
+    <div class="scanlines"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+    <canvas id="reptileCanvas"></canvas>
+
+    <!-- Navbar -->
+    <nav class="top-nav">
+        <a href="projects.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Platforms Hub</a>
+        <h2 style="margin:0; font-weight: 700; letter-spacing: 2px; color: var(--primary-accent); text-transform: uppercase; font-size: 1.2rem;">Student Tools</h2>
+    </nav>
+
+    <div class="content-wrapper">
+        <h2 class="section-title"><span style="color:var(--primary-accent)">Academic Utilities</span></h2>
+        
+        <div class="tools-grid">
+            
+            <!-- Tool 1: CGPA -->
+            <div class="tool-card" onclick="openModal('cgpa')">
+                <div class="icon-box"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">CGPA Calculator</h3>
+                    <p class="tool-desc">Calculate your cumulative grade point average across semesters.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 2: Attendance -->
+            <div class="tool-card card-att" onclick="openModal('attendance')">
+                <div class="icon-box"><i class="fa-solid fa-clipboard-user"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Bunk Manager</h3>
+                    <p class="tool-desc">Plan your attendance to maintain your required target percentage.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 3: Percentage -->
+            <div class="tool-card card-perc" onclick="openModal('percentage')">
+                <div class="icon-box"><i class="fa-solid fa-percent"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Score Analyzer</h3>
+                    <p class="tool-desc">Convert raw marks into final percentages for quick evaluation.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 4: Age -->
+            <div class="tool-card card-age" onclick="openModal('age')">
+                <div class="icon-box"><i class="fa-solid fa-calendar-days"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Exact Age Finder</h3>
+                    <p class="tool-desc">Determine your exact age down to the day using calendar logic.</p>
+                </div>
+            </div>
+
+            <!-- Tool 5: Countdown -->
+            <div class="tool-card card-time" onclick="openModal('countdown')">
+                <div class="icon-box"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Exam Tracker</h3>
+                    <p class="tool-desc">Deploy a live digital countdown timer for upcoming exams.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+    
+    <!-- 1. CGPA Calculator Modal -->
+    <div class="modal-overlay" id="modal-cgpa" onclick="closeModal(event, 'modal-cgpa')">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal(null, 'modal-cgpa')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <h3>CGPA Engine</h3>
+            </div>
+            
+            <div id="cgpa-inputs" class="space-y-3 max-h-[250px] overflow-y-auto pr-2">
+                <div class="flex gap-3 cgpa-row">
+                    <div class="input-group flex-1 mb-0">
+                        <label>Credits</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-book"></i>
+                            <input type="number" class="cgpa-credit" placeholder="e.g. 20" min="1">
+                        </div>
+                    </div>
+                    <div class="input-group flex-1 mb-0">
+                        <label>SGPA</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-star"></i>
+                            <input type="number" class="cgpa-sgpa" placeholder="e.g. 8.5" step="0.01" min="0" max="10">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="addCGPARow()" class="w-full py-2.5 mt-3 mb-2 rounded-xl text-xs font-bold text-slate-300 border border-dashed border-slate-600 hover:bg-slate-800 hover:border-slate-400 transition-colors flex justify-center items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Add Semester
+            </button>
+            
+            <button class="btn-calc" onclick="calculateCGPA()">Compute CGPA</button>
+            
+            <div class="result-box" id="result-cgpa">
+                <div class="result-value" id="val-cgpa">0.00</div>
+                <div class="result-sub">Final Cumulative Grade Point Average</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Attendance Modal -->
+    <div class="modal-overlay" id="modal-attendance" onclick="closeModal(event, 'modal-attendance')">
+        <div class="modal-content" style="border-color: rgba(245, 158, 11, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-attendance')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-clipboard-user" style="color: #f59e0b; text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);"></i>
+                <h3>Bunk Manager</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Total Classes Held</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <input type="number" id="att-held" placeholder="Enter total classes" min="1">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Classes Attended</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user-check"></i>
+                    <input type="number" id="att-attended" placeholder="Enter attended classes" min="0">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Target Percentage (%)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <input type="number" id="att-target" placeholder="e.g. 75" value="75" min="1" max="100">
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="calculateAttendance()" style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 5px 15px rgba(245, 158, 11, 0.2);">Analyze Status</button>
+            
+            <div class="result-box" id="result-attendance" style="border-color: rgba(245, 158, 11, 0.3); background: linear-gradient(145deg, rgba(245, 158, 11, 0.05), rgba(0,0,0,0.5));">
+                <div class="result-value" id="val-att-current" style="color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);">0%</div>
+                <div class="result-sub" id="val-att-msg" style="color: #fff;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Percentage Modal -->
+    <div class="modal-overlay" id="modal-percentage" onclick="closeModal(event, 'modal-percentage')">
+        <div class="modal-content" style="border-color: rgba(16, 185, 129, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-percentage')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-percent" style="color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);"></i>
+                <h3>Score Analyzer</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Marks Obtained</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-marker"></i>
+                    <input type="number" id="perc-obtained" placeholder="e.g. 450" min="0">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Total Marks</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-list-ol"></i>
+                    <input type="number" id="perc-total" placeholder="e.g. 600" min="1">
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="calculatePercentage()" style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2); color:white;">Evaluate</button>
+            
+            <div class="result-box" id="result-percentage" style="border-color: rgba(16, 185, 129, 0.3); background: linear-gradient(145deg, rgba(16, 185, 129, 0.05), rgba(0,0,0,0.5));">
+                <div class="result-value" id="val-percentage" style="color: #10b981; text-shadow: 0 0 15px rgba(16, 185, 129, 0.5);">0%</div>
+                <div class="result-sub">Final Percentage Score</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Age Modal -->
+    <div class="modal-overlay" id="modal-age" onclick="closeModal(event, 'modal-age')">
+        <div class="modal-content" style="border-color: rgba(236, 72, 153, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-age')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-calendar-days" style="color: #ec4899; text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);"></i>
+                <h3>Exact Age Finder</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Date of Birth</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-cake-candles"></i>
+                    <input type="date" id="age-dob" style="color-scheme: dark;">
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="calculateAge()" style="background: linear-gradient(135deg, #ec4899, #db2777); box-shadow: 0 5px 15px rgba(236, 72, 153, 0.2); color:white;">Process Data</button>
+            
+            <div class="result-box" id="result-age" style="border-color: rgba(236, 72, 153, 0.3); background: linear-gradient(145deg, rgba(236, 72, 153, 0.05), rgba(0,0,0,0.5));">
+                <div class="result-value" id="val-age" style="font-size: 1.8rem; color: #ec4899; text-shadow: 0 0 15px rgba(236, 72, 153, 0.5);">--</div>
+                <div class="result-sub" id="val-age-sub">Chronological Age</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Exam Countdown Modal -->
+    <div class="modal-overlay" id="modal-countdown" onclick="closeModal(event, 'modal-countdown')">
+        <div class="modal-content" style="border-color: rgba(139, 92, 246, 0.3); max-width: 500px;">
+            <button class="modal-close" onclick="closeModal(null, 'modal-countdown')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-hourglass-half" style="color: #8b5cf6; text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);"></i>
+                <h3>Exam Tracker</h3>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-3">
+                <div class="input-group mb-2">
+                    <label>Exam Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-pen-clip"></i>
+                        <input type="text" id="cd-name" placeholder="e.g. Midterms">
+                    </div>
+                </div>
+                <div class="input-group mb-2">
+                    <label>Target Date & Time</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-clock"></i>
+                        <input type="datetime-local" id="cd-date" style="color-scheme: dark;">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="startCountdown()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2); color:white;">Initialize Timer</button>
+            
+            <div class="result-box" id="result-countdown" style="border-color: rgba(139, 92, 246, 0.3); background: linear-gradient(145deg, rgba(139, 92, 246, 0.05), rgba(0,0,0,0.5)); padding: 15px;">
+                <div class="result-sub font-bold text-white uppercase tracking-widest border-none bg-transparent p-0 mb-2" id="val-cd-title">Target Lock</div>
+                <div class="timer-grid">
+                    <div class="timer-box"><div class="timer-num" id="cd-d">00</div><div class="timer-lbl">DAYS</div></div>
+                    <div class="timer-box"><div class="timer-num" id="cd-h">00</div><div class="timer-lbl">HOURS</div></div>
+                    <div class="timer-box"><div class="timer-num" id="cd-m">00</div><div class="timer-lbl">MINS</div></div>
+                    <div class="timer-box"><div class="timer-num" id="cd-s">00</div><div class="timer-lbl">SECS</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal UI Controls
+        function openModal(toolName) {
+            const modal = document.getElementById('modal-' + toolName);
+            if(modal) {
+                const resultBox = document.getElementById('result-' + toolName);
+                if(resultBox) resultBox.style.display = 'none'; // reset
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(e, modalId) {
+            if (e && e.target.id !== modalId && !e.target.closest('.modal-close')) return;
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // 1. CGPA Logic
+        function addCGPARow() {
+            const container = document.getElementById('cgpa-inputs');
+            const row = document.createElement('div');
+            row.className = 'flex gap-3 cgpa-row mt-3';
+            row.innerHTML = `
+                <div class="input-group flex-1 mb-0">
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-book"></i>
+                        <input type="number" class="cgpa-credit" placeholder="Credits" min="1">
+                    </div>
+                </div>
+                <div class="input-group flex-1 mb-0">
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-star"></i>
+                        <input type="number" class="cgpa-sgpa" placeholder="SGPA" step="0.01" min="0" max="10">
+                    </div>
+                </div>
+                <button onclick="this.parentElement.remove()" class="w-10 h-[46px] rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition flex justify-center items-center shrink-0">
+                    <i class="fa-solid fa-trash text-sm"></i>
+                </button>
+            `;
+            container.appendChild(row);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function calculateCGPA() {
+            const credits = document.querySelectorAll('.cgpa-credit');
+            const sgpas = document.querySelectorAll('.cgpa-sgpa');
+            let totalCredits = 0, totalPoints = 0;
+
+            for(let i=0; i<credits.length; i++) {
+                const c = parseFloat(credits[i].value);
+                const s = parseFloat(sgpas[i].value);
+                if(!isNaN(c) && !isNaN(s)) { totalCredits += c; totalPoints += (c * s); }
+            }
+
+            const resultBox = document.getElementById('result-cgpa');
+            const resultVal = document.getElementById('val-cgpa');
+            resultBox.style.display = 'block';
+
+            if(totalCredits === 0) {
+                resultVal.innerText = "Error"; resultVal.style.color = '#ef4444'; resultVal.style.textShadow = '0 0 15px rgba(239,68,68,0.5)';
+            } else {
+                resultVal.innerText = (totalPoints / totalCredits).toFixed(2);
+                resultVal.style.color = 'var(--primary-accent)'; resultVal.style.textShadow = '0 0 15px rgba(0,234,255,0.5)';
+            }
+        }
+
+        // 2. Attendance Logic
+        function calculateAttendance() {
+            const held = parseInt(document.getElementById('att-held').value);
+            const attended = parseInt(document.getElementById('att-attended').value);
+            const target = parseInt(document.getElementById('att-target').value);
+            const resultBox = document.getElementById('result-attendance');
+            const valCurr = document.getElementById('val-att-current');
+            const valMsg = document.getElementById('val-att-msg');
+            
+            resultBox.style.display = 'block';
+
+            if(isNaN(held) || isNaN(attended) || isNaN(target) || attended > held) {
+                valCurr.innerText = "N/A"; valMsg.innerHTML = "<span class='text-red-400 font-bold'>Invalid Data Input</span>";
+                return;
+            }
+
+            const currentPerc = (attended / held) * 100;
+            valCurr.innerText = currentPerc.toFixed(1) + "%";
+
+            if (currentPerc < target) {
+                const req = Math.ceil(((target * held) - (100 * attended)) / (100 - target));
+                valMsg.innerHTML = `Critical. Attend <span class='text-amber-400 font-bold'>${req}</span> consecutive classes to recover.`;
+            } else if (currentPerc > target) {
+                const bunk = Math.floor(((100 * attended) - (target * held)) / target);
+                valMsg.innerHTML = `Safe zone. You can miss <span class='text-emerald-400 font-bold'>${bunk}</span> classes without dropping below target.`;
+            } else {
+                valMsg.innerHTML = `<span class='text-blue-400 font-bold'>Perfectly on target. Don't skip the next one.</span>`;
+            }
+        }
+
+        // 3. Percentage Logic
+        function calculatePercentage() {
+            const obt = parseFloat(document.getElementById('perc-obtained').value);
+            const tot = parseFloat(document.getElementById('perc-total').value);
+            const resultBox = document.getElementById('result-percentage');
+            const resultVal = document.getElementById('val-percentage');
+            
+            resultBox.style.display = 'block';
+            
+            if(isNaN(obt) || isNaN(tot) || tot === 0) {
+                resultVal.innerText = "N/A"; resultVal.style.color = '#ef4444'; resultVal.style.textShadow = '0 0 15px rgba(239,68,68,0.5)';
+            } else {
+                resultVal.innerText = ((obt / tot) * 100).toFixed(2) + "%";
+                resultVal.style.color = '#10b981'; resultVal.style.textShadow = '0 0 15px rgba(16,185,129,0.5)';
+            }
+        }
+
+        // 4. Age Logic
+        function calculateAge() {
+            const dobInput = document.getElementById('age-dob').value;
+            const resultBox = document.getElementById('result-age');
+            const resultVal = document.getElementById('val-age');
+            
+            resultBox.style.display = 'block';
+
+            if(!dobInput) { resultVal.innerText = "N/A"; return; }
+
+            const dob = new Date(dobInput);
+            const today = new Date();
+            
+            if(dob > today) { resultVal.innerText = "Future Entity"; return; }
+
+            let years = today.getFullYear() - dob.getFullYear();
+            let months = today.getMonth() - dob.getMonth();
+            let days = today.getDate() - dob.getDate();
+
+            if (days < 0) {
+                months--;
+                const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+            if (months < 0) { years--; months += 12; }
+
+            resultVal.innerText = `${years}y ${months}m ${days}d`;
+        }
+
+        // 5. Countdown Logic
+        let countdownInterval = null;
+        function startCountdown() {
+            const targetDateStr = document.getElementById('cd-date').value;
+            const nameStr = document.getElementById('cd-name').value || "Mission";
+            const resultBox = document.getElementById('result-countdown');
+            const titleEl = document.getElementById('val-cd-title');
+            
+            if(!targetDateStr) return;
+            
+            const targetDate = new Date(targetDateStr).getTime();
+            resultBox.style.display = 'block';
+            titleEl.innerHTML = `<i class="fa-solid fa-satellite-dish mr-2 text-purple-400"></i> ${nameStr} Approaches`;
+            
+            if(countdownInterval) clearInterval(countdownInterval);
+
+            function update() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    ['d','h','m','s'].forEach(id => document.getElementById(`cd-${id}`).innerText = "00");
+                    titleEl.innerHTML = `<span class="text-red-500"><i class="fa-solid fa-triangle-exclamation"></i> TARGET REACHED</span>`;
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('cd-d').innerText = String(days).padStart(2, '0');
+                document.getElementById('cd-h').innerText = String(hours).padStart(2, '0');
+                document.getElementById('cd-m').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('cd-s').innerText = String(seconds).padStart(2, '0');
+            }
+            
+            update();
+            countdownInterval = setInterval(update, 1000);
+        }
+
+        // Background Reptile Engine (Matched with Main Theme)
+        const rCanvas = document.getElementById('reptileCanvas');
+        const rCtx = rCanvas.getContext('2d');
+
+        let rWidth, rHeight;
+        let rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        let rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+        const rSegments = [];
+        const rSegCount = 45; 
+        const rSegDist = 12; 
+        let rWalkCycle = 0;
+
+        for (let i = 0; i < rSegCount; i++) { rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 }); }
+
+        function rResize() {
+            rWidth = rCanvas.width = window.innerWidth;
+            rHeight = rCanvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('mousemove', e => {
+            rMouse.x = e.clientX;
+            rMouse.y = e.clientY;
+        });
+
+        function drawReptileEngine() {
+            rCtx.clearRect(0, 0, rWidth, rHeight);
+
+            rHead.x += (rMouse.x - rHead.x) * 0.12;
+            rHead.y += (rMouse.y - rHead.y) * 0.12;
+
+            let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
+            if (dHead > 1) rWalkCycle += dHead * 0.08;
+
+            rSegments[0].x = rHead.x;
+            rSegments[0].y = rHead.y;
+
+            for (let i = 1; i < rSegCount; i++) {
+                let s1 = rSegments[i - 1];
+                let s2 = rSegments[i];
+                let dx = s1.x - s2.x;
+                let dy = s1.y - s2.y;
+                s2.angle = Math.atan2(dy, dx);
+                s2.x = s1.x - Math.cos(s2.angle) * rSegDist;
+                s2.y = s1.y - Math.sin(s2.angle) * rSegDist;
+                renderReptileBody(s2, i);
+            }
+            requestAnimationFrame(drawReptileEngine);
+        }
+
+        function renderReptileBody(seg, i) {
+            rCtx.save();
+            rCtx.translate(seg.x, seg.y);
+            rCtx.rotate(seg.angle);
+
+            let hue = 190 + (i * 2); 
+            rCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`; 
+            rCtx.lineWidth = 1.5;
+            rCtx.shadowBlur = 12;
+            rCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+
+            let bW = Math.sin((i / rSegCount) * Math.PI) * 22;
+
+            rCtx.beginPath();
+            rCtx.moveTo(0, -bW / 2);
+            rCtx.lineTo(0, bW / 2);
+            rCtx.stroke();
+
+            if (i === 10 || i === 25) {
+                let lStep = Math.sin(rWalkCycle) * 20;
+                let rStep = Math.sin(rWalkCycle + Math.PI) * 20;
+                rCtx.beginPath();
+                rCtx.moveTo(0, bW / 2);
+                rCtx.lineTo(rStep, bW / 2 + 15);
+                rCtx.lineTo(rStep + 5, bW / 2 + 18);
+                rCtx.moveTo(0, -bW / 2);
+                rCtx.lineTo(lStep, -bW / 2 - 15);
+                rCtx.lineTo(lStep + 5, -bW / 2 - 18);
+                rCtx.stroke();
+            }
+
+            rCtx.fillStyle = "white";
+            rCtx.shadowBlur = 0;
+            rCtx.beginPath();
+            rCtx.arc(0, 0, 1.5, 0, Math.PI * 2);
+            rCtx.fill();
+
+            rCtx.restore();
+        }
+        window.addEventListener('resize', rResize);
+        rResize();
+        drawReptileEngine();
+    </script>
+</body>
+</html>
