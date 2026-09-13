@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Omm Sairam Mahanta | Privacy Tools</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-accent: #00eaff;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --glass-bg: rgba(10, 10, 15, 0.45);
+            --card-border: rgba(0, 234, 255, 0.15);
+            --bg-dark: #050b14;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            background: linear-gradient(135deg, rgba(5,11,20,0.92) 0%, rgba(10,25,47,0.85) 100%), url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, p { margin: 0; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 234, 255, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 234, 255, 0.6); }
+
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+
+        #reptileCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; opacity: 0.6;
+        }
+
+        .bg-glow {
+            position: fixed; top: -15%; left: -10%; width: 55vw; height: 55vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.08) 0%, rgba(0,0,0,0) 65%);
+            border-radius: 50%; z-index: -1; animation: pulse-glow 10s infinite alternate;
+        }
+        .bg-glow-2 {
+            position: fixed; bottom: -10%; right: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(0, 234, 255, 0.06) 0%, rgba(0,0,0,0) 60%);
+            border-radius: 50%; z-index: -1; animation: pulse-glow 12s infinite alternate-reverse;
+        }
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(2%, -2%); }
+        }
+
+        .top-nav {
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border); z-index: 50; position: sticky; top: 0;
+        }
+        .back-btn { 
+            color: var(--text-main); text-decoration: none; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 10px; transition: 0.3s;
+        }
+        .back-btn:hover { color: var(--primary-accent); text-shadow: 0 0 10px var(--primary-accent); }
+
+        .content-wrapper { padding: 40px 5%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10;}
+        .section-title { font-size: 2.2rem; margin-bottom: 40px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+
+        .tools-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+            perspective: 1000px;
+        }
+        
+        .tool-card {
+            background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 25px 20px; 
+            transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 15px;
+        }
+        
+        .tool-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg); transition: 0.5s;
+        }
+
+        .tool-card:hover { 
+            transform: translateY(-5px); border-color: var(--primary-accent); 
+            box-shadow: 0 10px 30px rgba(0, 234, 255, 0.2); 
+        }
+        .tool-card:hover::before { left: 200%; }
+
+        .icon-box {
+            width: 45px; height: 45px; border-radius: 12px; 
+            display: flex; justify-content: center; align-items: center; font-size: 1.3rem;
+            background: rgba(0, 234, 255, 0.1); color: var(--primary-accent);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            flex-shrink: 0; transition: 0.3s;
+        }
+        .tool-card:hover .icon-box { transform: scale(1.1); box-shadow: 0 0 15px rgba(0, 234, 255, 0.4); }
+
+        .tool-info { flex-grow: 1; }
+        .tool-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px; font-family: 'Outfit', sans-serif;}
+        .tool-desc { color: var(--text-muted); font-size: 0.75rem; line-height: 1.4; font-weight: 400; }
+
+        /* Specific Card Colors */
+        .card-pwd .icon-box { color: #f43f5e; background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.2);}
+        .card-pwd:hover { border-color: rgba(244, 63, 94, 0.5); box-shadow: 0 10px 30px rgba(244, 63, 94, 0.2); }
+        .card-pwd:hover .icon-box { box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
+
+        .card-hash .icon-box { color: #a855f7; background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.2);}
+        .card-hash:hover { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2); }
+        .card-hash:hover .icon-box { box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+
+        .card-qr .icon-box { color: #3b82f6; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2);}
+        .card-qr:hover { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2); }
+        .card-qr:hover .icon-box { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(12px);
+            z-index: 100000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .modal-content {
+            background: rgba(15, 20, 30, 0.95);
+            border: 1px solid rgba(0, 234, 255, 0.3); border-radius: 24px; 
+            padding: 35px; width: 100%; max-width: 550px; position: relative;
+            transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 234, 255, 0.1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        
+        .modal-close {
+            position: absolute; top: 20px; right: 20px;
+            width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .modal-close:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: #ef4444; transform: rotate(90deg); }
+
+        .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .modal-header i { font-size: 1.5rem; color: var(--primary-accent); text-shadow: 0 0 10px rgba(0,234,255,0.5); }
+        .modal-header h3 { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; color: #fff;}
+
+        /* Premium Inputs */
+        .input-group { margin-bottom: 15px; position: relative;}
+        .input-group label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;}
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; left: 15px; color: #64748b; font-size: 0.9rem; transition: 0.3s; top: 14px;}
+        .input-group input[type="text"], .input-group select, .input-group textarea { 
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; font-size: 0.95rem; padding: 12px 15px 12px 40px; border-radius: 12px; outline: none; transition: 0.3s;
+            font-family: 'Courier New', monospace; font-weight: 500; appearance: none;
+        }
+        .input-group select { padding-left: 40px; cursor: pointer; }
+        .input-group select option { background: #0f141e; color: #fff; }
+        .input-group textarea { min-height: 100px; resize: vertical; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: var(--primary-accent); box-shadow: 0 0 15px rgba(0, 234, 255, 0.15); background: rgba(0,0,0,0.6);}
+        .input-group input:focus + i, .input-group select:focus + i, .input-group textarea:focus + i, .input-wrapper:focus-within i { color: var(--primary-accent); }
+
+        /* Custom Checkboxes */
+        .checkbox-container {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;
+            font-size: 0.85rem; color: #cbd5e1;
+        }
+        .checkbox-container input { display: none; }
+        .checkmark {
+            width: 20px; height: 20px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;
+            transition: 0.2s;
+        }
+        .checkbox-container input:checked + .checkmark { background: #f43f5e; border-color: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
+        .checkbox-container input:checked + .checkmark::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: white; font-size: 10px; }
+
+        /* Sliders */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--primary-accent); cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(0, 234, 255, 0.5); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        /* Action Buttons */
+        .btn-calc {
+            width: 100%; padding: 14px; border-radius: 12px; border: none; cursor: pointer;
+            background: linear-gradient(135deg, var(--primary-accent), #0099aa);
+            color: #000; font-weight: 800; font-size: 0.9rem; transition: 0.3s; 
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0, 234, 255, 0.2);
+            font-family: 'Outfit', sans-serif;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-calc:hover { box-shadow: 0 10px 25px rgba(0, 234, 255, 0.4); transform: translateY(-2px); background: #fff;}
+        .btn-download { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); box-shadow: none; margin-top: 10px; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; transition: 0.3s; display: none;}
+        .btn-download:hover { background: var(--primary-accent); color: #000; border-color: var(--primary-accent); }
+
+        /* Glowing Result Box */
+        .result-box {
+            margin-top: 20px; padding: 15px; border-radius: 12px; 
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1); 
+            display: none; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            position: relative;
+        }
+        .result-box pre { margin: 0; color: #10b981; font-family: 'Courier New', monospace; font-size: 0.9rem; white-space: pre-wrap; word-wrap: break-word; text-align: center; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .copy-btn:hover { background: var(--primary-accent); color: #000; }
+        
+        .qr-container { display: flex; justify-content: center; padding: 10px; background: white; border-radius: 10px; width: max-content; margin: 0 auto 10px auto; }
+
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        @media (max-width: 600px) {
+            .tools-grid { grid-template-columns: 1fr; gap: 15px;}
+            .content-wrapper { padding: 30px 5%; }
+            .top-nav { padding: 15px 20px; }
+            .section-title { font-size: 1.8rem; margin-bottom: 25px;}
+            .modal-content { padding: 25px 20px; }
+            .tool-card { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+    <canvas id="reptileCanvas"></canvas>
+
+    <nav class="top-nav">
+        <a href="projects.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Platforms Hub</a>
+        <h2 style="margin:0; font-weight: 700; letter-spacing: 2px; color: var(--primary-accent); text-transform: uppercase; font-size: 1.2rem;">Privacy Tools</h2>
+    </nav>
+
+    <div class="content-wrapper">
+        <h2 class="section-title"><span style="color:var(--primary-accent)">Privacy Utilities</span></h2>
+        
+        <div class="tools-grid">
+            
+            <!-- Tool 1: Password Generator -->
+            <div class="tool-card card-pwd" onclick="openModal('pwd')">
+                <div class="icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Password Generator</h3>
+                    <p class="tool-desc">Create highly secure, randomized passwords with custom parameters.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 2: Hash Generator -->
+            <div class="tool-card card-hash" onclick="openModal('hash')">
+                <div class="icon-box"><i class="fa-solid fa-lock"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">Hash Generator</h3>
+                    <p class="tool-desc">Compute cryptographic hashes (MD5, SHA-256, etc.) securely offline.</p>
+                </div>
+            </div>
+            
+            <!-- Tool 3: QR Generator -->
+            <div class="tool-card card-qr" onclick="openModal('qr')">
+                <div class="icon-box"><i class="fa-solid fa-qrcode"></i></div>
+                <div class="tool-info">
+                    <h3 class="tool-title">QR Generator</h3>
+                    <p class="tool-desc">Encode text, URLs, or secure data into a scannable QR code format.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 1. Password Generator Modal -->
+    <div class="modal-overlay" id="modal-pwd" onclick="closeModal(event, 'modal-pwd')">
+        <div class="modal-content" style="border-color: rgba(244, 63, 94, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-pwd')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-shield-halved" style="color: #f43f5e; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5);"></i>
+                <h3>Password Generator</h3>
+            </div>
+            
+            <div class="input-group">
+                <label class="flex justify-between"><span>Password Length</span> <span id="pwd-len-val" style="color:#f43f5e;">16</span></label>
+                <input type="range" id="pwd-slider" min="8" max="64" value="16" oninput="document.getElementById('pwd-len-val').innerText = this.value" style="--primary-accent: #f43f5e;">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="chk-uc" checked>
+                    <span class="checkmark"></span> Uppercase (A-Z)
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="chk-lc" checked>
+                    <span class="checkmark"></span> Lowercase (a-z)
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="chk-num" checked>
+                    <span class="checkmark"></span> Numbers (0-9)
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="chk-sym" checked>
+                    <span class="checkmark"></span> Symbols (!@#$)
+                </label>
+            </div>
+            
+            <button class="btn-calc" onclick="generatePassword()" style="background: linear-gradient(135deg, #f43f5e, #e11d48); color: white;"><i class="fa-solid fa-key"></i> Generate Secure Password</button>
+            
+            <div class="result-box mt-4" id="result-pwd" style="border-color: #f43f5e;">
+                <button class="copy-btn" onclick="copyResult('pwd-output')"><i class="fa-regular fa-copy"></i></button>
+                <pre id="pwd-output" style="color: #fda4af; font-size: 1.1rem; padding-right: 30px;"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Hash Generator Modal -->
+    <div class="modal-overlay" id="modal-hash" onclick="closeModal(event, 'modal-hash')">
+        <div class="modal-content" style="border-color: rgba(168, 85, 247, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-hash')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-lock" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);"></i>
+                <h3>Hash Generator</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Input Text or Data</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-keyboard"></i>
+                    <textarea id="hash-input" placeholder="Enter text to hash..."></textarea>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>Cryptographic Algorithm</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-microchip"></i>
+                    <select id="hash-algo">
+                        <option value="SHA256">SHA-256 (Recommended)</option>
+                        <option value="SHA512">SHA-512</option>
+                        <option value="SHA1">SHA-1</option>
+                        <option value="MD5">MD5 (Legacy)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="generateHash()" style="background: linear-gradient(135deg, #a855f7, #9333ea); color: white;"><i class="fa-solid fa-fingerprint"></i> Compute Hash</button>
+            
+            <div class="result-box mt-4" id="result-hash" style="border-color: #a855f7;">
+                <button class="copy-btn" onclick="copyResult('hash-output')"><i class="fa-regular fa-copy"></i></button>
+                <pre id="hash-output" style="color: #d8b4fe; font-size: 0.85rem; padding-right: 30px;"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. QR Generator Modal -->
+    <div class="modal-overlay" id="modal-qr" onclick="closeModal(event, 'modal-qr')">
+        <div class="modal-content" style="border-color: rgba(59, 130, 246, 0.3);">
+            <button class="modal-close" onclick="closeModal(null, 'modal-qr')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <i class="fa-solid fa-qrcode" style="color: #3b82f6; text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></i>
+                <h3>QR Code Generator</h3>
+            </div>
+            
+            <div class="input-group">
+                <label>Data to Encode (Text/URL)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-link"></i>
+                    <input type="text" id="qr-input" placeholder="https://example.com">
+                </div>
+            </div>
+            
+            <button class="btn-calc" onclick="generateQRCode()" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate QR Code</button>
+            
+            <div class="result-box mt-4 text-center" id="result-qr" style="border-color: #3b82f6;">
+                <div class="qr-container"><canvas id="qr-canvas"></canvas></div>
+                <p id="qr-error" style="color: #ef4444; font-size: 0.85rem; display: none;"></p>
+                <button id="qr-download" class="btn-download" style="border-color:#3b82f6;"><i class="fa-solid fa-download"></i> Save Image</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal UI Controls
+        function openModal(toolName) {
+            const modal = document.getElementById('modal-' + toolName);
+            if(modal) {
+                const resultBox = document.getElementById('result-' + toolName);
+                if(resultBox) resultBox.style.display = 'none';
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(e, modalId) {
+            if (e && e.target.id !== modalId && !e.target.closest('.modal-close')) return;
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function copyResult(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            if(!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.currentTarget;
+                const og = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check text-green-400"></i>';
+                setTimeout(() => btn.innerHTML = og, 1500);
+            });
+        }
+
+        function showError(elementId, msg) {
+            const out = document.getElementById(elementId);
+            out.innerText = msg;
+            out.style.color = '#ef4444';
+            document.getElementById('result-' + elementId.split('-')[0]).style.display = 'block';
+        }
+
+        function showSuccess(elementId, text, color) {
+            const out = document.getElementById(elementId);
+            out.innerText = text;
+            out.style.color = color;
+            document.getElementById('result-' + elementId.split('-')[0]).style.display = 'block';
+        }
+
+        // --- 1. Password Generator Logic ---
+        function generatePassword() {
+            const length = parseInt(document.getElementById('pwd-slider').value);
+            const useUc = document.getElementById('chk-uc').checked;
+            const useLc = document.getElementById('chk-lc').checked;
+            const useNum = document.getElementById('chk-num').checked;
+            const useSym = document.getElementById('chk-sym').checked;
+
+            if (!useUc && !useLc && !useNum && !useSym) {
+                showError('pwd-output', "Please select at least one character type.");
+                return;
+            }
+
+            const chars = {
+                uc: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                lc: "abcdefghijklmnopqrstuvwxyz",
+                num: "0123456789",
+                sym: "!@#$%^&*()_+~`|}{[]:;?><,./-="
+            };
+
+            let allowedChars = "";
+            if (useUc) allowedChars += chars.uc;
+            if (useLc) allowedChars += chars.lc;
+            if (useNum) allowedChars += chars.num;
+            if (useSym) allowedChars += chars.sym;
+
+            let password = "";
+            const array = new Uint32Array(length);
+            window.crypto.getRandomValues(array);
+
+            for (let i = 0; i < length; i++) {
+                password += allowedChars[array[i] % allowedChars.length];
+            }
+
+            showSuccess('pwd-output', password, '#fda4af');
+        }
+
+        // --- 2. Hash Generator Logic ---
+        function generateHash() {
+            const input = document.getElementById('hash-input').value;
+            const algo = document.getElementById('hash-algo').value;
+
+            if (!input) {
+                showError('hash-output', "Input cannot be empty.");
+                return;
+            }
+
+            try {
+                let hash = "";
+                // Using CryptoJS for offline robust hashing
+                if (algo === 'MD5') hash = CryptoJS.MD5(input).toString();
+                else if (algo === 'SHA1') hash = CryptoJS.SHA1(input).toString();
+                else if (algo === 'SHA256') hash = CryptoJS.SHA256(input).toString();
+                else if (algo === 'SHA512') hash = CryptoJS.SHA512(input).toString();
+
+                showSuccess('hash-output', hash, '#d8b4fe');
+            } catch (e) {
+                showError('hash-output', "Error computing hash.");
+            }
+        }
+
+        // --- 3. QR Generator Logic ---
+        let qrInstance = null;
+        function generateQRCode() {
+            const input = document.getElementById('qr-input').value.trim();
+            const resultBox = document.getElementById('result-qr');
+            const errBox = document.getElementById('qr-error');
+            const dlBtn = document.getElementById('qr-download');
+            const canvas = document.getElementById('qr-canvas');
+
+            resultBox.style.display = 'block';
+
+            if (!input) {
+                canvas.style.display = 'none';
+                dlBtn.style.display = 'none';
+                errBox.style.display = 'block';
+                errBox.innerText = "Please enter data to encode.";
+                return;
+            }
+
+            errBox.style.display = 'none';
+            canvas.style.display = 'block';
+            
+            // Generate QR Code
+            if(qrInstance) {
+                qrInstance.set({ value: input });
+            } else {
+                qrInstance = new QRious({
+                    element: canvas,
+                    value: input,
+                    size: 250,
+                    background: 'white',
+                    foreground: 'black',
+                    level: 'H' // High error correction
+                });
+            }
+
+            dlBtn.style.display = 'inline-block';
+            dlBtn.onclick = () => {
+                const link = document.createElement('a');
+                link.download = 'secure-qr-code.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+        }
+
+        const rCanvas = document.getElementById('reptileCanvas');
+        const rCtx = rCanvas.getContext('2d');
+
+        let rWidth, rHeight;
+        let rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        let rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+        const rSegments = [];
+        const rSegCount = 45; 
+        const rSegDist = 12; 
+        let rWalkCycle = 0;
+
+        for (let i = 0; i < rSegCount; i++) { rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 }); }
+
+        function rResize() {
+            rWidth = rCanvas.width = window.innerWidth;
+            rHeight = rCanvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('mousemove', e => {
+            rMouse.x = e.clientX;
+            rMouse.y = e.clientY;
+        });
+
+        function drawReptileEngine() {
+            rCtx.clearRect(0, 0, rWidth, rHeight);
+
+            rHead.x += (rMouse.x - rHead.x) * 0.12;
+            rHead.y += (rMouse.y - rHead.y) * 0.12;
+
+            let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
+            if (dHead > 1) rWalkCycle += dHead * 0.08;
+
+            rSegments[0].x = rHead.x;
+            rSegments[0].y = rHead.y;
+
+            for (let i = 1; i < rSegCount; i++) {
+                let s1 = rSegments[i - 1];
+                let s2 = rSegments[i];
+                let dx = s1.x - s2.x;
+                let dy = s1.y - s2.y;
+                s2.angle = Math.atan2(dy, dx);
+                s2.x = s1.x - Math.cos(s2.angle) * rSegDist;
+                s2.y = s1.y - Math.sin(s2.angle) * rSegDist;
+                renderReptileBody(s2, i);
+            }
+            requestAnimationFrame(drawReptileEngine);
+        }
+
+        function renderReptileBody(seg, i) {
+            rCtx.save();
+            rCtx.translate(seg.x, seg.y);
+            rCtx.rotate(seg.angle);
+
+            let hue = 190 + (i * 2); 
+            rCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`; 
+            rCtx.lineWidth = 1.5;
+            rCtx.shadowBlur = 12;
+            rCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+
+            let bW = Math.sin((i / rSegCount) * Math.PI) * 22;
+
+            rCtx.beginPath();
+            rCtx.moveTo(0, -bW / 2);
+            rCtx.lineTo(0, bW / 2);
+            rCtx.stroke();
+
+            if (i === 10 || i === 25) {
+                let lStep = Math.sin(rWalkCycle) * 20;
+                let rStep = Math.sin(rWalkCycle + Math.PI) * 20;
+                rCtx.beginPath();
+                rCtx.moveTo(0, bW / 2);
+                rCtx.lineTo(rStep, bW / 2 + 15);
+                rCtx.lineTo(rStep + 5, bW / 2 + 18);
+                rCtx.moveTo(0, -bW / 2);
+                rCtx.lineTo(lStep, -bW / 2 - 15);
+                rCtx.lineTo(lStep + 5, -bW / 2 - 18);
+                rCtx.stroke();
+            }
+
+            rCtx.fillStyle = "white";
+            rCtx.shadowBlur = 0;
+            rCtx.beginPath();
+            rCtx.arc(0, 0, 1.5, 0, Math.PI * 2);
+            rCtx.fill();
+
+            rCtx.restore();
+        }
+        window.addEventListener('resize', rResize);
+        rResize();
+        drawReptileEngine();
+    </script>
+</body>
+</html>
