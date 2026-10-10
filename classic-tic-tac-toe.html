@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Tic-Tac-Toe | Gaming Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --x:#00eaff; --o:#ff4466; --gold:#ffd54a; --bg:#050b14; }
+        * { box-sizing:border-box; }
+        body {
+            margin:0; min-height:100vh; font-family:'Poppins',sans-serif; color:#fff; display:flex; flex-direction:column;
+            background: linear-gradient(135deg, rgba(5,11,20,.93) 0%, rgba(10,25,47,.88) 100%),
+                        url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center/cover fixed;
+            background-color:var(--bg);
+        }
+        .scan { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.35;
+            background:repeating-linear-gradient(to bottom, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.18) 2px 4px); }
+        nav { padding:16px 28px; display:flex; justify-content:space-between; align-items:center;
+            background:rgba(0,0,0,.3); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,234,255,.2); }
+        nav a { color:#fff; text-decoration:none; font-weight:600; transition:.25s; }
+        nav a:hover { color:var(--x); text-shadow:0 0 10px var(--x); }
+        nav h2 { margin:0; font-size:1.05rem; letter-spacing:2px; text-transform:uppercase; color:var(--x); }
+
+        main { flex:1; display:flex; justify-content:center; align-items:center; padding:20px; }
+        .card { width:100%; max-width:480px; text-align:center; padding:28px 24px 30px; border-radius:28px;
+            background:rgba(15,15,20,.88); backdrop-filter:blur(10px); border:1px solid rgba(0,234,255,.3);
+            box-shadow:0 0 60px rgba(0,234,255,.14), inset 0 0 30px rgba(0,234,255,.05);
+            animation:cardIn .6s cubic-bezier(.2,.8,.2,1); }
+        @keyframes cardIn { from { opacity:0; transform:translateY(24px) scale(.95); filter:blur(8px); } }
+        h1 { margin:0 0 16px; font-size:1.9rem; font-weight:900; text-transform:uppercase; letter-spacing:3px; color:var(--x); text-shadow:0 0 18px rgba(0,234,255,.5); }
+
+        .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+        .btn { padding:9px 18px; border-radius:30px; border:1px solid rgba(255,255,255,.22); background:transparent; color:#fff; cursor:pointer;
+            font:700 .78rem 'Poppins',sans-serif; text-transform:uppercase; transition:.25s; }
+        .btn:hover { background:rgba(0,234,255,.12); border-color:var(--x); transform:scale(1.05); }
+        .btn.active { background:var(--x); color:#000; border-color:var(--x); box-shadow:0 0 15px rgba(0,234,255,.45); }
+        .btn.hard.active { background:linear-gradient(45deg,#ff4466,#aa0022); color:#fff; border-color:var(--o); box-shadow:0 0 15px rgba(255,68,102,.5); }
+        .hidden { display:none !important; }
+
+        .scoreboard { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin:6px 0 10px; }
+        .sc { padding:8px 10px; border-radius:14px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.1); transition:.3s; }
+        .sc .nm { font-size:.74rem; color:#bbb; }
+        .sc .pts { font-size:1.6rem; font-weight:800; }
+        .sc.x .pts { color:var(--x); } .sc.o .pts { color:var(--o); }
+        .sc.turn { transform:scale(1.06); }
+        .sc.x.turn { border-color:var(--x); box-shadow:0 0 18px rgba(0,234,255,.35); }
+        .sc.o.turn { border-color:var(--o); box-shadow:0 0 18px rgba(255,68,102,.35); }
+        .dr { font-size:.74rem; color:#aaa; } .dr b { display:block; font-size:1.2rem; color:#fff; }
+
+        #status { min-height:1.7em; font-weight:700; letter-spacing:1px; margin:6px 0 14px; color:var(--x); transition:color .25s; }
+
+        /* Board */
+        .board-wrap { position:relative; width:min(100%, 330px); margin:0 auto 18px; aspect-ratio:1; }
+        .board { display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); width:100%; height:100%; }
+        .cell { position:relative; background:transparent; border:0; padding:0; cursor:pointer; color:inherit;
+            border-right:3px solid rgba(255,255,255,.28); border-bottom:3px solid rgba(255,255,255,.28); transition:background .2s; }
+        .cell:nth-child(3n) { border-right:0; }
+        .cell:nth-child(n+7) { border-bottom:0; }
+        .cell:not(.filled):hover { background:rgba(0,234,255,.08); }
+        .cell.filled { cursor:default; }
+        .locked .cell:not(.filled) { cursor:not-allowed; }
+        .cell:focus-visible { outline:2px solid var(--gold); outline-offset:-4px; }
+        .cell svg { position:absolute; inset:16%; width:68%; height:68%; overflow:visible; }
+        .cell svg * { fill:none; stroke-width:11; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:1; animation:draw .38s ease-out forwards; }
+        .cell svg *:nth-child(2) { animation-delay:.2s; }
+        .cell.x svg * { stroke:var(--x); filter:drop-shadow(0 0 7px var(--x)); }
+        .cell.o svg * { stroke:var(--o); filter:drop-shadow(0 0 7px var(--o)); animation-duration:.5s; }
+        @keyframes draw { to { stroke-dashoffset:0; } }
+        .cell.dim svg { opacity:.35; transition:opacity .4s; }
+        .cell.win { background:rgba(255,213,74,.1); }
+
+        .winline { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; }
+        .winline line { stroke:var(--gold); stroke-width:7; stroke-linecap:round; filter:drop-shadow(0 0 10px var(--gold));
+            stroke-dasharray:1; stroke-dashoffset:1; animation:draw .55s .15s ease-out forwards; }
+
+        .shake { animation:shake .4s; }
+        @keyframes shake { 20%,60% { transform:translateX(-6px); } 40%,80% { transform:translateX(6px); } }
+
+        .wide { width:100%; border-radius:14px; padding:13px; font-size:.95rem; border-color:var(--x); }
+        @media (max-width:420px) { .card { padding:22px 14px 24px; } h1 { font-size:1.5rem; } nav { padding:14px 16px; } }
+        @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+    </style>
+</head>
+<body>
+    <div class="scan"></div>
+    <nav>
+        <a href="tictactoe-dashboard.html">&larr; Dashboard</a>
+        <h2>Classic</h2>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h1>Classic Tic-Tac-Toe</h1>
+
+            <div class="row">
+                <button class="btn active" id="m-ai" onclick="setMode('ai')">vs AI</button>
+                <button class="btn" id="m-local" onclick="setMode('local')">2 Players</button>
+            </div>
+            <div class="row" id="diffRow">
+                <button class="btn" id="d-easy" onclick="setDiff('easy')">Easy</button>
+                <button class="btn" id="d-medium" onclick="setDiff('medium')">Medium</button>
+                <button class="btn hard active" id="d-hard" onclick="setDiff('hard')">Hard</button>
+            </div>
+
+            <div class="scoreboard">
+                <div class="sc x" id="cardX"><div class="nm" id="nmX">You (X)</div><div class="pts" id="scX">0</div></div>
+                <div class="dr">Draws<b id="scD">0</b></div>
+                <div class="sc o" id="cardO"><div class="nm" id="nmO">AI (O)</div><div class="pts" id="scO">0</div></div>
+            </div>
+
+            <div id="status">Your turn</div>
+
+            <div class="board-wrap" id="wrap">
+                <div class="board" id="board"></div>
+                <svg class="winline" id="winline" viewBox="0 0 300 300" preserveAspectRatio="none"></svg>
+            </div>
+
+            <button class="btn wide" onclick="newRound()">New Round</button>
+            <button class="btn" style="margin-top:10px;" onclick="resetScores()">Reset Scores</button>
+        </div>
+    </main>
+
+<script>
+const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const HUMAN = "X", AI = "O";
+const $ = id => document.getElementById(id);
+const SVG = {
+    X: '<svg viewBox="0 0 100 100"><path pathLength="1" d="M18 18 L82 82"/><path pathLength="1" d="M82 18 L18 82"/></svg>',
+    O: '<svg viewBox="0 0 100 100"><circle pathLength="1" cx="50" cy="50" r="33"/></svg>'
+};
+
+let board = Array(9).fill(""), current = "X", starter = "X", active = false;
+let mode = "ai", diff = "hard", scores = { X:0, O:0, D:0 }, aiTimer = null;
+const cells = [];
+
+/* ---- build board once ---- */
+for (let i = 0; i < 9; i++) {
+    const b = document.createElement("button");
+    b.className = "cell"; b.setAttribute("aria-label", "Cell " + (i + 1));
+    b.onclick = () => clickCell(i);
+    $("board").appendChild(b); cells.push(b);
+}
+
+/* ---- modes ---- */
+function setMode(m) {
+    mode = m;
+    $("m-ai").classList.toggle("active", m === "ai");
+    $("m-local").classList.toggle("active", m === "local");
+    $("diffRow").classList.toggle("hidden", m !== "ai");
+    $("nmX").textContent = m === "ai" ? "You (X)" : "Player 1 (X)";
+    $("nmO").textContent = m === "ai" ? "AI (O)" : "Player 2 (O)";
+    resetScores(); startRound("X");
+}
+function setDiff(d) {
+    diff = d;
+    ["easy","medium","hard"].forEach(k => $("d-" + k).classList.toggle("active", k === d));
+    resetScores(); startRound("X");
+}
+function resetScores() { scores = { X:0, O:0, D:0 }; renderScores(); }
+function renderScores() { $("scX").textContent = scores.X; $("scO").textContent = scores.O; $("scD").textContent = scores.D; }
+function newRound() { startRound(starter === "X" ? "O" : "X"); }   // starter alternates
+
+/* ---- round flow ---- */
+function startRound(first) {
+    clearTimeout(aiTimer);
+    board.fill(""); starter = first; current = first; active = true;
+    cells.forEach(c => { c.className = "cell"; c.innerHTML = ""; });
+    $("winline").innerHTML = "";
+    updateUI();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function clickCell(i) {
+    if (!active || board[i]) { if (active) { cells[i].classList.remove("shake"); void cells[i].offsetWidth; cells[i].classList.add("shake"); } return; }
+    if (mode === "ai" && current !== HUMAN) return;
+    place(i);
+}
+function place(i) {
+    board[i] = current;
+    cells[i].classList.add("filled", current.toLowerCase());
+    cells[i].innerHTML = SVG[current];
+    const line = winLine(board);
+    if (line) { finish(current, line); return; }
+    if (!board.includes("")) { finish("D"); return; }
+    current = current === "X" ? "O" : "X";
+    updateUI();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function finish(result, line) {
+    active = false; scores[result]++; renderScores();
+    if (line) {
+        cells.forEach((c, i) => { if (line.includes(i)) c.classList.add("win"); else c.classList.add("dim"); });
+        drawWinLine(line);
+    }
+    let msg, color = "#fff";
+    if (result === "D") msg = "🤝 It's a draw!";
+    else if (mode === "ai") msg = result === HUMAN ? "🏆 You win!" : "🤖 AI wins!";
+    else msg = "🏆 Player " + (result === "X" ? "1" : "2") + " wins!";
+    $("status").textContent = msg; $("status").style.color = color;
+    $("cardX").classList.remove("turn"); $("cardO").classList.remove("turn");
+    $("wrap").classList.add("locked");
+}
+function updateUI() {
+    $("wrap").classList.toggle("locked", !active || (mode === "ai" && current !== HUMAN));
+    $("cardX").classList.toggle("turn", active && current === "X");
+    $("cardO").classList.toggle("turn", active && current === "O");
+    const col = current === "X" ? "var(--x)" : "var(--o)";
+    $("status").style.color = col;
+    $("status").textContent = mode === "ai"
+        ? (current === HUMAN ? "Your turn (X)" : "AI is thinking…")
+        : "Player " + (current === "X" ? "1" : "2") + "'s turn (" + current + ")";
+}
+function drawWinLine(l) {
+    const c = i => [50 + 100 * (i % 3), 50 + 100 * Math.floor(i / 3)];
+    const [x1, y1] = c(l[0]), [x2, y2] = c(l[2]);
+    const len = Math.hypot(x2 - x1, y2 - y1), dx = (x2 - x1) / len, dy = (y2 - y1) / len, e = 30;
+    $("winline").innerHTML = '<line pathLength="1" x1="' + (x1 - dx * e) + '" y1="' + (y1 - dy * e) + '" x2="' + (x2 + dx * e) + '" y2="' + (y2 + dy * e) + '"/>';
+}
+
+/* ---- logic ---- */
+function winLine(b) { return LINES.find(l => b[l[0]] && b[l[0]] === b[l[1]] && b[l[1]] === b[l[2]]) || null; }
+function winnerOf(b) { const l = winLine(b); return l ? b[l[0]] : null; }
+
+/* ---- AI ---- */
+function scheduleAI() {
+    updateUI();
+    aiTimer = setTimeout(() => {
+        const m = diff === "easy" ? randomMove() : diff === "medium" ? mediumMove() : bestMove();
+        if (m !== undefined && active) place(m);
+    }, 550);
+}
+function empties() { return board.map((v, i) => v === "" ? i : null).filter(v => v !== null); }
+function randomMove() { const e = empties(); return e[Math.floor(Math.random() * e.length)]; }
+function mediumMove() {
+    for (const p of [AI, HUMAN]) for (const i of empties()) {          // win, else block
+        board[i] = p; const w = winnerOf(board) === p; board[i] = "";
+        if (w) return i;
+    }
+    return randomMove();
+}
+function bestMove() {
+    const e = empties();
+    if (e.length === 9) return [0, 2, 4, 6, 8][Math.floor(Math.random() * 5)];   // vary the opening
+    let best = -Infinity, moves = [];
+    for (const i of e) {
+        board[i] = AI; const s = minimax(0, false, -Infinity, Infinity); board[i] = "";
+        if (s > best) { best = s; moves = [i]; } else if (s === best) moves.push(i);
+    }
+    return moves[Math.floor(Math.random() * moves.length)];
+}
+function minimax(depth, max, alpha, beta) {
+    const w = winnerOf(board);
+    if (w === AI) return 10 - depth;
+    if (w === HUMAN) return depth - 10;
+    if (!board.includes("")) return 0;
+    let best = max ? -Infinity : Infinity;
+    for (let i = 0; i < 9; i++) if (board[i] === "") {
+        board[i] = max ? AI : HUMAN;
+        const s = minimax(depth + 1, !max, alpha, beta);
+        board[i] = "";
+        if (max) { best = Math.max(best, s); alpha = Math.max(alpha, s); } else { best = Math.min(best, s); beta = Math.min(beta, s); }
+        if (beta <= alpha) break;
+    }
+    return best;
+}
+
+setMode("ai");
+</script>
+</body>
+</html>

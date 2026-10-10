@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Tic-Tac-Toe | NEON LAB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #050b14;
+            --cyan: #00eaff;
+            --cyan-glow: rgba(0, 234, 255, 0.45);
+            --red: #ff4466;
+            --red-glow: rgba(255, 68, 102, 0.45);
+            --gold: #ffd54a;
+            --gold-glow: rgba(255, 213, 74, 0.6);
+            --card-bg: rgba(7, 18, 34, 0.82);
+            --glass-border: rgba(0, 234, 255, 0.35);
+            --glass-blur: blur(20px);
+            --transition-fast: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(0, 234, 255, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(5, 11, 20, 0.88) 0%, rgba(5, 11, 20, 0.96) 100%),
+                url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg');
+            background-position: center; background-size: cover; background-repeat: no-repeat;
+            background-attachment: fixed; font-family: 'Poppins', sans-serif; color: #e2e8f0;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+            overflow-x: hidden; padding-bottom: 2.5rem;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18) 1.5px, transparent 1.5px, transparent 3px);
+            pointer-events: none; z-index: 999; opacity: 0.85;
+        }
+
+        .top-navbar {
+            width: 100%; height: 58px; background: rgba(5, 11, 20, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1.5px solid var(--cyan); box-shadow: 0 4px 20px rgba(0, 234, 255, 0.2);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.5rem; position: sticky; top: 0; z-index: 100;
+        }
+
+        .nav-link {
+            color: #a0aec0; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all var(--transition-fast); border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.35rem 0.85rem; border-radius: 9999px;
+        }
+        .nav-link:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px var(--cyan-glow); transform: translateX(-2px); }
+        .nav-title { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.15em; color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow); }
+
+        .main-container { width: 100%; max-width: 580px; padding: 1.25rem 1rem; display: flex; justify-content: center; z-index: 10; }
+
+        @keyframes cardEntrance { 0% { opacity: 0; transform: translateY(35px) scale(0.96); filter: blur(12px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+
+        .glass-card {
+            width: 100%; background: var(--card-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 28px; border: 1.5px solid var(--glass-border);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(0, 234, 255, 0.18), inset 0 0 20px rgba(0, 234, 255, 0.05);
+            padding: 1.8rem 1.6rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+            animation: cardEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .header-group { text-align: center; }
+        .game-heading { font-size: 1.7rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff; text-shadow: 0 0 12px var(--cyan), 0 0 30px var(--cyan-glow); line-height: 1.2; }
+        .rules-hint { margin-top: 0.35rem; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase; }
+        .rules-highlight { color: var(--cyan); font-weight: 700; text-shadow: 0 0 8px var(--cyan-glow); }
+
+        .controls-wrapper { width: 100%; display: flex; flex-direction: column; gap: 0.65rem; }
+        .pill-group { display: flex; justify-content: center; gap: 0.45rem; flex-wrap: wrap; }
+        .pill-btn {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 234, 255, 0.25); color: #cbd5e1;
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 0.42rem 0.95rem; border-radius: 9999px; cursor: pointer; transition: all var(--transition-fast); outline: none;
+        }
+        .pill-btn:hover:not(:disabled) { transform: scale(1.05); border-color: var(--cyan); color: #ffffff; box-shadow: 0 0 12px var(--cyan-glow); background: rgba(0, 234, 255, 0.1); }
+        .pill-btn.active { background: var(--cyan); color: #050b14; border-color: var(--cyan); box-shadow: 0 0 16px var(--cyan); font-weight: 800; }
+        .pill-btn.diff-hard.active { background: linear-gradient(135deg, #ff2d55, #c81e3a); border-color: var(--red); color: #ffffff; box-shadow: 0 0 18px var(--red); }
+
+        .scoreboard { width: 100%; display: grid; grid-template-columns: 1fr 0.8fr 1fr; gap: 0.65rem; margin-top: 0.2rem; }
+        .score-card {
+            background: rgba(10, 22, 40, 0.6); border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px; padding: 0.75rem 0.5rem; text-align: center; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .score-card .player-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #94a3b8; }
+        .score-card .score-num { font-size: 1.55rem; font-weight: 900; line-height: 1.2; margin-top: 0.15rem; color: #ffffff; }
+        .score-card.player-x { border-color: rgba(0, 234, 255, 0.25); }
+        .score-card.player-o { border-color: rgba(255, 68, 102, 0.25); }
+        .score-card.active-turn-x { transform: scale(1.06); border-color: var(--cyan); box-shadow: 0 0 22px var(--cyan-glow), inset 0 0 12px rgba(0, 234, 255, 0.15); }
+        .score-card.active-turn-x .player-label { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+        .score-card.active-turn-o { transform: scale(1.06); border-color: var(--red); box-shadow: 0 0 22px var(--red-glow), inset 0 0 12px rgba(255, 68, 102, 0.15); }
+        .score-card.active-turn-o .player-label { color: var(--red); text-shadow: 0 0 8px var(--red-glow); }
+
+        .phase-indicator { background: rgba(0,0,0,0.5); padding: 0.4rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .phase-indicator span { color: var(--gold); }
+        
+        .status-line { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; min-height: 1.7rem; display: flex; align-items: center; justify-content: center; text-align: center; transition: color var(--transition-fast), text-shadow var(--transition-fast); }
+        .status-x { color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); }
+        .status-o { color: var(--red); text-shadow: 0 0 12px var(--red-glow); }
+        .status-gold { color: var(--gold); text-shadow: 0 0 16px var(--gold-glow); }
+        .status-collapse { color: #fff; text-shadow: 0 0 16px rgba(255,255,255,0.8); animation: pulseCollapseText 1s infinite alternate; }
+        
+        @keyframes pulseCollapseText { from { opacity: 0.8; text-shadow: 0 0 10px #fff; } to { opacity: 1; text-shadow: 0 0 25px #fff, 0 0 15px var(--cyan); } }
+
+        .board-container {
+            position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin: 0 auto;
+            background: rgba(3, 8, 16, 0.65); border-radius: 20px; border: 1px solid rgba(0, 234, 255, 0.2);
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.7); padding: 8px;
+        }
+        
+        .board-grid { display: grid; width: 100%; height: 100%; gap: 8px; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+
+        .cell {
+            background: rgba(14, 29, 51, 0.45); border: 1.5px solid rgba(0, 234, 255, 0.15); border-radius: 12px;
+            display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: flex-start; gap: 4px; padding: 6px;
+            cursor: pointer; position: relative; transition: all 0.15s ease; touch-action: manipulation; overflow: hidden;
+        }
+        
+        .board-container:not(.game-over):not(.collapse-mode) .cell:not(.classical):hover {
+            background: rgba(0, 234, 255, 0.08); border-color: rgba(0, 234, 255, 0.45); box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+        }
+
+        .cell.pick1-highlight { background: rgba(0, 234, 255, 0.15); border-color: var(--cyan); box-shadow: inset 0 0 15px var(--cyan-glow); }
+        .cell.pick1-highlight-o { background: rgba(255, 68, 102, 0.15); border-color: var(--red); box-shadow: inset 0 0 15px var(--red-glow); }
+        
+        .board-container.collapse-mode .cell.in-cycle {
+            animation: pulseCollapseCell 1.5s infinite alternate; z-index: 5; cursor: pointer;
+        }
+        .board-container.collapse-mode .cell:not(.in-cycle) { opacity: 0.3; pointer-events: none; filter: grayscale(80%); }
+
+        @keyframes pulseCollapseCell { 
+            0% { border-color: #fff; box-shadow: inset 0 0 15px rgba(255,255,255,0.2), 0 0 10px rgba(255,255,255,0.2); }
+            100% { border-color: var(--gold); box-shadow: inset 0 0 25px rgba(255,213,74,0.4), 0 0 20px var(--gold-glow); }
+        }
+
+        /* Quantum Marks (Small Numbers) */
+        .q-mark {
+            font-size: 0.8rem; font-weight: 800; padding: 2px 6px; border-radius: 6px;
+            background: rgba(0,0,0,0.6); display: inline-flex; align-items: baseline; gap: 2px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .q-mark sub { font-size: 0.55rem; font-weight: 600; }
+        .q-mark.qx { color: var(--cyan); border: 1px solid rgba(0, 234, 255, 0.4); text-shadow: 0 0 5px var(--cyan); }
+        .q-mark.qo { color: var(--red); border: 1px solid rgba(255, 68, 102, 0.4); text-shadow: 0 0 5px var(--red); }
+        
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Classical Marks (Big SVG) */
+        .mark-svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 75%; height: 75%; pointer-events: none; }
+        @keyframes drawStroke { to { stroke-dashoffset: 0; } }
+        
+        .mark-x { stroke: var(--cyan); filter: drop-shadow(0 0 8px var(--cyan-glow)) drop-shadow(0 0 16px rgba(0, 234, 255, 0.6)); }
+        .mark-x path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+        .mark-x path.stroke-1 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+        .mark-x path.stroke-2 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) 0.18s forwards; }
+
+        .mark-o { stroke: var(--red); filter: drop-shadow(0 0 8px var(--red-glow)) drop-shadow(0 0 16px rgba(255, 68, 102, 0.6)); }
+        .mark-o circle { stroke-dasharray: 1; stroke-dashoffset: 1; animation: drawStroke 0.38s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; transform-origin: center; transform: rotate(-90deg); }
+
+        .cell.classical .q-mark { display: none; } /* Hide small marks when classical */
+        
+        /* Winning Line */
+        .win-line-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .win-line-svg line {
+            stroke: var(--gold); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1;
+            filter: drop-shadow(0 0 10px var(--gold)) drop-shadow(0 0 20px var(--gold-glow));
+            animation: drawStroke 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes winPulse { 0%, 100% { transform: scale(1); border-color: var(--gold); box-shadow: 0 0 20px var(--gold-glow), inset 0 0 12px rgba(255, 213, 74, 0.3); } 50% { transform: scale(1.05); border-color: #ffffff; box-shadow: 0 0 28px var(--gold), inset 0 0 18px rgba(255, 213, 74, 0.5); } }
+        .cell.winning-cell { animation: winPulse 1.4s infinite ease-in-out; z-index: 5; background: rgba(255, 213, 74, 0.12) !important; }
+        .board-container.has-winner .cell:not(.winning-cell) .mark-svg { opacity: 0.22; filter: grayscale(80%); transition: opacity 0.5s ease, filter 0.5s ease; }
+
+        @keyframes shakeCell { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-5px) rotate(-1deg); } 40% { transform: translateX(5px) rotate(1deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+        .cell.shake { animation: shakeCell 0.32s ease-in-out; }
+
+        .actions-group { width: 100%; display: flex; flex-direction: column; gap: 0.65rem; align-items: center; margin-top: 0.4rem; }
+        .btn-new-round {
+            width: 100%; background: linear-gradient(135deg, rgba(0, 234, 255, 0.18), rgba(0, 234, 255, 0.05));
+            border: 1.5px solid var(--cyan); color: #ffffff; font-family: inherit; font-size: 0.95rem; font-weight: 800;
+            letter-spacing: 0.12em; text-transform: uppercase; padding: 0.82rem 1.2rem; border-radius: 9999px;
+            cursor: pointer; box-shadow: 0 0 16px rgba(0, 234, 255, 0.2); transition: all var(--transition-fast); outline: none;
+        }
+        .btn-new-round:hover { background: var(--cyan); color: #050b14; box-shadow: 0 0 28px var(--cyan); transform: translateY(-2px); }
+        .btn-new-round:active { transform: translateY(0); }
+
+        .btn-reset-scores { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #94a3b8; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 1rem; border-radius: 9999px; cursor: pointer; transition: all var(--transition-fast); outline: none; }
+        .btn-reset-scores:hover { border-color: var(--red); color: var(--red); box-shadow: 0 0 10px var(--red-glow); }
+
+        @media (max-width: 440px) {
+            .glass-card { padding: 1.4rem 1.1rem; border-radius: 22px; }
+            .game-heading { font-size: 1.35rem; }
+            .pill-btn { font-size: 0.68rem; padding: 0.35rem 0.75rem; }
+            .score-card .score-num { font-size: 1.3rem; }
+            .board-container { max-width: 320px; }
+            .phase-indicator { font-size: 0.7rem; padding: 0.3rem 0.8rem; }
+        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } .mark-svg, .q-mark { animation: none !important; } .mark-x path, .mark-o circle, .win-line-svg line { stroke-dashoffset: 0 !important; } }
+    </style>
+</head>
+<body>
+
+    <nav class="top-navbar">
+        <a href="tictactoe-dashboard.html" class="nav-link"><span>&#8592;</span> Dashboard</a>
+        <div class="nav-title">QUANTUM</div>
+    </nav>
+
+    <main class="main-container">
+        <div class="glass-card">
+            
+            <div class="header-group">
+                <h1 class="game-heading">Quantum Tic-Tac-Toe</h1>
+                <p class="rules-hint">Place <span class="rules-highlight">2 entangled marks</span>. Creating a cycle forces collapse!</p>
+            </div>
+
+            <div class="controls-wrapper">
+                <div class="pill-group" id="modeGroup">
+                    <button class="pill-btn active" data-mode="ai">vs AI</button>
+                    <button class="pill-btn" data-mode="pvp">2 Players</button>
+                </div>
+                <div class="pill-group" id="diffGroup">
+                    <button class="pill-btn" data-diff="easy">Easy</button>
+                    <button class="pill-btn active" data-diff="medium">Medium</button>
+                    <button class="pill-btn diff-hard" data-diff="hard">Hard</button>
+                </div>
+            </div>
+
+            <div class="scoreboard">
+                <div class="score-card player-x active-turn-x" id="scoreCardX">
+                    <div class="player-label" id="labelPlayerX">You (X)</div>
+                    <div class="score-num" id="scoreX">0</div>
+                </div>
+                <div class="score-card" id="scoreCardDraw">
+                    <div class="player-label">Draws</div>
+                    <div class="score-num" id="scoreDraw">0</div>
+                </div>
+                <div class="score-card player-o" id="scoreCardO">
+                    <div class="player-label" id="labelPlayerO">AI (O)</div>
+                    <div class="score-num" id="scoreO">0</div>
+                </div>
+            </div>
+
+            <div class="phase-indicator" id="phaseIndicator">PHASE: <span id="phaseText">Select 1st Cell</span></div>
+            <div class="status-line status-x" id="statusLine">YOUR TURN (X)</div>
+
+            <div class="board-container" id="boardContainer">
+                <div class="board-grid" id="boardGrid">
+                    <!-- Cells injected by JS -->
+                </div>
+                <svg class="win-line-svg" id="winLineSvg" viewBox="0 0 100 100" preserveAspectRatio="none" style="display: none;">
+                    <line id="winSvgLine" x1="0" y1="0" x2="0" y2="0" pathLength="1" />
+                </svg>
+            </div>
+
+            <div class="actions-group">
+                <button class="btn-new-round" id="btnNewRound">New Round</button>
+                <button class="btn-reset-scores" id="btnResetScores">Reset Scores</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // Application State
+            const state = {
+                mode: 'ai',
+                difficulty: 'medium',
+                board: Array.from({length: 9}, () => ({ type: 'empty', qMarks: [], classical: null })),
+                currentPlayer: 'X',
+                startingPlayer: 'X',
+                gameOver: false,
+                aiThinking: false,
+                moveId: 1,
+                phase: 'pick1', // pick1, pick2, collapse
+                firstPickIdx: null,
+                cycleNodes: [], // Nodes involved in a detected cycle
+                scores: { X: 0, O: 0, draw: 0 },
+            };
+
+            const winLines = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Cols
+                [0, 4, 8], [2, 4, 6]             // Diagonals
+            ];
+
+            const dom = {
+                modeBtns: document.querySelectorAll('#modeGroup .pill-btn'),
+                diffBtns: document.querySelectorAll('#diffGroup .pill-btn'),
+                diffGroup: document.getElementById('diffGroup'),
+                labelPlayerX: document.getElementById('labelPlayerX'),
+                labelPlayerO: document.getElementById('labelPlayerO'),
+                scoreX: document.getElementById('scoreX'),
+                scoreO: document.getElementById('scoreO'),
+                scoreDraw: document.getElementById('scoreDraw'),
+                scoreCardX: document.getElementById('scoreCardX'),
+                scoreCardO: document.getElementById('scoreCardO'),
+                statusLine: document.getElementById('statusLine'),
+                phaseText: document.getElementById('phaseText'),
+                boardContainer: document.getElementById('boardContainer'),
+                boardGrid: document.getElementById('boardGrid'),
+                winLineSvg: document.getElementById('winLineSvg'),
+                winSvgLine: document.getElementById('winSvgLine'),
+                btnNewRound: document.getElementById('btnNewRound'),
+                btnResetScores: document.getElementById('btnResetScores')
+            };
+
+            let cellEls = [];
+
+            function init() {
+                buildBoardDOM();
+                attachEventListeners();
+                updateUI();
+                startRound(true);
+            }
+
+            function buildBoardDOM() {
+                dom.boardGrid.innerHTML = '';
+                cellEls = [];
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.index = i;
+                    cell.addEventListener('click', () => handleCellClick(i));
+                    dom.boardGrid.appendChild(cell);
+                    cellEls.push(cell);
+                }
+            }
+
+            function createClassicalSVG(type) {
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 100');
+                svg.setAttribute('class', `mark-svg ${type === 'X' ? 'mark-x' : 'mark-o'}`);
+                if (type === 'X') {
+                    const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p1.setAttribute('d', 'M 24 24 L 76 76'); p1.setAttribute('stroke-width', '14'); p1.setAttribute('stroke-linecap', 'round'); p1.setAttribute('pathLength', '1'); p1.setAttribute('class', 'stroke-1');
+                    const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p2.setAttribute('d', 'M 76 24 L 24 76'); p2.setAttribute('stroke-width', '14'); p2.setAttribute('stroke-linecap', 'round'); p2.setAttribute('pathLength', '1'); p2.setAttribute('class', 'stroke-2');
+                    svg.appendChild(p1); svg.appendChild(p2);
+                } else {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', '50'); circle.setAttribute('cy', '50'); circle.setAttribute('r', '27');
+                    circle.setAttribute('fill', 'none'); circle.setAttribute('stroke-width', '13'); circle.setAttribute('stroke-linecap', 'round'); circle.setAttribute('pathLength', '1');
+                    svg.appendChild(circle);
+                }
+                return svg;
+            }
+
+            function renderBoard() {
+                for (let i = 0; i < 9; i++) {
+                    const cellData = state.board[i];
+                    const cellEl = cellEls[i];
+                    
+                    // Maintain highlight if first pick
+                    const isPick1 = state.phase === 'pick2' && state.firstPickIdx === i;
+                    
+                    cellEl.className = 'cell';
+                    if (isPick1) {
+                        cellEl.classList.add(state.currentPlayer === 'X' ? 'pick1-highlight' : 'pick1-highlight-o');
+                    }
+                    if (state.phase === 'collapse' && state.cycleNodes.includes(i)) {
+                        cellEl.classList.add('in-cycle');
+                    }
+                    if (cellData.type === 'classical') {
+                        cellEl.classList.add('classical');
+                    }
+                    
+                    cellEl.innerHTML = '';
+                    
+                    // Render Quantum Marks
+                    cellData.qMarks.forEach(qm => {
+                        const span = document.createElement('span');
+                        span.className = `q-mark ${qm.player === 'X' ? 'qx' : 'qo'}`;
+                        span.innerHTML = `${qm.player}<sub>${qm.moveId}</sub>`;
+                        cellEl.appendChild(span);
+                    });
+
+                    // Render Classical Mark if collapsed
+                    if (cellData.type === 'classical') {
+                        cellEl.appendChild(createClassicalSVG(cellData.classical));
+                    }
+                }
+            }
+
+            // Graph traversal to find if a path exists between u and v
+            function findPath(u, v, boardState = state.board) {
+                if (u === v) return [u];
+                const visited = new Set();
+                const queue = [[u, [u]]];
+                
+                while(queue.length > 0) {
+                    const [current, path] = queue.shift();
+                    if (visited.has(current)) continue;
+                    visited.add(current);
+                    
+                    // Find all neighbors via quantum links
+                    const cellData = boardState[current];
+                    if(cellData.type === 'classical') continue; // Broken link
+                    
+                    for (const qm of cellData.qMarks) {
+                        const neighbor = qm.pair;
+                        if (neighbor === v) return [...path, v]; // Found path
+                        if (!visited.has(neighbor) && boardState[neighbor].type !== 'classical') {
+                            queue.push([neighbor, [...path, neighbor]]);
+                        }
+                    }
+                }
+                return null; // No path
+            }
+
+            function handleCellClick(index) {
+                if (state.gameOver || state.aiThinking) return;
+                
+                const cell = state.board[index];
+                
+                if (state.phase === 'collapse') {
+                    // Only allow clicking cells involved in the specific cycle edge that triggered collapse
+                    // The triggering edge is between firstPickIdx and second click.
+                    // For simplicity and standard rules, clicking ANY node in the cycle to establish its final value resolves the whole connected component.
+                    if (state.cycleNodes.includes(index)) {
+                        executeCollapse(index);
+                    } else {
+                        shakeCell(index);
+                    }
+                    return;
+                }
+                
+                if (cell.type === 'classical') {
+                    shakeCell(index);
+                    return; // Cannot play in a collapsed classical cell
+                }
+
+                if (state.phase === 'pick1') {
+                    state.firstPickIdx = index;
+                    state.phase = 'pick2';
+                    renderBoard();
+                    updateUI();
+                } 
+                else if (state.phase === 'pick2') {
+                    if (index === state.firstPickIdx) {
+                        // Undo pick1
+                        state.firstPickIdx = null;
+                        state.phase = 'pick1';
+                        renderBoard();
+                        updateUI();
+                        return;
+                    }
+                    
+                    executeQuantumMove(state.firstPickIdx, index, state.currentPlayer);
+                }
+            }
+
+            function executeQuantumMove(u, v, playerCode) {
+                // Check if adding this edge creates a cycle
+                const existingPath = findPath(u, v);
+                
+                // Add the edge (quantum marks)
+                state.board[u].qMarks.push({ player: playerCode, moveId: state.moveId, pair: v });
+                state.board[v].qMarks.push({ player: playerCode, moveId: state.moveId, pair: u });
+                
+                if (existingPath) {
+                    // CYCLE DETECTED!
+                    state.cycleNodes = existingPath; // The nodes in the loop
+                    state.phase = 'collapse';
+                    dom.boardContainer.classList.add('collapse-mode');
+                    renderBoard();
+                    updateUI();
+                    
+                    // If AI's turn caused the collapse, AI must choose resolution
+                    if (state.mode === 'ai' && state.currentPlayer === 'O') {
+                        state.aiThinking = true;
+                        setTimeout(() => resolveAICollapse(), 800);
+                    }
+                } else {
+                    // Normal move continues
+                    finalizeTurn();
+                }
+            }
+
+            // Recursive function to collapse a connected component.
+            // Choosing 'cellIdx' forces it to take the value of the most recent quantum link that connects it in the cycle, or we can just say:
+            // Standard rule: When a player creates a cycle, they select which of their two entangled marks from the *current* turn becomes classical.
+            // This forces a chain reaction.
+            function cascadeResolve(startCellIdx, forcedMoveId, boardState) {
+                const queue = [[startCellIdx, forcedMoveId]];
+                
+                while(queue.length > 0) {
+                    const [cIdx, mId] = queue.shift();
+                    const cell = boardState[cIdx];
+                    if (cell.type === 'classical') continue;
+                    
+                    // Find the mark corresponding to mId
+                    const targetMark = cell.qMarks.find(m => m.moveId === mId);
+                    if (!targetMark) continue; // Should not happen in valid graph
+                    
+                    // Make it classical
+                    cell.type = 'classical';
+                    cell.classical = targetMark.player;
+                    
+                    // For every OTHER mark in this cell, its pair in the other cell MUST become classical
+                    for (const qm of cell.qMarks) {
+                        if (qm.moveId !== mId) {
+                            queue.push([qm.pair, qm.moveId]);
+                        }
+                    }
+                }
+            }
+
+            function executeCollapse(chosenCellIdx) {
+                // The player clicks one of the two cells they just played in (firstPickIdx or the current v) to anchor their mark there.
+                // Or if they clicked a cell in the cycle, anchor the highest move ID there.
+                const cell = state.board[chosenCellIdx];
+                // Get the moveId that connects this cell in the cycle (usually the one just played, state.moveId)
+                const triggerMark = cell.qMarks.find(m => m.moveId === state.moveId) || cell.qMarks[cell.qMarks.length - 1];
+                
+                cascadeResolve(chosenCellIdx, triggerMark.moveId, state.board);
+                
+                dom.boardContainer.classList.remove('collapse-mode');
+                state.cycleNodes = [];
+                finalizeTurn();
+            }
+
+            function finalizeTurn() {
+                renderBoard();
+                
+                const winResult = checkClassicalWin(state.board);
+                
+                if (winResult) {
+                    handleGameEnd(winResult);
+                    return;
+                }
+                
+                if (state.board.every(c => c.type === 'classical')) {
+                    handleGameEnd({ winner: 'D', line: [] });
+                    return;
+                }
+
+                state.moveId++;
+                state.currentPlayer = state.currentPlayer === 'X' ? 'O' : 'X';
+                state.phase = 'pick1';
+                state.firstPickIdx = null;
+                state.aiThinking = false;
+                
+                updateUI();
+
+                if (state.mode === 'ai' && state.currentPlayer === 'O' && !state.gameOver) {
+                    state.aiThinking = true;
+                    setTimeout(makeAIMove, 600);
+                }
+            }
+
+            function checkClassicalWin(boardState) {
+                let xWinLine = null;
+                let oWinLine = null;
+
+                for (const line of winLines) {
+                    const [a, b, c] = line;
+                    const cA = boardState[a], cB = boardState[b], cC = boardState[c];
+                    
+                    if (cA.type === 'classical' && cA.classical === cB.classical && cA.classical === cC.classical) {
+                        if (cA.classical === 'X') xWinLine = line;
+                        if (cA.classical === 'O') oWinLine = line;
+                    }
+                }
+
+                // In Quantum TTT, a collapse can create wins for BOTH players.
+                // Standard rule: The player whose turn caused the collapse gets a penalty if they give the opponent a win.
+                // Usually evaluated by maximum subscript. To keep it simple:
+                // If both win, it's a DRAW. If one wins, they win.
+                if (xWinLine && oWinLine) return { winner: 'D', line: [] };
+                if (xWinLine) return { winner: 'X', line: xWinLine };
+                if (oWinLine) return { winner: 'O', line: oWinLine };
+                return null;
+            }
+
+            function handleGameEnd(result) {
+                state.gameOver = true;
+                dom.boardContainer.classList.add('game-over');
+                
+                if (result.winner !== 'D') {
+                    state.scores[result.winner]++;
+                    dom.boardContainer.classList.add('has-winner');
+                    result.line.forEach(idx => cellEls[idx].classList.add('winning-cell'));
+                    drawWinLine(result.line);
+                } else {
+                    state.scores.draw++;
+                }
+                updateUI(result.winner);
+            }
+
+            function drawWinLine(line) {
+                if (!line || line.length === 0) return;
+                dom.winLineSvg.style.display = 'block';
+                const getCoord = (idx) => {
+                    const row = Math.floor(idx / 3); const col = idx % 3;
+                    return { x: (col * 33.33) + 16.66, y: (row * 33.33) + 16.66 };
+                };
+                const start = getCoord(line[0]); const end = getCoord(line[2]);
+                dom.winSvgLine.setAttribute('x1', `${start.x}%`); dom.winSvgLine.setAttribute('y1', `${start.y}%`);
+                dom.winSvgLine.setAttribute('x2', `${end.x}%`); dom.winSvgLine.setAttribute('y2', `${end.y}%`);
+            }
+
+            function shakeCell(index) {
+                const cell = cellEls[index];
+                cell.classList.add('shake');
+                setTimeout(() => cell.classList.remove('shake'), 320);
+            }
+
+            function updateUI(winnerCode = null) {
+                dom.modeBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === state.mode));
+                dom.diffBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.diff === state.difficulty));
+                dom.diffGroup.style.display = state.mode === 'ai' ? 'flex' : 'none';
+
+                dom.labelPlayerX.textContent = state.mode === 'ai' ? 'Human (X)' : 'Player 1 (X)';
+                dom.labelPlayerO.textContent = state.mode === 'ai' ? 'AI (O)' : 'Player 2 (O)';
+                dom.scoreX.textContent = state.scores.X;
+                dom.scoreO.textContent = state.scores.O;
+                dom.scoreDraw.textContent = state.scores.draw;
+
+                dom.scoreCardX.classList.remove('active-turn-x');
+                dom.scoreCardO.classList.remove('active-turn-o');
+                
+                dom.statusLine.className = 'status-line';
+                
+                if (state.gameOver) {
+                    dom.phaseText.textContent = 'GAME OVER';
+                    if (winnerCode && winnerCode !== 'D') {
+                        const winnerName = winnerCode === 'X' ? dom.labelPlayerX.textContent : dom.labelPlayerO.textContent;
+                        dom.statusLine.textContent = `${winnerName} WINS!`;
+                        dom.statusLine.classList.add(`status-${winnerCode.toLowerCase()}`);
+                    } else {
+                        dom.statusLine.textContent = 'MATCH DRAWN!';
+                        dom.statusLine.classList.add('status-gold');
+                    }
+                } else {
+                    if (state.currentPlayer === 'X') dom.scoreCardX.classList.add('active-turn-x');
+                    else dom.scoreCardO.classList.add('active-turn-o');
+                    
+                    const curName = state.currentPlayer === 'X' ? dom.labelPlayerX.textContent : dom.labelPlayerO.textContent;
+                    
+                    if (state.phase === 'pick1') {
+                        dom.phaseText.textContent = 'Select 1st Cell';
+                        dom.statusLine.textContent = `${curName}'S TURN`;
+                        dom.statusLine.classList.add(`status-${state.currentPlayer.toLowerCase()}`);
+                    } else if (state.phase === 'pick2') {
+                        dom.phaseText.textContent = 'Select 2nd Cell';
+                        dom.statusLine.textContent = `${curName}'S TURN`;
+                        dom.statusLine.classList.add(`status-${state.currentPlayer.toLowerCase()}`);
+                    } else if (state.phase === 'collapse') {
+                        dom.phaseText.textContent = 'RESOLVE CYCLE!';
+                        dom.statusLine.textContent = `${curName} MUST CHOOSE COLLAPSE`;
+                        dom.statusLine.classList.add('status-collapse');
+                    }
+                }
+            }
+
+            function startRound(forceReset = false) {
+                if (forceReset) state.startingPlayer = 'X';
+                else state.startingPlayer = state.startingPlayer === 'X' ? 'O' : 'X';
+
+                state.currentPlayer = state.startingPlayer;
+                state.gameOver = false;
+                state.aiThinking = false;
+                state.board = Array.from({length: 9}, () => ({ type: 'empty', qMarks: [], classical: null }));
+                state.moveId = 1;
+                state.phase = 'pick1';
+                state.firstPickIdx = null;
+                state.cycleNodes = [];
+
+                dom.winLineSvg.style.display = 'none';
+                dom.boardContainer.classList.remove('has-winner', 'game-over', 'collapse-mode');
+                
+                renderBoard();
+                updateUI();
+
+                if (state.mode === 'ai' && state.currentPlayer === 'O') {
+                    state.aiThinking = true;
+                    setTimeout(makeAIMove, 600);
+                }
+            }
+
+            function attachEventListeners() {
+                dom.modeBtns.forEach(btn => btn.addEventListener('click', (e) => {
+                    if (state.mode === e.target.dataset.mode) return;
+                    state.mode = e.target.dataset.mode;
+                    state.scores = { X: 0, O: 0, draw: 0 };
+                    startRound(true);
+                }));
+
+                dom.diffBtns.forEach(btn => btn.addEventListener('click', (e) => {
+                    if (state.difficulty === e.target.dataset.diff) return;
+                    state.difficulty = e.target.dataset.diff;
+                    state.scores = { X: 0, O: 0, draw: 0 };
+                    startRound(true);
+                }));
+
+                dom.btnNewRound.addEventListener('click', () => startRound(false));
+                dom.btnResetScores.addEventListener('click', () => {
+                    state.scores = { X: 0, O: 0, draw: 0 };
+                    updateUI();
+                });
+            }
+
+            // --- AI LOGIC ---
+            function getAvailableCells(boardState) {
+                const av = [];
+                for (let i = 0; i < 9; i++) {
+                    if (boardState[i].type !== 'classical') av.push(i);
+                }
+                return av;
+            }
+
+            function deepCopyBoard(boardState) {
+                return boardState.map(c => ({
+                    type: c.type,
+                    classical: c.classical,
+                    qMarks: c.qMarks.map(qm => ({...qm}))
+                }));
+            }
+
+            function evaluateClassicalBoard(boardState, player) {
+                const opp = player === 'X' ? 'O' : 'X';
+                let score = 0;
+                
+                // Score center
+                if (boardState[4].type === 'classical') {
+                    if(boardState[4].classical === player) score += 5;
+                    else score -= 5;
+                }
+
+                for (const line of winLines) {
+                    let pCount = 0, oCount = 0;
+                    for (const idx of line) {
+                        const cell = boardState[idx];
+                        if (cell.type === 'classical') {
+                            if (cell.classical === player) pCount++;
+                            if (cell.classical === opp) oCount++;
+                        }
+                    }
+                    if (pCount === 3) return 1000;
+                    if (oCount === 3) return -1000;
+                    if (pCount === 2 && oCount === 0) score += 10;
+                    if (oCount === 2 && pCount === 0) score -= 15; // Defend!
+                }
+                return score;
+            }
+
+            function resolveAICollapse() {
+                // AI is forced to pick a node to collapse the cycle it created
+                let bestScore = -Infinity;
+                let bestPick = state.cycleNodes[0];
+
+                if (state.difficulty !== 'easy') {
+                    for (const node of state.cycleNodes) {
+                        const tempBoard = deepCopyBoard(state.board);
+                        const triggerMark = tempBoard[node].qMarks.find(m => m.moveId === state.moveId) || tempBoard[node].qMarks[tempBoard[node].qMarks.length - 1];
+                        cascadeResolve(node, triggerMark.moveId, tempBoard);
+                        
+                        const winRes = checkClassicalWin(tempBoard);
+                        let score = 0;
+                        if (winRes) {
+                            if (winRes.winner === 'O') score = 10000;
+                            else if (winRes.winner === 'X') score = -10000;
+                            else score = 0; // Draw
+                        } else {
+                            score = evaluateClassicalBoard(tempBoard, 'O');
+                        }
+
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestPick = node;
+                        }
+                    }
+                } else {
+                    bestPick = state.cycleNodes[Math.floor(Math.random() * state.cycleNodes.length)];
+                }
+
+                executeCollapse(bestPick);
+            }
+
+            function makeAIMove() {
+                if (state.gameOver) return;
+                const av = getAvailableCells(state.board);
+                if (av.length < 2) return;
+
+                let u = av[0], v = av[1];
+
+                if (state.difficulty === 'easy') {
+                    // Random pick
+                    const p1 = Math.floor(Math.random() * av.length);
+                    let p2 = Math.floor(Math.random() * av.length);
+                    while (p2 === p1) p2 = Math.floor(Math.random() * av.length);
+                    u = av[p1]; v = av[p2];
+                } else {
+                    // Medium/Hard: Greedy 1-ply search over all possible pairs
+                    let bestScore = -Infinity;
+                    let bestPairs = [];
+
+                    for (let i = 0; i < av.length; i++) {
+                        for (let j = i + 1; j < av.length; j++) {
+                            const testU = av[i];
+                            const testV = av[j];
+                            
+                            const tempBoard = deepCopyBoard(state.board);
+                            const path = findPath(testU, testV, tempBoard);
+                            
+                            tempBoard[testU].qMarks.push({ player: 'O', moveId: state.moveId, pair: testV });
+                            tempBoard[testV].qMarks.push({ player: 'O', moveId: state.moveId, pair: testU });
+                            
+                            let score = 0;
+
+                            if (path) {
+                                // Forces a collapse
+                                let maxCollapseScore = -Infinity;
+                                for (const colNode of path) {
+                                    const collapseBoard = deepCopyBoard(tempBoard);
+                                    const triggerMark = collapseBoard[colNode].qMarks.find(m => m.moveId === state.moveId) || collapseBoard[colNode].qMarks[collapseBoard[colNode].qMarks.length-1];
+                                    cascadeResolve(colNode, triggerMark.moveId, collapseBoard);
+                                    
+                                    const winRes = checkClassicalWin(collapseBoard);
+                                    let cScore = 0;
+                                    if (winRes) {
+                                        if (winRes.winner === 'O') cScore = 10000;
+                                        else if (winRes.winner === 'X') cScore = -10000;
+                                        else cScore = 0;
+                                    } else {
+                                        cScore = evaluateClassicalBoard(collapseBoard, 'O');
+                                    }
+                                    if (cScore > maxCollapseScore) maxCollapseScore = cScore;
+                                }
+                                score = maxCollapseScore;
+                            } else {
+                                // No collapse, just evaluate classical advantages
+                                score = evaluateClassicalBoard(tempBoard, 'O');
+                                // Add slight preference for central or spreading marks
+                                if (testU === 4 || testV === 4) score += 1;
+                            }
+
+                            // Add some variance for medium
+                            if (state.difficulty === 'medium') score += (Math.random() * 5);
+
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestPairs = [{u: testU, v: testV}];
+                            } else if (score === bestScore) {
+                                bestPairs.push({u: testU, v: testV});
+                            }
+                        }
+                    }
+                    
+                    const pick = bestPairs[Math.floor(Math.random() * bestPairs.length)];
+                    u = pick.u; v = pick.v;
+                }
+
+                // Execute move in UI sequence
+                state.firstPickIdx = u;
+                state.phase = 'pick2';
+                renderBoard();
+                updateUI();
+                
+                setTimeout(() => {
+                    executeQuantumMove(u, v, 'O');
+                }, 400); // Small delay to show the first pick visually
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

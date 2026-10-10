@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tic-Tac-Toe | NEON LAB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #050b14;
+            --cyan: #00eaff;
+            --cyan-glow: rgba(0, 234, 255, 0.45);
+            --red: #ff4466;
+            --red-glow: rgba(255, 68, 102, 0.45);
+            --gold: #ffd54a;
+            --gold-glow: rgba(255, 213, 74, 0.6);
+            --card-bg: rgba(7, 18, 34, 0.82);
+            --glass-border: rgba(0, 234, 255, 0.35);
+            --glass-blur: blur(20px);
+            --transition-fast: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(0, 234, 255, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(5, 11, 20, 0.88) 0%, rgba(5, 11, 20, 0.96) 100%),
+                url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg');
+            background-position: center; background-size: cover; background-repeat: no-repeat;
+            background-attachment: fixed; font-family: 'Poppins', sans-serif; color: #e2e8f0;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+            overflow-x: hidden; padding-bottom: 2.5rem;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18) 1.5px, transparent 1.5px, transparent 3px);
+            pointer-events: none; z-index: 999; opacity: 0.85;
+        }
+
+        .top-navbar {
+            width: 100%; height: 58px; background: rgba(5, 11, 20, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1.5px solid var(--cyan); box-shadow: 0 4px 20px rgba(0, 234, 255, 0.2);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.5rem; position: sticky; top: 0; z-index: 100;
+        }
+
+        .nav-link {
+            color: #a0aec0; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all var(--transition-fast); border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.35rem 0.85rem; border-radius: 9999px;
+        }
+        .nav-link:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px var(--cyan-glow); transform: translateX(-2px); }
+        .nav-title { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.15em; color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow); }
+
+        .main-container { width: 100%; max-width: 620px; padding: 1.25rem 1rem; display: flex; justify-content: center; z-index: 10; }
+
+        @keyframes cardEntrance { 0% { opacity: 0; transform: translateY(35px) scale(0.96); filter: blur(12px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+
+        .glass-card {
+            width: 100%; background: var(--card-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 28px; border: 1.5px solid var(--glass-border);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(0, 234, 255, 0.18), inset 0 0 20px rgba(0, 234, 255, 0.05);
+            padding: 1.8rem 1.6rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+            animation: cardEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative; overflow: hidden;
+        }
+
+        .header-group { text-align: center; width: 100%; }
+        .game-heading { font-size: 1.8rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff; text-shadow: 0 0 12px var(--cyan), 0 0 30px var(--cyan-glow); line-height: 1.2; }
+        .rules-hint { margin-top: 0.35rem; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase; }
+        .rules-highlight { color: var(--cyan); font-weight: 700; text-shadow: 0 0 8px var(--cyan-glow); }
+
+        .controls-wrapper { width: 100%; display: flex; flex-direction: column; gap: 0.65rem; }
+        
+        .config-row { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 0.4rem 0.8rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 0.5rem; }
+        .config-label { font-size: 0.65rem; font-weight: 800; color: #64748b; letter-spacing: 0.1em; text-transform: uppercase; min-width: 60px; }
+        
+        .pill-group { display: flex; justify-content: flex-end; gap: 0.35rem; flex-wrap: wrap; flex: 1; }
+        .pill-btn {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 234, 255, 0.25); color: #cbd5e1;
+            font-family: inherit; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 0.35rem 0.8rem; border-radius: 9999px; cursor: pointer; transition: all var(--transition-fast); outline: none;
+        }
+        .pill-btn:hover:not(:disabled) { transform: scale(1.05); border-color: var(--cyan); color: #ffffff; box-shadow: 0 0 12px var(--cyan-glow); background: rgba(0, 234, 255, 0.1); }
+        .pill-btn.active { background: var(--cyan); color: #050b14; border-color: var(--cyan); box-shadow: 0 0 16px var(--cyan); font-weight: 800; }
+        
+        /* Streaming Chunk: Advanced Styling */
+        .pill-btn.diff-hard.active { background: linear-gradient(135deg, #ff2d55, #c81e3a); border-color: var(--red); color: #ffffff; box-shadow: 0 0 18px var(--red); }
+        .pill-btn.speed-btn.active { background: var(--gold); border-color: var(--gold); color: #050b14; box-shadow: 0 0 16px var(--gold-glow); }
+
+        .scoreboard { width: 100%; display: grid; grid-template-columns: 1fr 0.8fr 1fr; gap: 0.65rem; margin-top: 0.2rem; }
+        .score-card {
+            background: rgba(10, 22, 40, 0.6); border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 0.6rem 0.5rem; text-align: center; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .score-card .player-label { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #ffffff; }
+        .score-card .bot-sub { font-size: 0.55rem; color: #94a3b8; font-weight: 600; margin-top: 0.2rem; letter-spacing: 0.1em; }
+        .score-card .score-num { font-size: 1.4rem; font-weight: 900; line-height: 1.2; margin-top: 0.2rem; color: #ffffff; }
+        
+        .score-card.team-cyan { border-color: rgba(0, 234, 255, 0.25); }
+        .score-card.team-red { border-color: rgba(255, 68, 102, 0.25); }
+        .score-card.active-turn-cyan { transform: scale(1.06); border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan-glow), inset 0 0 10px rgba(0, 234, 255, 0.15); z-index: 2; }
+        .score-card.active-turn-cyan .player-label { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+        .score-card.active-turn-red { transform: scale(1.06); border-color: var(--red); box-shadow: 0 0 20px var(--red-glow), inset 0 0 10px rgba(255, 68, 102, 0.15); z-index: 2; }
+        .score-card.active-turn-red .player-label { color: var(--red); text-shadow: 0 0 8px var(--red-glow); }
+
+        .status-line { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; min-height: 1.5rem; display: flex; align-items: center; justify-content: center; text-align: center; transition: color var(--transition-fast), text-shadow var(--transition-fast); margin: 0.2rem 0; }
+        .status-cyan { color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); }
+        .status-red { color: var(--red); text-shadow: 0 0 12px var(--red-glow); }
+        .status-gold { color: var(--gold); text-shadow: 0 0 12px var(--gold-glow); }
+        
+        .sim-indicator { display: none; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--gold); font-weight: 800; letter-spacing: 0.15em; margin-bottom: 0.5rem; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; text-shadow: 0 0 10px var(--gold-glow); } }
+        .sim-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 8px var(--gold); }
+
+        .board-container {
+            position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin: 0 auto;
+            background: rgba(3, 8, 16, 0.65); border-radius: 20px; border: 1px solid rgba(0, 234, 255, 0.2);
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.7); padding: 8px;
+        }
+        
+        .board-grid { display: grid; width: 100%; height: 100%; gap: 6px; }
+        .board-grid.size-3 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; }
+        .board-grid.size-4 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 6px; }
+        .board-grid.size-5 { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); gap: 5px; }
+
+        .cell {
+            background: rgba(14, 29, 51, 0.45); border: 1.5px solid rgba(0, 234, 255, 0.15); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;
+            transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; touch-action: manipulation;
+        }
+        .board-grid.size-3 .cell { border-radius: 12px; }
+
+        .board-container:not(.game-over):not(.sim-mode) .cell:hover:empty { background: rgba(0, 234, 255, 0.08); border-color: rgba(0, 234, 255, 0.45); box-shadow: 0 0 10px rgba(0, 234, 255, 0.2); }
+        .board-container.sim-mode .cell { cursor: default; }
+
+        .cell.last-move { box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4); }
+
+        @keyframes winPulse { 0%, 100% { border-color: #ffffff; box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 12px rgba(255,255,255,0.3); } 50% { border-color: currentColor; box-shadow: 0 0 28px currentColor, inset 0 0 18px currentColor; } }
+        .cell.winning-cell { animation: winPulse 1.4s infinite ease-in-out; z-index: 5; background: rgba(255, 255, 255, 0.1) !important; }
+        .cell.winning-cell.win-cyan { color: var(--cyan); }
+        .cell.winning-cell.win-red { color: var(--red); }
+
+        .board-container.has-winner .cell:not(.winning-cell) .mark-svg { opacity: 0.22; filter: grayscale(80%); transition: opacity 0.5s ease, filter 0.5s ease; }
+
+        .mark-svg { width: 70%; height: 70%; overflow: visible; pointer-events: none; }
+        @keyframes drawStroke { to { stroke-dashoffset: 0; } }
+        
+        .mark-x { stroke: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan-glow)); }
+        .mark-o { stroke: var(--red); filter: drop-shadow(0 0 6px var(--red-glow)); }
+        
+        .mark-x path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+        .mark-x path.stroke-1 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+        .mark-x path.stroke-2 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) 0.15s forwards; }
+
+        .mark-o circle { stroke-dasharray: 1; stroke-dashoffset: 1; animation: drawStroke 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; transform-origin: center; transform: rotate(-90deg); }
+
+        /* Speed modifiers for fast sim */
+        .board-container.fast-sim .mark-x path.stroke-1, .board-container.fast-sim .mark-x path.stroke-2, .board-container.fast-sim .mark-o circle { animation-duration: 0.05s !important; }
+        .board-container.instant-sim .mark-x path.stroke-1, .board-container.instant-sim .mark-x path.stroke-2, .board-container.instant-sim .mark-o circle { animation: none !important; stroke-dashoffset: 0 !important; }
+
+        .win-line-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .win-line-svg line { stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: drawStroke 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .board-container.fast-sim .win-line-svg line { animation-duration: 0.1s; }
+        .board-container.instant-sim .win-line-svg line { animation: none; stroke-dashoffset: 0; }
+
+        .actions-group { width: 100%; display: flex; flex-direction: column; gap: 0.65rem; align-items: center; margin-top: 0.6rem; }
+        
+        .btn-large {
+            width: 100%; background: linear-gradient(135deg, rgba(0, 234, 255, 0.18), rgba(0, 234, 255, 0.05));
+            border: 1.5px solid var(--cyan); color: #ffffff; font-family: inherit; font-size: 0.95rem; font-weight: 800;
+            letter-spacing: 0.12em; text-transform: uppercase; padding: 0.82rem 1.2rem; border-radius: 9999px;
+            cursor: pointer; box-shadow: 0 0 16px rgba(0, 234, 255, 0.2); transition: all var(--transition-fast); outline: none;
+        }
+        .btn-large:hover { background: var(--cyan); color: #050b14; box-shadow: 0 0 28px var(--cyan); transform: translateY(-2px); }
+        .btn-large:active { transform: translateY(0); }
+
+        .btn-large.btn-red { border-color: var(--red); background: linear-gradient(135deg, rgba(255, 68, 102, 0.18), rgba(255, 68, 102, 0.05)); box-shadow: 0 0 16px rgba(255, 68, 102, 0.2); color: var(--red); }
+        .btn-large.btn-red:hover { background: var(--red); color: #ffffff; box-shadow: 0 0 28px var(--red); }
+
+        .btn-text { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #94a3b8; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 1rem; border-radius: 9999px; cursor: pointer; transition: all var(--transition-fast); outline: none; }
+        .btn-text:hover { border-color: var(--red); color: var(--red); box-shadow: 0 0 10px var(--red-glow); }
+
+        @media (max-width: 440px) {
+            .glass-card { padding: 1.4rem 1.1rem; border-radius: 22px; }
+            .game-heading { font-size: 1.35rem; }
+            .config-row { padding: 0.4rem; justify-content: center; }
+            .config-label { min-width: 100%; text-align: center; margin-bottom: 0.2rem; }
+            .pill-btn { font-size: 0.6rem; padding: 0.35rem 0.6rem; }
+            .score-card { padding: 0.4rem; }
+            .score-card .player-label { font-size: 0.65rem; }
+        }
+        @media (prefers-reduced-motion: reduce) { 
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } 
+            .mark-x path, .mark-o circle, .win-line-svg line { stroke-dashoffset: 0 !important; } 
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-navbar">
+        <a href="tictactoe-dashboard.html" class="nav-link"><span>&#8592;</span> Dashboard</a>
+        <div class="nav-title">AI BATTLE</div>
+    </nav>
+
+    <main class="main-container">
+        <div class="glass-card">
+            
+            <div class="header-group">
+                <h1 class="game-heading">AI Tic-Tac-Toe</h1>
+                <p class="rules-hint">Fight the AI, or watch <span class="rules-highlight">Neural Networks</span> battle.</p>
+            </div>
+
+            <div class="controls-wrapper">
+                <div class="config-row">
+                    <span class="config-label">MODE</span>
+                    <div class="pill-group" id="modeGroup">
+                        <button class="pill-btn active" data-mode="human-ai">Human vs AI</button>
+                        <button class="pill-btn" data-mode="ai-sim">AI Simulation</button>
+                    </div>
+                </div>
+
+                <div class="config-row">
+                    <span class="config-label">GRID</span>
+                    <div class="pill-group" id="sizeGroup">
+                        <button class="pill-btn active" data-size="3" data-streak="3">3×3</button>
+                        <button class="pill-btn" data-size="4" data-streak="4">4×4</button>
+                        <button class="pill-btn" data-size="5" data-streak="4">5×5</button>
+                    </div>
+                </div>
+
+                <div class="config-row" id="p1DiffRow" style="display: none;">
+                    <span class="config-label" style="color: var(--cyan);">P1 BRAIN</span>
+                    <div class="pill-group" id="p1DiffGroup">
+                        <button class="pill-btn active" data-p1diff="easy">Easy</button>
+                        <button class="pill-btn" data-p1diff="medium">Medium</button>
+                        <button class="pill-btn diff-hard" data-p1diff="hard">Hard</button>
+                    </div>
+                </div>
+
+                <div class="config-row" id="p2DiffRow">
+                    <span class="config-label" id="p2DiffLabel" style="color: var(--red);">AI BRAIN</span>
+                    <div class="pill-group" id="p2DiffGroup">
+                        <button class="pill-btn" data-p2diff="easy">Easy</button>
+                        <button class="pill-btn active" data-p2diff="medium">Medium</button>
+                        <button class="pill-btn diff-hard" data-p2diff="hard">Hard</button>
+                    </div>
+                </div>
+
+                <div class="config-row" id="speedRow" style="display: none;">
+                    <span class="config-label" style="color: var(--gold);">SIM SPEED</span>
+                    <div class="pill-group" id="speedGroup">
+                        <button class="pill-btn speed-btn active" data-speed="800">Normal</button>
+                        <button class="pill-btn speed-btn" data-speed="100">Fast</button>
+                        <button class="pill-btn speed-btn" data-speed="10">Hyper</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scoreboard">
+                <div class="score-card team-cyan active-turn-cyan" id="scoreCardX">
+                    <div class="player-label" id="labelPlayerX">You (X)</div>
+                    <div class="bot-sub" id="subPlayerX">HUMAN</div>
+                    <div class="score-num" id="scoreX">0</div>
+                </div>
+                <div class="score-card" id="scoreCardDraw" style="display: flex; flex-direction: column; justify-content: center; border-color: rgba(255, 213, 74, 0.2);">
+                    <div class="player-label" style="color: var(--gold); margin-top: -0.5rem;">Draws</div>
+                    <div class="score-num" id="scoreDraw" style="font-size: 1.1rem; margin-top: 0.1rem;">0</div>
+                </div>
+                <div class="score-card team-red" id="scoreCardO">
+                    <div class="player-label" id="labelPlayerO">Bot Beta (O)</div>
+                    <div class="bot-sub" id="subPlayerO">MEDIUM AI</div>
+                    <div class="score-num" id="scoreO">0</div>
+                </div>
+            </div>
+
+            <div class="sim-indicator" id="simIndicator">
+                <div class="sim-dot"></div> NEURAL NETWORKS ACTIVE <div class="sim-dot"></div>
+            </div>
+
+            <div class="status-line status-cyan" id="statusLine">YOUR TURN</div>
+
+            <div class="board-container hover-x" id="boardContainer">
+                <div class="board-grid size-3" id="boardGrid">
+                    <!-- Cells injected by JS -->
+                </div>
+                <svg class="win-line-svg" id="winLineSvg" viewBox="0 0 100 100" preserveAspectRatio="none" style="display: none;">
+                    <line id="winSvgLine" x1="0" y1="0" x2="0" y2="0" pathLength="1" />
+                </svg>
+            </div>
+
+            <div class="actions-group">
+                <button class="btn-large" id="btnActionMain">Play Match</button>
+                <button class="btn-text" id="btnResetScores">Reset Statistics</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const state = {
+                mode: 'human-ai', // 'human-ai' or 'ai-sim'
+                bSize: 3,
+                streak: 3,
+                p1Diff: 'easy',
+                p2Diff: 'medium',
+                simSpeed: 800, // ms delay
+                
+                board: [],
+                currentPlayer: 'X',
+                startingPlayer: 'X',
+                gameOver: false,
+                systemLocked: false, // Prevents clicks during AI or sim
+                isAutoPlaying: false,
+                lastMoveIdx: null,
+                scores: { X: 0, O: 0, draw: 0 },
+                winLines: [],
+                simTimeout: null
+            };
+
+            const dom = {
+                modeBtns: document.querySelectorAll('#modeGroup .pill-btn'),
+                sizeBtns: document.querySelectorAll('#sizeGroup .pill-btn'),
+                p1DiffBtns: document.querySelectorAll('#p1DiffGroup .pill-btn'),
+                p2DiffBtns: document.querySelectorAll('#p2DiffGroup .pill-btn'),
+                speedBtns: document.querySelectorAll('#speedGroup .pill-btn'),
+                
+                p1DiffRow: document.getElementById('p1DiffRow'),
+                p2DiffLabel: document.getElementById('p2DiffLabel'),
+                speedRow: document.getElementById('speedRow'),
+                
+                labelPlayerX: document.getElementById('labelPlayerX'),
+                labelPlayerO: document.getElementById('labelPlayerO'),
+                subPlayerX: document.getElementById('subPlayerX'),
+                subPlayerO: document.getElementById('subPlayerO'),
+                scoreX: document.getElementById('scoreX'),
+                scoreO: document.getElementById('scoreO'),
+                scoreDraw: document.getElementById('scoreDraw'),
+                scoreCardX: document.getElementById('scoreCardX'),
+                scoreCardO: document.getElementById('scoreCardO'),
+                
+                simIndicator: document.getElementById('simIndicator'),
+                statusLine: document.getElementById('statusLine'),
+                boardContainer: document.getElementById('boardContainer'),
+                boardGrid: document.getElementById('boardGrid'),
+                winLineSvg: document.getElementById('winLineSvg'),
+                winSvgLine: document.getElementById('winSvgLine'),
+                
+                btnActionMain: document.getElementById('btnActionMain'),
+                btnResetScores: document.getElementById('btnResetScores')
+            };
+
+            let cellEls = [];
+
+            function init() {
+                attachListeners();
+                generateWinLines();
+                buildBoardDOM();
+                updateUIConfig();
+                startRound(true);
+            }
+
+            function attachListeners() {
+                const addToggle = (btns, key, callback) => {
+                    btns.forEach(btn => btn.addEventListener('click', (e) => {
+                        if (state[key] === e.target.dataset[key.toLowerCase()]) return;
+                        state[key] = e.target.dataset[key.toLowerCase()];
+                        if(key === 'simSpeed') state[key] = parseInt(state[key]);
+                        if(key === 'bSize') {
+                            state.bSize = parseInt(e.target.dataset.size);
+                            state.streak = parseInt(e.target.dataset.streak);
+                        }
+                        
+                        btns.forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        callback();
+                    }));
+                };
+
+                addToggle(dom.modeBtns, 'mode', () => { stopAutoPlay(); updateUIConfig(); startRound(true); });
+                addToggle(dom.sizeBtns, 'bSize', () => { stopAutoPlay(); generateWinLines(); buildBoardDOM(); startRound(true); });
+                addToggle(dom.p1DiffBtns, 'p1Diff', () => { updateUIConfig(); });
+                addToggle(dom.p2DiffBtns, 'p2Diff', () => { updateUIConfig(); });
+                addToggle(dom.speedBtns, 'simSpeed', () => { updateSpeedClasses(); });
+
+                dom.btnActionMain.addEventListener('click', () => {
+                    if (state.mode === 'human-ai') {
+                        startRound(false);
+                    } else {
+                        toggleAutoPlay();
+                    }
+                });
+
+                dom.btnResetScores.addEventListener('click', () => {
+                    state.scores = { X: 0, O: 0, draw: 0 };
+                    renderScores();
+                });
+            }
+
+            function updateUIConfig() {
+                if (state.mode === 'human-ai') {
+                    dom.p1DiffRow.style.display = 'none';
+                    dom.p2DiffLabel.textContent = 'AI BRAIN';
+                    dom.speedRow.style.display = 'none';
+                    
+                    dom.labelPlayerX.textContent = 'You (X)';
+                    dom.subPlayerX.textContent = 'HUMAN';
+                    dom.labelPlayerO.textContent = 'Bot Alpha (O)';
+                    dom.subPlayerO.textContent = `${state.p2Diff.toUpperCase()} AI`;
+                    
+                    dom.btnActionMain.textContent = 'New Match';
+                    dom.btnActionMain.className = 'btn-large';
+                    dom.simIndicator.style.display = 'none';
+                    dom.boardContainer.classList.remove('sim-mode');
+                } else {
+                    dom.p1DiffRow.style.display = 'flex';
+                    dom.p2DiffLabel.textContent = 'P2 BRAIN';
+                    dom.speedRow.style.display = 'flex';
+                    
+                    dom.labelPlayerX.textContent = 'Bot X';
+                    dom.subPlayerX.textContent = `${state.p1Diff.toUpperCase()} AI`;
+                    dom.labelPlayerO.textContent = 'Bot O';
+                    dom.subPlayerO.textContent = `${state.p2Diff.toUpperCase()} AI`;
+                    
+                    dom.btnActionMain.textContent = state.isAutoPlaying ? 'Stop Simulation' : 'Start Simulation';
+                    dom.btnActionMain.className = state.isAutoPlaying ? 'btn-large btn-red' : 'btn-large';
+                    dom.simIndicator.style.display = state.isAutoPlaying ? 'flex' : 'none';
+                    dom.boardContainer.classList.add('sim-mode');
+                }
+                updateSpeedClasses();
+            }
+
+            function updateSpeedClasses() {
+                dom.boardContainer.classList.remove('fast-sim', 'instant-sim');
+                if (state.simSpeed === 100) dom.boardContainer.classList.add('fast-sim');
+                else if (state.simSpeed === 10) dom.boardContainer.classList.add('instant-sim');
+            }
+
+            function generateWinLines() {
+                state.winLines = [];
+                const s = state.bSize;
+                const k = state.streak;
+                
+                for (let r = 0; r < s; r++) {
+                    for (let c = 0; c <= s - k; c++) {
+                        const row = [], col = [];
+                        for (let i = 0; i < k; i++) {
+                            row.push(r * s + (c + i));
+                            col.push((c + i) * s + r);
+                        }
+                        state.winLines.push(row, col);
+                    }
+                }
+                for (let r = 0; r <= s - k; r++) {
+                    for (let c = 0; c <= s - k; c++) {
+                        const diag1 = [], diag2 = [];
+                        for (let i = 0; i < k; i++) {
+                            diag1.push((r + i) * s + (c + i));
+                            diag2.push((r + i) * s + (c + k - 1 - i));
+                        }
+                        state.winLines.push(diag1, diag2);
+                    }
+                }
+            }
+
+            function buildBoardDOM() {
+                dom.boardGrid.innerHTML = '';
+                dom.boardGrid.className = `board-grid size-${state.bSize}`;
+                state.board = Array(state.bSize * state.bSize).fill(null);
+                cellEls = [];
+                
+                for (let i = 0; i < state.bSize * state.bSize; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.index = i;
+                    cell.addEventListener('click', () => {
+                        if (!state.systemLocked && state.mode === 'human-ai' && state.currentPlayer === 'X') {
+                            handleCellClick(i, 'X');
+                        } else if (!state.systemLocked) {
+                             shakeCell(i);
+                        }
+                    });
+                    dom.boardGrid.appendChild(cell);
+                    cellEls.push(cell);
+                }
+            }
+
+            function createMarkSVG(type) {
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 100');
+                svg.setAttribute('class', `mark-svg ${type === 'X' ? 'mark-x' : 'mark-o'}`);
+                
+                const strokeW = state.bSize >= 5 ? '12' : '14';
+
+                if (type === 'X') {
+                    const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p1.setAttribute('d', 'M 24 24 L 76 76'); p1.setAttribute('stroke-width', strokeW); p1.setAttribute('stroke-linecap', 'round'); p1.setAttribute('pathLength', '1'); p1.setAttribute('class', 'stroke-1');
+                    const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p2.setAttribute('d', 'M 76 24 L 24 76'); p2.setAttribute('stroke-width', strokeW); p2.setAttribute('stroke-linecap', 'round'); p2.setAttribute('pathLength', '1'); p2.setAttribute('class', 'stroke-2');
+                    svg.appendChild(p1); svg.appendChild(p2);
+                } else {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', '50'); circle.setAttribute('cy', '50'); circle.setAttribute('r', '27');
+                    circle.setAttribute('fill', 'none'); circle.setAttribute('stroke-width', strokeW); circle.setAttribute('stroke-linecap', 'round'); circle.setAttribute('pathLength', '1');
+                    svg.appendChild(circle);
+                }
+                return svg;
+            }
+
+            function handleCellClick(index, playerReq) {
+                if (state.gameOver || state.systemLocked || state.board[index] !== null || state.currentPlayer !== playerReq) {
+                    if (state.board[index] !== null && !state.gameOver) shakeCell(index);
+                    return;
+                }
+                executeMove(index, state.currentPlayer);
+            }
+
+            function executeMove(index, player) {
+                state.board[index] = player;
+                state.lastMoveIdx = index;
+                
+                cellEls.forEach(c => c.classList.remove('last-move'));
+                const cell = cellEls[index];
+                cell.innerHTML = '';
+                cell.appendChild(createMarkSVG(player));
+                cell.classList.add('last-move');
+
+                const winResult = checkWin(state.board);
+                if (winResult) {
+                    handleMatchEnd(winResult.winner, winResult.line);
+                    return;
+                } 
+                if (state.board.every(c => c !== null)) {
+                    handleMatchEnd('D', null);
+                    return;
+                }
+
+                state.currentPlayer = player === 'X' ? 'O' : 'X';
+                updateMatchStatus();
+                triggerNextTurn();
+            }
+
+            function triggerNextTurn() {
+                if (state.gameOver) return;
+
+                if (state.mode === 'human-ai') {
+                    if (state.currentPlayer === 'O') {
+                        state.systemLocked = true;
+                        state.simTimeout = setTimeout(() => makeAIMove('O', state.p2Diff), state.simSpeed);
+                    } else {
+                        state.systemLocked = false;
+                    }
+                } else if (state.mode === 'ai-sim' && state.isAutoPlaying) {
+                    state.systemLocked = true;
+                    const diff = state.currentPlayer === 'X' ? state.p1Diff : state.p2Diff;
+                    state.simTimeout = setTimeout(() => makeAIMove(state.currentPlayer, diff), state.simSpeed);
+                }
+            }
+
+            function toggleAutoPlay() {
+                state.isAutoPlaying = !state.isAutoPlaying;
+                updateUIConfig();
+                if (state.isAutoPlaying) {
+                    if (state.gameOver) startRound(false);
+                    else triggerNextTurn();
+                } else {
+                    clearTimeout(state.simTimeout);
+                    state.systemLocked = false;
+                }
+            }
+
+            function stopAutoPlay() {
+                state.isAutoPlaying = false;
+                clearTimeout(state.simTimeout);
+                state.systemLocked = false;
+                updateUIConfig();
+            }
+
+            function checkWin(boardState) {
+                for (const line of state.winLines) {
+                    const first = boardState[line[0]];
+                    if (first !== null) {
+                        let win = true;
+                        for (let i = 1; i < state.streak; i++) {
+                            if (boardState[line[i]] !== first) { win = false; break; }
+                        }
+                        if (win) return { winner: first, line: line };
+                    }
+                }
+                return null;
+            }
+
+            function handleMatchEnd(winnerCode, line) {
+                state.gameOver = true;
+                state.systemLocked = true;
+                dom.boardContainer.classList.add('game-over');
+                
+                if (winnerCode !== 'D') {
+                    dom.boardContainer.classList.add('has-winner');
+                    line.forEach(idx => {
+                        cellEls[idx].classList.add('winning-cell', winnerCode === 'X' ? 'win-cyan' : 'win-red');
+                    });
+                    drawWinLine(line, winnerCode);
+                    state.scores[winnerCode]++;
+                } else {
+                    state.scores.draw++;
+                }
+                
+                renderScores();
+                updateMatchStatus(winnerCode);
+
+                if (state.mode === 'ai-sim' && state.isAutoPlaying) {
+                    // Start next match automatically after short delay
+                    const restartDelay = state.simSpeed === 10 ? 200 : 1500;
+                    state.simTimeout = setTimeout(() => {
+                        if (state.isAutoPlaying) startRound(false);
+                    }, restartDelay);
+                }
+            }
+
+            function drawWinLine(line, winnerCode) {
+                dom.winLineSvg.style.display = 'block';
+                const s = state.bSize;
+                const getCoord = (idx) => {
+                    const row = Math.floor(idx / s); const col = idx % s;
+                    const cellPct = 100 / s;
+                    return { x: (col * cellPct) + (cellPct / 2), y: (row * cellPct) + (cellPct / 2) };
+                };
+                const start = getCoord(line[0]); const end = getCoord(line[line.length - 1]);
+                dom.winSvgLine.setAttribute('x1', `${start.x}%`); dom.winSvgLine.setAttribute('y1', `${start.y}%`);
+                dom.winSvgLine.setAttribute('x2', `${end.x}%`); dom.winSvgLine.setAttribute('y2', `${end.y}%`);
+                
+                dom.winSvgLine.style.stroke = winnerCode === 'X' ? 'var(--cyan)' : 'var(--red)';
+                dom.winSvgLine.style.filter = `drop-shadow(0 0 10px ${winnerCode === 'X' ? 'var(--cyan)' : 'var(--red)'})`;
+            }
+
+            function shakeCell(index) {
+                const cell = cellEls[index];
+                cell.classList.add('shake');
+                setTimeout(() => cell.classList.remove('shake'), 320);
+            }
+
+            function updateMatchStatus(winnerCode = null) {
+                dom.scoreCardX.classList.remove('active-turn-cyan');
+                dom.scoreCardO.classList.remove('active-turn-red');
+                dom.boardContainer.classList.remove('hover-x', 'hover-o');
+                
+                if (state.gameOver) {
+                    if (winnerCode && winnerCode !== 'D') {
+                        const name = winnerCode === 'X' ? dom.labelPlayerX.textContent : dom.labelPlayerO.textContent;
+                        dom.statusLine.textContent = `${name.toUpperCase()} WINS!`;
+                        dom.statusLine.className = `status-line status-${winnerCode === 'X' ? 'cyan' : 'red'}`;
+                    } else {
+                        dom.statusLine.textContent = 'MATCH DRAWN!';
+                        dom.statusLine.className = 'status-line status-gold';
+                    }
+                } else {
+                    if (state.mode === 'human-ai') {
+                        dom.boardContainer.classList.add(state.currentPlayer === 'X' ? 'hover-x' : 'hover-o');
+                    }
+                    if (state.currentPlayer === 'X') dom.scoreCardX.classList.add('active-turn-cyan');
+                    else dom.scoreCardO.classList.add('active-turn-red');
+                    
+                    const name = state.currentPlayer === 'X' ? dom.labelPlayerX.textContent : dom.labelPlayerO.textContent;
+                    dom.statusLine.textContent = `${name.toUpperCase()}'S TURN`;
+                    dom.statusLine.className = `status-line status-${state.currentPlayer === 'X' ? 'cyan' : 'red'}`;
+                }
+            }
+
+            function renderScores() {
+                dom.scoreX.textContent = state.scores.X;
+                dom.scoreO.textContent = state.scores.O;
+                dom.scoreDraw.textContent = state.scores.draw;
+            }
+
+            function startRound(forceReset = false) {
+                clearTimeout(state.simTimeout);
+                if (forceReset) state.startingPlayer = 'X';
+                else state.startingPlayer = state.startingPlayer === 'X' ? 'O' : 'X';
+
+                state.currentPlayer = state.startingPlayer;
+                state.gameOver = false;
+                state.systemLocked = false;
+                state.board.fill(null);
+                state.lastMoveIdx = null;
+
+                dom.winLineSvg.style.display = 'none';
+                dom.boardContainer.classList.remove('has-winner', 'game-over');
+                
+                cellEls.forEach(c => { c.innerHTML = ''; c.className = 'cell'; });
+                
+                updateMatchStatus();
+                triggerNextTurn();
+            }
+
+            function getLegalMoves(b) {
+                const m = [];
+                for (let i = 0; i < b.length; i++) if (b[i] === null) m.push(i);
+                return m;
+            }
+
+            function evaluateHeuristic(b, mySym) {
+                const opSym = mySym === 'X' ? 'O' : 'X';
+                let score = 0;
+                for (const line of state.winLines) {
+                    let myC = 0, opC = 0;
+                    for (const idx of line) {
+                        if (b[idx] === mySym) myC++;
+                        else if (b[idx] === opSym) opC++;
+                    }
+                    if (opC > 0 && myC > 0) continue; 
+                    if (myC > 0) score += Math.pow(10, myC);
+                    if (opC > 0) score -= Math.pow(10, opC) * 1.2; 
+                }
+                
+                const cOff = Math.floor(state.bSize / 2);
+                const center = (cOff * state.bSize) + cOff;
+                if (b[center] === mySym) score += 5;
+                else if (b[center] === opSym) score -= 5;
+                
+                return score;
+            }
+
+            function minimax(b, depth, alpha, beta, isMax, mySym) {
+                const opSym = mySym === 'X' ? 'O' : 'X';
+                const winRes = checkWin(b);
+                if (winRes) {
+                    if (winRes.winner === mySym) return 10000 + depth;
+                    if (winRes.winner === opSym) return -10000 - depth;
+                }
+                
+                const moves = getLegalMoves(b);
+                if (moves.length === 0) return 0;
+                if (depth === 0) return evaluateHeuristic(b, mySym);
+
+                if (isMax) {
+                    let maxE = -Infinity;
+                    for (let m of moves) {
+                        b[m] = mySym;
+                        const ev = minimax(b, depth - 1, alpha, beta, false, mySym);
+                        b[m] = null;
+                        maxE = Math.max(maxE, ev);
+                        alpha = Math.max(alpha, ev);
+                        if (beta <= alpha) break;
+                    }
+                    return maxE;
+                } else {
+                    let minE = Infinity;
+                    for (let m of moves) {
+                        b[m] = opSym;
+                        const ev = minimax(b, depth - 1, alpha, beta, true, mySym);
+                        b[m] = null;
+                        minE = Math.min(minE, ev);
+                        beta = Math.min(beta, ev);
+                        if (beta <= alpha) break;
+                    }
+                    return minE;
+                }
+            }
+
+            function makeAIMove(sym, diff) {
+                if (state.gameOver) return;
+                const moves = getLegalMoves(state.board);
+                if (moves.length === 0) return;
+
+                const opSym = sym === 'X' ? 'O' : 'X';
+                let bestMove = moves[Math.floor(Math.random() * moves.length)];
+
+                if (diff === 'easy') {
+                    for(let m of moves) {
+                        state.board[m] = sym;
+                        if(checkWin(state.board)) { bestMove = m; state.board[m] = null; break; }
+                        state.board[m] = null;
+                    }
+                } else if (diff === 'medium') {
+                    let bestScore = -Infinity;
+                    for (let m of moves) {
+                        state.board[m] = sym;
+                        let score = evaluateHeuristic(state.board, sym);
+                        if (checkWin(state.board)) score = 10000;
+                        state.board[m] = opSym;
+                        if (checkWin(state.board)) score += 5000; 
+                        state.board[m] = null;
+                        
+                        score += Math.random() * 15;
+                        if (score > bestScore) {
+                            bestScore = score; bestMove = m;
+                        }
+                    }
+                } else {
+                    let dLimit = state.bSize === 3 ? 9 : (state.bSize === 4 ? 4 : 3);
+                    // Drop depth if hyper fast to prevent lag
+                    if (state.simSpeed <= 10 && state.bSize >= 4) dLimit -= 1; 
+                    
+                    let bestScore = -Infinity, picks = [];
+                    
+                    if (moves.length >= state.bSize * state.bSize - 1) {
+                        const cOff = Math.floor(state.bSize / 2);
+                        const c = (cOff * state.bSize) + cOff;
+                        if (moves.includes(c)) bestMove = c;
+                    } else {
+                        for (let m of moves) {
+                            state.board[m] = sym;
+                            const score = minimax(state.board, dLimit - 1, -Infinity, Infinity, false, sym);
+                            state.board[m] = null;
+                            
+                            if (score > bestScore) { bestScore = score; picks = [m]; } 
+                            else if (score === bestScore) { picks.push(m); }
+                        }
+                        bestMove = picks[Math.floor(Math.random() * picks.length)];
+                    }
+                }
+
+                executeMove(bestMove, sym);
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Matchmaking | NEON LAB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #050b14;
+            --cyan: #00eaff;
+            --cyan-glow: rgba(0, 234, 255, 0.45);
+            --red: #ff4466;
+            --red-glow: rgba(255, 68, 102, 0.45);
+            --gold: #ffd54a;
+            --gold-glow: rgba(255, 213, 74, 0.6);
+            --card-bg: rgba(7, 18, 34, 0.82);
+            --glass-border: rgba(0, 234, 255, 0.35);
+            --glass-blur: blur(20px);
+            --transition-fast: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(0, 234, 255, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(5, 11, 20, 0.88) 0%, rgba(5, 11, 20, 0.96) 100%),
+                url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg');
+            background-position: center; background-size: cover; background-repeat: no-repeat;
+            background-attachment: fixed; font-family: 'Poppins', sans-serif; color: #e2e8f0;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+            overflow-x: hidden; padding-bottom: 2.5rem;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18) 1.5px, transparent 1.5px, transparent 3px);
+            pointer-events: none; z-index: 999; opacity: 0.85;
+        }
+
+        .top-navbar {
+            width: 100%; height: 58px; background: rgba(5, 11, 20, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1.5px solid var(--cyan); box-shadow: 0 4px 20px rgba(0, 234, 255, 0.2);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.5rem; position: sticky; top: 0; z-index: 100;
+        }
+
+        .nav-link {
+            color: #a0aec0; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all var(--transition-fast); border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.35rem 0.85rem; border-radius: 9999px;
+        }
+        .nav-link:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px var(--cyan-glow); transform: translateX(-2px); }
+        .nav-title { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.15em; color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow); }
+
+        .main-container { width: 100%; max-width: 580px; padding: 1.25rem 1rem; display: flex; justify-content: center; z-index: 10; }
+
+        @keyframes cardEntrance { 0% { opacity: 0; transform: translateY(35px) scale(0.96); filter: blur(12px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+
+        .glass-card {
+            width: 100%; background: var(--card-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 28px; border: 1.5px solid var(--glass-border);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(0, 234, 255, 0.18), inset 0 0 20px rgba(0, 234, 255, 0.05);
+            padding: 1.8rem 1.6rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+            animation: cardEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative; overflow: hidden;
+        }
+
+        .header-group { text-align: center; }
+        .game-heading { font-size: 1.8rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff; text-shadow: 0 0 12px var(--cyan), 0 0 30px var(--cyan-glow); line-height: 1.2; }
+        .rules-hint { margin-top: 0.35rem; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase; }
+        .rules-highlight { color: var(--gold); font-weight: 700; text-shadow: 0 0 8px var(--gold-glow); }
+
+        /* Multi-View System */
+        .view-section { width: 100%; display: none; flex-direction: column; align-items: center; gap: 1.5rem; animation: fadeIn 0.4s ease-out forwards; }
+        .view-section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Loader & Matchmaking */
+        .radar-box { position: relative; width: 120px; height: 120px; border-radius: 50%; border: 2px solid rgba(0, 234, 255, 0.2); overflow: hidden; margin: 2rem auto; background: rgba(0,0,0,0.5); }
+        .radar-box::after { content: ''; position: absolute; top: 50%; left: 50%; width: 50%; height: 50%; background: linear-gradient(45deg, rgba(0, 234, 255, 0.6) 0%, transparent 50%); transform-origin: top left; animation: radarSpin 1.5s linear infinite; }
+        @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .radar-text { color: var(--cyan); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1rem; text-shadow: 0 0 10px var(--cyan-glow); animation: pulseText 1.5s infinite; }
+        @keyframes pulseText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* Setup View Controls */
+        .btn-large {
+            width: 100%; background: linear-gradient(135deg, rgba(0, 234, 255, 0.18), rgba(0, 234, 255, 0.05));
+            border: 1.5px solid var(--cyan); color: #ffffff; font-family: inherit; font-size: 0.95rem; font-weight: 800;
+            letter-spacing: 0.12em; text-transform: uppercase; padding: 0.82rem 1.2rem; border-radius: 9999px;
+            cursor: pointer; box-shadow: 0 0 16px rgba(0, 234, 255, 0.2); transition: all var(--transition-fast); outline: none; margin-top: 0.5rem;
+        }
+        .btn-large:hover:not(:disabled) { background: var(--cyan); color: #050b14; box-shadow: 0 0 28px var(--cyan); transform: translateY(-2px); }
+        .btn-large:active:not(:disabled) { transform: translateY(0); }
+
+        .btn-secondary {
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #94a3b8;
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; padding: 0.5rem 1rem; border-radius: 9999px; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--red); color: var(--red); box-shadow: 0 0 10px var(--red-glow); }
+
+        /* Match View Styles */
+        .scoreboard { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-top: 0.2rem; }
+        .score-card {
+            background: rgba(10, 22, 40, 0.6); border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 0.6rem 0.5rem; text-align: center; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .score-card .player-label { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
+        .score-card .bot-sub { font-size: 0.55rem; color: #94a3b8; font-weight: 600; margin-top: 0.2rem; letter-spacing: 0.1em; }
+        
+        .score-card.team-cyan { border-color: rgba(0, 234, 255, 0.25); }
+        .score-card.team-red { border-color: rgba(255, 68, 102, 0.25); }
+        .score-card.active-turn-cyan { transform: scale(1.06); border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan-glow), inset 0 0 10px rgba(0, 234, 255, 0.15); z-index: 2; }
+        .score-card.active-turn-cyan .player-label { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+        .score-card.active-turn-red { transform: scale(1.06); border-color: var(--red); box-shadow: 0 0 20px var(--red-glow), inset 0 0 10px rgba(255, 68, 102, 0.15); z-index: 2; }
+        .score-card.active-turn-red .player-label { color: var(--red); text-shadow: 0 0 8px var(--red-glow); }
+
+        .status-line { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; min-height: 1.5rem; display: flex; align-items: center; justify-content: center; text-align: center; transition: color var(--transition-fast), text-shadow var(--transition-fast); margin: 0.2rem 0; }
+        .status-cyan { color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); }
+        .status-red { color: var(--red); text-shadow: 0 0 12px var(--red-glow); }
+        .status-gold { color: var(--gold); text-shadow: 0 0 12px var(--gold-glow); }
+        .status-wait { color: #a0aec0; animation: pulseText 1.5s infinite; }
+
+        .board-container {
+            position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin: 0 auto;
+            background: rgba(3, 8, 16, 0.65); border-radius: 20px; border: 1px solid rgba(0, 234, 255, 0.2);
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.7); padding: 8px;
+        }
+        
+        .board-grid { display: grid; width: 100%; height: 100%; gap: 8px; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+
+        .cell {
+            background: rgba(14, 29, 51, 0.45); border: 1.5px solid rgba(0, 234, 255, 0.15); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;
+            transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; touch-action: manipulation;
+        }
+
+        .board-container.my-turn:not(.game-over) .cell:hover:empty { background: rgba(0, 234, 255, 0.08); border-color: rgba(0, 234, 255, 0.45); box-shadow: 0 0 10px rgba(0, 234, 255, 0.2); }
+        
+        .board-container.my-turn.hover-x:not(.game-over) .cell:hover:empty::after { content: ''; position: absolute; width: 60%; height: 60%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 24 24 L 76 76" stroke="%2300eaff" stroke-width="14" stroke-linecap="round"/><path d="M 76 24 L 24 76" stroke="%2300eaff" stroke-width="14" stroke-linecap="round"/></svg>') center/contain no-repeat; opacity: 0.3; }
+        .board-container.my-turn.hover-o:not(.game-over) .cell:hover:empty::after { content: ''; position: absolute; width: 60%; height: 60%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="27" fill="none" stroke="%23ff4466" stroke-width="13" stroke-linecap="round"/></svg>') center/contain no-repeat; opacity: 0.3; }
+
+        .cell.last-move { box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4); }
+
+        @keyframes winPulse { 0%, 100% { border-color: #ffffff; box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 12px rgba(255,255,255,0.3); } 50% { border-color: currentColor; box-shadow: 0 0 28px currentColor, inset 0 0 18px currentColor; } }
+        .cell.winning-cell { animation: winPulse 1.4s infinite ease-in-out; z-index: 5; background: rgba(255, 255, 255, 0.1) !important; }
+        .cell.winning-cell.win-x { color: var(--cyan); }
+        .cell.winning-cell.win-o { color: var(--red); }
+
+        .board-container.has-winner .cell:not(.winning-cell) .mark-svg { opacity: 0.22; filter: grayscale(80%); transition: opacity 0.5s ease, filter 0.5s ease; }
+
+        @keyframes shakeCell { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-3px) rotate(-1deg); } 40% { transform: translateX(3px) rotate(1deg); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+        .cell.shake { animation: shakeCell 0.32s ease-in-out; }
+
+        .mark-svg { width: 70%; height: 70%; overflow: visible; pointer-events: none; }
+        @keyframes drawStroke { to { stroke-dashoffset: 0; } }
+        
+        .mark-x { stroke: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan-glow)); }
+        .mark-o { stroke: var(--red); filter: drop-shadow(0 0 6px var(--red-glow)); }
+        
+        .mark-x path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+        .mark-x path.stroke-1 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+        .mark-x path.stroke-2 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) 0.15s forwards; }
+
+        .mark-o circle { stroke-dasharray: 1; stroke-dashoffset: 1; animation: drawStroke 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; transform-origin: center; transform: rotate(-90deg); }
+
+        .win-line-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .win-line-svg line { stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: drawStroke 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+        /* Toast Notifications */
+        #toastContainer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 1000; pointer-events: none; }
+        .toast { background: rgba(0, 0, 0, 0.8); border: 1px solid var(--cyan); color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; box-shadow: 0 5px 15px rgba(0,0,0,0.5); animation: toastIn 0.3s ease forwards, toastOut 0.3s ease 2.7s forwards; opacity: 0; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+
+        @media (max-width: 440px) {
+            .glass-card { padding: 1.4rem 1.1rem; border-radius: 22px; }
+            .game-heading { font-size: 1.35rem; }
+            .score-card { padding: 0.4rem; }
+            .score-card .player-label { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-navbar">
+        <a href="tictactoe-dashboard.html" class="nav-link"><span>&#8592;</span> Dashboard</a>
+        <div class="nav-title">GLOBAL MATCH</div>
+    </nav>
+
+    <main class="main-container">
+        <div class="glass-card">
+            
+            <div class="header-group">
+                <h1 class="game-heading">Play Online</h1>
+                <p class="rules-hint" id="mainHint">Battle players <span class="rules-highlight">around the world</span>!</p>
+            </div>
+
+            <!-- VIEW 1: LOBBY -->
+            <div class="view-section active" id="viewLobby">
+                <div style="width: 100%; padding: 1.5rem; background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem;">Find a random opponent online.</p>
+                    <button class="btn-large" id="btnFindMatch">Find Match</button>
+                </div>
+            </div>
+
+            <!-- VIEW 2: SEARCHING -->
+            <div class="view-section" id="viewSearching">
+                <div class="radar-box"></div>
+                <div class="radar-text">Searching for players...</div>
+                <p style="font-size: 0.7rem; color: #64748b; margin-top: -0.5rem;" id="searchTime">Estimated time: 0:03</p>
+                <button class="btn-secondary" id="btnCancelSearch" style="margin-top: 1rem;">Cancel</button>
+            </div>
+
+            <!-- VIEW 3: MATCH -->
+            <div class="view-section" id="viewMatch">
+                <div class="scoreboard">
+                    <div class="score-card team-cyan" id="scoreCardX">
+                        <div class="player-label" id="labelPlayerX">You (X)</div>
+                        <div class="bot-sub">RATING: 1200</div>
+                    </div>
+                    <div class="score-card team-red" id="scoreCardO">
+                        <div class="player-label" id="labelPlayerO">Opponent (O)</div>
+                        <div class="bot-sub" id="oppRating">RATING: 1250</div>
+                    </div>
+                </div>
+
+                <div class="status-line status-wait" id="matchStatusLine">CONNECTING...</div>
+
+                <div class="board-container" id="boardContainer">
+                    <div class="board-grid" id="boardGrid">
+                        <!-- Cells injected by JS -->
+                    </div>
+                    <svg class="win-line-svg" id="winLineSvg" viewBox="0 0 100 100" preserveAspectRatio="none" style="display: none;">
+                        <line id="winSvgLine" x1="0" y1="0" x2="0" y2="0" pathLength="1" />
+                    </svg>
+                </div>
+
+                <div id="playAgainWrap" style="display: none; width: 100%; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button class="btn-large" id="btnRematch">Rematch with <span id="rematchName">Opponent</span></button>
+                    <button class="btn-secondary" id="btnFindNew">Find New Opponent</button>
+                </div>
+                
+                <button class="btn-secondary" id="btnLeaveMatch" style="margin-top: 0.5rem;">Leave Match</button>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="toastContainer"></div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const FIRST_NAMES = ['Shadow', 'Alex', 'ProGamer', 'Neo', 'Cyber', 'Ghost', 'Alpha', 'Neon', 'Viper', 'Storm', 'Blaze', 'Zero', 'Apex', 'Titan', 'Phoenix'];
+            const LAST_TAGS = ['Ninja99', '_2005', '_X', 'Matrix', '22', 'Rider', 'Wolf', 'Spectre', 'God', 'Slayer', '99', 'Prime', 'Ghost', 'X'];
+
+            function generateRandomName() {
+                const f = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+                const l = LAST_TAGS[Math.floor(Math.random() * LAST_TAGS.length)];
+                return f + l;
+            }
+
+            const state = {
+                board: Array(9).fill(null),
+                mySymbol: 'X',
+                turn: 'X',
+                winner: null,
+                opponentName: '',
+                opponentRating: 1200,
+                opponentDifficulty: 'medium', // 'easy', 'medium', 'hard', 'pro'
+                isSearching: false,
+                searchTimer: null,
+                matchTimeout: null,
+                gameActive: false
+            };
+
+            const dom = {
+                viewLobby: document.getElementById('viewLobby'),
+                viewSearching: document.getElementById('viewSearching'),
+                viewMatch: document.getElementById('viewMatch'),
+                
+                btnFindMatch: document.getElementById('btnFindMatch'),
+                btnCancelSearch: document.getElementById('btnCancelSearch'),
+                
+                scoreCardX: document.getElementById('scoreCardX'),
+                scoreCardO: document.getElementById('scoreCardO'),
+                labelPlayerX: document.getElementById('labelPlayerX'),
+                labelPlayerO: document.getElementById('labelPlayerO'),
+                oppRating: document.getElementById('oppRating'),
+                matchStatusLine: document.getElementById('matchStatusLine'),
+                
+                boardContainer: document.getElementById('boardContainer'),
+                boardGrid: document.getElementById('boardGrid'),
+                winLineSvg: document.getElementById('winLineSvg'),
+                winSvgLine: document.getElementById('winSvgLine'),
+                
+                playAgainWrap: document.getElementById('playAgainWrap'),
+                btnRematch: document.getElementById('btnRematch'),
+                rematchName: document.getElementById('rematchName'),
+                btnFindNew: document.getElementById('btnFindNew'),
+                btnLeaveMatch: document.getElementById('btnLeaveMatch'),
+                
+                toastContainer: document.getElementById('toastContainer')
+            };
+
+            let cellEls = [];
+            const WIN_LINES = [
+                [0,1,2], [3,4,5], [6,7,8],
+                [0,3,6], [1,4,7], [2,5,8],
+                [0,4,8], [2,4,6]
+            ];
+
+            function init() {
+                buildBoardDOM();
+                attachListeners();
+                switchView(dom.viewLobby);
+            }
+
+            function switchView(view) {
+                dom.viewLobby.classList.remove('active');
+                dom.viewSearching.classList.remove('active');
+                dom.viewMatch.classList.remove('active');
+                view.classList.add('active');
+            }
+
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                dom.toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    if (dom.toastContainer.contains(toast)) {
+                        dom.toastContainer.removeChild(toast);
+                    }
+                }, 3000);
+            }
+
+            function buildBoardDOM() {
+                dom.boardGrid.innerHTML = '';
+                cellEls = [];
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.index = i;
+                    cell.addEventListener('click', () => handleCellClick(i));
+                    dom.boardGrid.appendChild(cell);
+                    cellEls.push(cell);
+                }
+            }
+
+            function startMatchmaking(keepSameOpponent = false) {
+                switchView(dom.viewSearching);
+                state.isSearching = true;
+                
+                if (!keepSameOpponent || !state.opponentName) {
+                    state.opponentName = generateRandomName();
+                    state.opponentRating = Math.floor(Math.random() * 800) + 950;
+                    
+                    // Randomly assign difficulty mode for this opponent
+                    const diffs = ['easy', 'medium', 'hard', 'pro'];
+                    state.opponentDifficulty = diffs[Math.floor(Math.random() * diffs.length)];
+                }
+
+                const delay = Math.floor(Math.random() * 2000) + 1500;
+                
+                state.searchTimer = setTimeout(() => {
+                    if (!state.isSearching) return;
+                    foundMatch();
+                }, delay);
+            }
+
+            function cancelMatchmaking() {
+                state.isSearching = false;
+                clearTimeout(state.searchTimer);
+                switchView(dom.viewLobby);
+            }
+
+            function foundMatch() {
+                state.isSearching = false;
+                state.mySymbol = Math.random() > 0.5 ? 'X' : 'O';
+                
+                dom.labelPlayerX.textContent = state.mySymbol === 'X' ? 'You (X)' : `${state.opponentName} (X)`;
+                dom.labelPlayerO.textContent = state.mySymbol === 'O' ? 'You (O)' : `${state.opponentName} (O)`;
+                dom.oppRating.textContent = `RATING: ${state.opponentRating} [${state.opponentDifficulty.toUpperCase()}]`;
+                dom.rematchName.textContent = state.opponentName;
+                
+                showToast(`Matched with ${state.opponentName}!`);
+                switchView(dom.viewMatch);
+                
+                startRound();
+            }
+
+            function leaveMatch() {
+                state.gameActive = false;
+                clearTimeout(state.matchTimeout);
+                switchView(dom.viewLobby);
+            }
+
+            function startRound() {
+                state.board.fill(null);
+                state.turn = 'X';
+                state.winner = null;
+                state.gameActive = true;
+                
+                dom.winLineSvg.style.display = 'none';
+                dom.boardContainer.classList.remove('has-winner', 'game-over');
+                dom.playAgainWrap.style.display = 'none';
+                dom.btnLeaveMatch.style.display = 'block';
+                
+                cellEls.forEach(c => {
+                    c.innerHTML = '';
+                    c.className = 'cell';
+                });
+                
+                updateUI();
+                
+                if (state.turn !== state.mySymbol) {
+                    scheduleBotMove();
+                }
+            }
+
+            function updateUI() {
+                if (!state.gameActive) return;
+                
+                dom.boardContainer.classList.remove('my-turn', 'hover-x', 'hover-o');
+                dom.scoreCardX.classList.remove('active-turn-cyan');
+                dom.scoreCardO.classList.remove('active-turn-red');
+                
+                if (state.winner) {
+                    dom.boardContainer.classList.add('game-over');
+                    dom.playAgainWrap.style.display = 'flex';
+                    dom.btnLeaveMatch.style.display = 'none';
+                    
+                    if (state.winner !== 'D') {
+                        dom.boardContainer.classList.add('has-winner');
+                        const isWin = state.winner === state.mySymbol;
+                        dom.matchStatusLine.textContent = isWin ? "YOU WIN!" : "YOU LOSE!";
+                        dom.matchStatusLine.className = `status-line status-${state.winner === 'X' ? 'cyan' : 'red'}`;
+                    } else {
+                        dom.matchStatusLine.textContent = "MATCH DRAWN!";
+                        dom.matchStatusLine.className = 'status-line status-gold';
+                    }
+                } else {
+                    const isMyTurn = state.turn === state.mySymbol;
+                    
+                    if (isMyTurn) {
+                        dom.boardContainer.classList.add('my-turn', `hover-${state.mySymbol.toLowerCase()}`);
+                        dom.matchStatusLine.textContent = "YOUR TURN";
+                        dom.matchStatusLine.className = `status-line status-${state.mySymbol === 'X' ? 'cyan' : 'red'}`;
+                    } else {
+                        dom.matchStatusLine.textContent = `${state.opponentName} IS THINKING...`;
+                        dom.matchStatusLine.className = 'status-line status-wait';
+                    }
+                    
+                    if (state.turn === 'X') dom.scoreCardX.classList.add('active-turn-cyan');
+                    else dom.scoreCardO.classList.add('active-turn-red');
+                }
+            }
+
+            function handleCellClick(index) {
+                if (!state.gameActive || state.winner || state.turn !== state.mySymbol || state.board[index] !== null) {
+                    if (state.board[index] !== null && !state.winner) {
+                        cellEls[index].classList.add('shake');
+                        setTimeout(() => cellEls[index].classList.remove('shake'), 320);
+                    }
+                    return;
+                }
+                executeMove(index, state.mySymbol);
+            }
+
+            function executeMove(index, symbol) {
+                state.board[index] = symbol;
+                
+                cellEls.forEach(c => c.classList.remove('last-move'));
+                const cell = cellEls[index];
+                cell.innerHTML = '';
+                cell.appendChild(createMarkSVG(symbol));
+                cell.classList.add('last-move');
+                
+                const winRes = checkWin(state.board);
+                if (winRes) {
+                    state.winner = winRes.winner;
+                    winRes.line.forEach(idx => cellEls[idx].classList.add('winning-cell', `win-${symbol.toLowerCase()}`));
+                    drawWinLine(winRes.line, symbol);
+                } else if (state.board.every(c => c !== null)) {
+                    state.winner = 'D';
+                } else {
+                    state.turn = symbol === 'X' ? 'O' : 'X';
+                }
+                
+                updateUI();
+                
+                if (!state.winner && state.turn !== state.mySymbol) {
+                    scheduleBotMove();
+                }
+            }
+
+            function createMarkSVG(type) {
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 100');
+                svg.setAttribute('class', `mark-svg ${type === 'X' ? 'mark-x' : 'mark-o'}`);
+                if (type === 'X') {
+                    const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p1.setAttribute('d', 'M 24 24 L 76 76'); p1.setAttribute('stroke-width', '14'); p1.setAttribute('stroke-linecap', 'round'); p1.setAttribute('class', 'stroke-1');
+                    const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p2.setAttribute('d', 'M 76 24 L 24 76'); p2.setAttribute('stroke-width', '14'); p2.setAttribute('stroke-linecap', 'round'); p2.setAttribute('class', 'stroke-2');
+                    svg.appendChild(p1); svg.appendChild(p2);
+                } else {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', '50'); circle.setAttribute('cy', '50'); circle.setAttribute('r', '27');
+                    circle.setAttribute('fill', 'none'); circle.setAttribute('stroke-width', '13'); circle.setAttribute('stroke-linecap', 'round');
+                    svg.appendChild(circle);
+                }
+                return svg;
+            }
+
+            function drawWinLine(line, winner) {
+                dom.winLineSvg.style.display = 'block';
+                const getCoord = (idx) => {
+                    const row = Math.floor(idx / 3); const col = idx % 3;
+                    return { x: (col * 33.33) + 16.66, y: (row * 33.33) + 16.66 };
+                };
+                const start = getCoord(line[0]); const end = getCoord(line[2]);
+                dom.winSvgLine.setAttribute('x1', `${start.x}%`); dom.winSvgLine.setAttribute('y1', `${start.y}%`);
+                dom.winSvgLine.setAttribute('x2', `${end.x}%`); dom.winSvgLine.setAttribute('y2', `${end.y}%`);
+                
+                dom.winSvgLine.style.stroke = winner === 'X' ? 'var(--cyan)' : 'var(--red)';
+                dom.winSvgLine.style.filter = `drop-shadow(0 0 10px ${winner === 'X' ? 'var(--cyan)' : 'var(--red)'})`;
+            }
+
+            function checkWin(boardState) {
+                for (const line of WIN_LINES) {
+                    const first = boardState[line[0]];
+                    if (first !== null && boardState[line[1]] === first && boardState[line[2]] === first) {
+                        return { winner: first, line: line };
+                    }
+                }
+                return null;
+            }
+
+            function scheduleBotMove() {
+                const delay = Math.floor(Math.random() * 1400) + 700;
+                state.matchTimeout = setTimeout(() => {
+                    if (!state.gameActive || state.winner) return;
+                    makeBotMove();
+                }, delay);
+            }
+
+            function makeBotMove() {
+                const botSymbol = state.mySymbol === 'X' ? 'O' : 'X';
+                const moves = [];
+                for (let i = 0; i < 9; i++) if (state.board[i] === null) moves.push(i);
+                if (moves.length === 0) return;
+
+                let bestMove = moves[Math.floor(Math.random() * moves.length)];
+                const diff = state.opponentDifficulty;
+
+                // EASY: makes random moves, misses blocks often
+                if (diff === 'easy') {
+                    if (Math.random() < 0.3) {
+                        for (let m of moves) {
+                            state.board[m] = botSymbol;
+                            if (checkWin(state.board)) bestMove = m;
+                            state.board[m] = null;
+                        }
+                    }
+                } 
+                // MEDIUM & HARD & PRO
+                else {
+                    // 1. Check for win
+                    for (let m of moves) {
+                        state.board[m] = botSymbol;
+                        if (checkWin(state.board)) bestMove = m;
+                        state.board[m] = null;
+                    }
+
+                    // 2. Check for block
+                    if (bestMove === moves[Math.floor(Math.random() * moves.length)]) {
+                        for (let m of moves) {
+                            state.board[m] = state.mySymbol;
+                            if (checkWin(state.board)) bestMove = m;
+                            state.board[m] = null;
+                        }
+                    }
+
+                    // 3. Hard & Pro take center / strategic corners
+                    if (diff === 'hard' || diff === 'pro') {
+                        if (bestMove === moves[Math.floor(Math.random() * moves.length)]) {
+                            if (state.board[4] === null) bestMove = 4;
+                            else {
+                                const corners = [0, 2, 6, 8].filter(c => state.board[c] === null);
+                                if (corners.length > 0 && Math.random() < (diff === 'pro' ? 0.9 : 0.6)) {
+                                    bestMove = corners[Math.floor(Math.random() * corners.length)];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                executeMove(bestMove, botSymbol);
+            }
+
+            function attachListeners() {
+                dom.btnFindMatch.addEventListener('click', () => startMatchmaking(false));
+                dom.btnCancelSearch.addEventListener('click', cancelMatchmaking);
+                dom.btnLeaveMatch.addEventListener('click', leaveMatch);
+                dom.btnRematch.addEventListener('click', () => startMatchmaking(true));
+                dom.btnFindNew.addEventListener('click', () => startMatchmaking(false));
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

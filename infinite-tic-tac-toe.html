@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Tic-Tac-Toe | Gaming Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --x:#00eaff; --o:#ff4466; --gold:#ffd54a; --bg:#050b14; }
+        * { box-sizing:border-box; }
+        body {
+            margin:0; min-height:100vh; font-family:'Poppins',sans-serif; color:#fff; display:flex; flex-direction:column;
+            background: linear-gradient(135deg, rgba(5,11,20,.93) 0%, rgba(10,25,47,.88) 100%),
+                        url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center/cover fixed;
+            background-color:var(--bg);
+        }
+        .scan { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.35;
+            background:repeating-linear-gradient(to bottom, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.18) 2px 4px); }
+        nav { padding:16px 28px; display:flex; justify-content:space-between; align-items:center;
+            background:rgba(0,0,0,.3); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,234,255,.2); }
+        nav a { color:#fff; text-decoration:none; font-weight:600; transition:.25s; }
+        nav a:hover { color:var(--x); text-shadow:0 0 10px var(--x); }
+        nav h2 { margin:0; font-size:1.05rem; letter-spacing:2px; text-transform:uppercase; color:var(--x); }
+
+        main { flex:1; display:flex; justify-content:center; align-items:flex-start; padding:20px; }
+        .card { width:100%; max-width:760px; text-align:center; padding:26px 22px 28px; border-radius:28px;
+            background:rgba(15,15,20,.88); backdrop-filter:blur(10px); border:1px solid rgba(0,234,255,.3);
+            box-shadow:0 0 60px rgba(0,234,255,.14), inset 0 0 30px rgba(0,234,255,.05);
+            animation:cardIn .6s cubic-bezier(.2,.8,.2,1); }
+        @keyframes cardIn { from { opacity:0; transform:translateY(24px) scale(.95); filter:blur(8px); } }
+        h1 { margin:0 0 6px; font-size:1.9rem; font-weight:900; text-transform:uppercase; letter-spacing:3px; color:var(--x); text-shadow:0 0 18px rgba(0,234,255,.5); }
+        .rule { margin:0 0 14px; font-size:.8rem; color:#9aa; }
+
+        .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+        .btn { padding:9px 16px; border-radius:30px; border:1px solid rgba(255,255,255,.22); background:transparent; color:#fff; cursor:pointer;
+            font:700 .76rem 'Poppins',sans-serif; text-transform:uppercase; transition:.25s; }
+        .btn:hover { background:rgba(0,234,255,.12); border-color:var(--x); transform:scale(1.05); }
+        .btn.active { background:var(--x); color:#000; border-color:var(--x); box-shadow:0 0 15px rgba(0,234,255,.45); }
+        .btn.hard.active { background:linear-gradient(45deg,#ff4466,#aa0022); color:#fff; border-color:var(--o); box-shadow:0 0 15px rgba(255,68,102,.5); }
+        .btn.gold.active { background:var(--gold); color:#000; border-color:var(--gold); box-shadow:0 0 15px rgba(255,213,74,.5); }
+        .btn.sq { min-width:44px; padding:9px 0; font-size:1rem; line-height:1; }
+        .hidden { display:none !important; }
+
+        .scoreboard { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin:6px 0 10px; }
+        .sc { padding:8px 10px; border-radius:14px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.1); transition:.3s; }
+        .sc .nm { font-size:.74rem; color:#bbb; }
+        .sc .pts { font-size:1.6rem; font-weight:800; }
+        .sc.x .pts { color:var(--x); } .sc.o .pts { color:var(--o); }
+        .sc.turn { transform:scale(1.06); }
+        .sc.x.turn { border-color:var(--x); box-shadow:0 0 18px rgba(0,234,255,.35); }
+        .sc.o.turn { border-color:var(--o); box-shadow:0 0 18px rgba(255,68,102,.35); }
+        .dr { font-size:.74rem; color:#aaa; } .dr b { display:block; font-size:1.2rem; color:#fff; }
+
+        #status { min-height:1.7em; font-weight:700; letter-spacing:1px; margin:6px 0 4px; color:var(--x); transition:color .25s; }
+        .hint { font-size:.74rem; color:#789; margin:0 0 10px; }
+
+        .viewport { position:relative; margin:0 auto 12px; border-radius:16px; border:1px solid rgba(0,234,255,.3); overflow:hidden;
+            background:rgba(0,0,0,.4); box-shadow:inset 0 0 30px rgba(0,0,0,.7), 0 0 28px rgba(0,234,255,.12); }
+        canvas { display:block; width:100%; height:520px; cursor:crosshair; touch-action:none; }
+        canvas.panning { cursor:grabbing; }
+        .locked canvas { cursor:not-allowed; }
+        .tools { display:flex; gap:10px; justify-content:center; margin-bottom:14px; }
+
+        .wide { width:100%; border-radius:14px; padding:13px; font-size:.95rem; border-color:var(--x); }
+        @media (max-width:520px) { canvas { height:420px; } }
+        @media (max-width:420px) { .card { padding:20px 12px 22px; } h1 { font-size:1.45rem; } nav { padding:14px 16px; } .btn { padding:8px 12px; } }
+        @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+    </style>
+</head>
+<body>
+    <div class="scan"></div>
+    <nav>
+        <a href="tictactoe-dashboard.html">&larr; Dashboard</a>
+        <h2>Infinite</h2>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h1>Infinite Tic-Tac-Toe</h1>
+            <p class="rule" id="rule"></p>
+
+            <div class="row">
+                <button class="btn active" id="m-ai" onclick="setMode('ai')">vs AI</button>
+                <button class="btn" id="m-local" onclick="setMode('local')">2 Players</button>
+            </div>
+            <div class="row" id="diffRow">
+                <button class="btn" id="d-easy" onclick="setDiff('easy')">Easy</button>
+                <button class="btn" id="d-medium" onclick="setDiff('medium')">Medium</button>
+                <button class="btn hard active" id="d-hard" onclick="setDiff('hard')">Hard</button>
+            </div>
+            <div class="row">
+                <button class="btn gold" id="k-4" onclick="setK(4)">Win: 4 in a row</button>
+                <button class="btn gold active" id="k-5" onclick="setK(5)">Win: 5 in a row</button>
+            </div>
+
+            <div class="scoreboard">
+                <div class="sc x" id="cardX"><div class="nm" id="nmX">You (X)</div><div class="pts" id="scX">0</div></div>
+                <div class="dr">Draws<b id="scD">0</b></div>
+                <div class="sc o" id="cardO"><div class="nm" id="nmO">AI (O)</div><div class="pts" id="scO">0</div></div>
+            </div>
+
+            <div id="status">Your turn</div>
+            <p class="hint" id="hint">Drag to pan • scroll or pinch to zoom • click to play</p>
+
+            <div class="viewport" id="viewport"><canvas id="cv"></canvas></div>
+
+            <div class="tools">
+                <button class="btn sq" onclick="zoomBy(1/1.25)" aria-label="Zoom out">−</button>
+                <button class="btn" onclick="fitAll()">Fit all</button>
+                <button class="btn sq" onclick="zoomBy(1.25)" aria-label="Zoom in">+</button>
+            </div>
+
+            <button class="btn wide" onclick="newRound()">New Round</button>
+            <button class="btn" style="margin-top:10px;" onclick="resetScores()">Reset Scores</button>
+        </div>
+    </main>
+
+<script>
+const HUMAN = "X", AI = "O";
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d");
+const COL = { X:"#00eaff", O:"#ff4466", gold:"#ffd54a" };
+const DIRS = [[1,0],[0,1],[1,1],[1,-1]];
+
+let K = 5;                                   // stones in a row needed to win
+let stones = [], map = new Map();            // the board is a sparse grid: it never runs out of room
+let current = "X", starter = "X", active = false, last = null, win = null, moves = 0;
+let mode = "ai", diff = "hard", scores = { X:0, O:0, D:0 }, aiTimer = null, hover = null;
+let animP = 1, winP = 0, animStart = 0, winStart = 0;
+
+/* ---------- sparse board helpers ---------- */
+const key = (x, y) => (x + 50000) * 100000 + (y + 50000);
+const get = (x, y) => map.get(key(x, y)) || "";
+function put(x, y, p) { stones.push({ x, y, p }); map.set(key(x, y), p); }
+function unput() { const s = stones.pop(); map.delete(key(s.x, s.y)); }
+
+/* length of the run of p through (x,y) in direction (dx,dy), counting (x,y) itself */
+function runThrough(x, y, dx, dy, p) {
+    let n = 1, a = 1, b = 1;
+    while (get(x + dx * a, y + dy * a) === p) { n++; a++; }
+    while (get(x - dx * b, y - dy * b) === p) { n++; b++; }
+    return { n, a, b };
+}
+function winAt(x, y) {                       // the winning run through the stone at (x,y), or null
+    const p = get(x, y);
+    for (const [dx, dy] of DIRS) {
+        const r = runThrough(x, y, dx, dy, p);
+        if (r.n >= K) return { x1:x - dx * (r.b - 1), y1:y - dy * (r.b - 1), x2:x + dx * (r.a - 1), y2:y + dy * (r.a - 1), dx, dy, len:r.n };
+    }
+    return null;
+}
+function wonAt(x, y) { const p = get(x, y); return DIRS.some(([dx, dy]) => runThrough(x, y, dx, dy, p).n >= K); }
+
+/* ---------- camera ---------- */
+let W = 600, H = 520, view = { ox:0, oy:0, s:44 }, target = null;
+function fit() {
+    const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const first = !r.width ? false : true;
+    const oldCx = (W / 2 - view.ox) / view.s, oldCy = (H / 2 - view.oy) / view.s;
+    W = Math.max(200, r.width); H = Math.max(200, r.height);
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    view.ox = W / 2 - oldCx * view.s; view.oy = H / 2 - oldCy * view.s;     // keep the same spot in the middle
+    request();
+}
+function centerOn(wx, wy, s) {
+    view = { ox:W / 2 - (wx + .5) * s, oy:H / 2 - (wy + .5) * s, s };
+}
+function zoomAt(px, py, factor) {
+    const s = Math.max(14, Math.min(96, view.s * factor)), k = s / view.s;
+    view.ox = px - (px - view.ox) * k; view.oy = py - (py - view.oy) * k; view.s = s; target = null; request();
+}
+function zoomBy(f) { zoomAt(W / 2, H / 2, f); }
+function fitAll() {
+    if (!stones.length) { target = { ox:W / 2 - .5 * 44, oy:H / 2 - .5 * 44, s:44 }; request(); return; }
+    let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+    for (const s of stones) { x1 = Math.min(x1, s.x); y1 = Math.min(y1, s.y); x2 = Math.max(x2, s.x); y2 = Math.max(y2, s.y); }
+    const bw = x2 - x1 + 1 + 4, bh = y2 - y1 + 1 + 4;
+    const s = Math.max(14, Math.min(64, Math.floor(Math.min(W / bw, H / bh))));
+    const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+    target = { ox:W / 2 - (cx + .5) * s, oy:H / 2 - (cy + .5) * s, s }; request();
+}
+function ensureVisible(x, y) {               // glide the camera if the newest stone is near or past the edge
+    const cx = (x + .5) * view.s + view.ox, cy = (y + .5) * view.s + view.oy, m = 80;
+    if (cx < m || cx > W - m || cy < m || cy > H - m) { target = { ox:W / 2 - (x + .5) * view.s, oy:H / 2 - (y + .5) * view.s, s:view.s }; request(); }
+}
+const toCell = (px, py) => ({ x:Math.floor((px - view.ox) / view.s), y:Math.floor((py - view.oy) / view.s) });
+
+/* ---------- drawing ---------- */
+function drawMark(cx, cy, s, m, p, alpha) {
+    const r = s * .29;
+    ctx.save();
+    ctx.globalAlpha = alpha; ctx.lineCap = "round"; ctx.lineWidth = Math.max(2.5, s * .11);
+    ctx.strokeStyle = COL[m]; ctx.shadowColor = COL[m]; ctx.shadowBlur = s * .35;
+    ctx.beginPath();
+    if (m === "X") {
+        const a = Math.min(1, p * 2), b = Math.max(0, p * 2 - 1);
+        ctx.moveTo(cx - r, cy - r); ctx.lineTo(cx - r + 2 * r * a, cy - r + 2 * r * a);
+        if (b > 0) { ctx.moveTo(cx + r, cy - r); ctx.lineTo(cx + r - 2 * r * b, cy - r + 2 * r * b); }
+    } else ctx.arc(cx, cy, r * 1.08, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * p);
+    ctx.stroke(); ctx.restore();
+}
+function draw() {
+    const s = view.s;
+    ctx.clearRect(0, 0, W, H);
+    const x0 = Math.floor(-view.ox / s), x1 = Math.ceil((W - view.ox) / s), y0 = Math.floor(-view.oy / s), y1 = Math.ceil((H - view.oy) / s);
+    // checker tint
+    ctx.fillStyle = "rgba(255,255,255,.025)";
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (((x + y) & 1) !== 0) ctx.fillRect(x * s + view.ox, y * s + view.oy, s, s);
+    // grid
+    ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 1; ctx.beginPath();
+    for (let x = x0; x <= x1; x++) { const px = Math.round(x * s + view.ox) + .5; ctx.moveTo(px, 0); ctx.lineTo(px, H); }
+    for (let y = y0; y <= y1; y++) { const py = Math.round(y * s + view.oy) + .5; ctx.moveTo(0, py); ctx.lineTo(W, py); }
+    ctx.stroke();
+    // origin marker (where the game started)
+    { const cx = .5 * s + view.ox, cy = .5 * s + view.oy; ctx.fillStyle = "rgba(255,213,74,.35)"; ctx.beginPath(); ctx.arc(cx, cy, Math.max(2, s * .05), 0, 7); ctx.fill(); }
+    // last-move glow
+    if (last) {
+        const cx = (last.x + .5) * s + view.ox, cy = (last.y + .5) * s + view.oy, g = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * .8);
+        g.addColorStop(0, "rgba(255,255,255,.22)"); g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = g; ctx.fillRect(cx - s, cy - s, s * 2, s * 2);
+    }
+    // winning run highlight
+    if (win) for (let t = 0; t < win.len; t++) {
+        ctx.fillStyle = "rgba(255,213,74,.2)"; ctx.fillRect((win.x1 + win.dx * t) * s + view.ox, (win.y1 + win.dy * t) * s + view.oy, s, s);
+    }
+    // hover ghost
+    if (hover && active && !get(hover.x, hover.y) && (mode !== "ai" || current === HUMAN))
+        drawMark((hover.x + .5) * s + view.ox, (hover.y + .5) * s + view.oy, s, current, 1, .3);
+    // stones
+    for (const st of stones) {
+        const cx = (st.x + .5) * s + view.ox, cy = (st.y + .5) * s + view.oy;
+        if (cx < -s || cx > W + s || cy < -s || cy > H + s) continue;
+        const isLast = last && st.x === last.x && st.y === last.y;
+        let dim = 1;
+        if (win && !(st.p === get(win.x1, win.y1) && onRun(st.x, st.y))) dim = .35;
+        drawMark(cx, cy, s, st.p, isLast ? animP : 1, dim);
+    }
+    // winning line
+    if (win && winP > 0) {
+        const [sx0, sy0] = [(win.x1 + .5) * s + view.ox, (win.y1 + .5) * s + view.oy], [ex0, ey0] = [(win.x2 + .5) * s + view.ox, (win.y2 + .5) * s + view.oy];
+        const len = Math.hypot(ex0 - sx0, ey0 - sy0) || 1, ux = (ex0 - sx0) / len, uy = (ey0 - sy0) / len, e = s * .45;
+        const sx = sx0 - ux * e, sy = sy0 - uy * e, ex = ex0 + ux * e, ey = ey0 + uy * e;
+        ctx.save(); ctx.strokeStyle = COL.gold; ctx.lineWidth = Math.max(4, s * .16); ctx.lineCap = "round"; ctx.shadowColor = COL.gold; ctx.shadowBlur = 14;
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + (ex - sx) * winP, sy + (ey - sy) * winP); ctx.stroke(); ctx.restore();
+    }
+    // soft fade at the edges suggests the board goes on forever
+    const f = 46;
+    for (const [x, y, w, h, gx, gy] of [[0,0,f,H,f,0],[W-f,0,f,H,W-f,0],[0,0,W,f,0,f],[0,H-f,W,f,0,H-f]]) {
+        const gr = ctx.createLinearGradient(x === 0 && w === f ? 0 : (w === f ? W : 0), y === 0 && h === f ? 0 : (h === f ? H : 0), gx, gy);
+        const lg = (w === f) ? ctx.createLinearGradient(x === 0 ? 0 : W, 0, x === 0 ? f : W - f, 0) : ctx.createLinearGradient(0, y === 0 ? 0 : H, 0, y === 0 ? f : H - f);
+        lg.addColorStop(0, "rgba(5,11,20,.85)"); lg.addColorStop(1, "rgba(5,11,20,0)");
+        ctx.fillStyle = lg; ctx.fillRect(x, y, w, h);
+    }
+}
+function onRun(x, y) {
+    if (!win) return false;
+    const t = win.dx ? (x - win.x1) / win.dx : (y - win.y1) / win.dy;
+    return Number.isInteger(t) && t >= 0 && t < win.len && x === win.x1 + win.dx * t && y === win.y1 + win.dy * t;
+}
+
+/* ---------- animation loop ---------- */
+let rafOn = false;
+function request() { if (!rafOn) { rafOn = true; requestAnimationFrame(frame); } }
+function frame(now) {
+    rafOn = false; let again = false;
+    animP = last ? Math.min(1, (now - animStart) / 300) : 1; if (animP < 1) again = true;
+    if (win) { winP = Math.max(0, Math.min(1, (now - winStart - 150) / 550)); if (winP < 1) again = true; } else winP = 0;
+    if (target) {
+        view.ox += (target.ox - view.ox) * .2; view.oy += (target.oy - view.oy) * .2; view.s += (target.s - view.s) * .2;
+        if (Math.abs(target.ox - view.ox) < .5 && Math.abs(target.oy - view.oy) < .5 && Math.abs(target.s - view.s) < .2) { view = target; target = null; } else again = true;
+    }
+    draw();
+    if (again) request();
+}
+
+/* ---------- pointer: drag to pan, pinch / wheel to zoom, tap to play ---------- */
+const ptrs = new Map(); let gesture = null;
+function pos(e) { const r = cv.getBoundingClientRect(); return { x:e.clientX - r.left, y:e.clientY - r.top }; }
+cv.addEventListener("pointerdown", e => {
+    cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, pos(e)); target = null;
+    if (ptrs.size === 1) gesture = { type:"pan", start:pos(e), ox:view.ox, oy:view.oy, moved:false };
+    else if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; gesture = { type:"pinch", d:Math.hypot(a.x - b.x, a.y - b.y), moved:true }; }
+});
+cv.addEventListener("pointermove", e => {
+    const p = pos(e);
+    if (!ptrs.has(e.pointerId)) { if (e.pointerType !== "touch") { hover = toCell(p.x, p.y); request(); } return; }
+    ptrs.set(e.pointerId, p);
+    if (!gesture) return;
+    if (gesture.type === "pan" && ptrs.size === 1) {
+        const dx = p.x - gesture.start.x, dy = p.y - gesture.start.y;
+        if (!gesture.moved && Math.hypot(dx, dy) < 6) return;
+        gesture.moved = true; cv.classList.add("panning"); hover = null;
+        view.ox = gesture.ox + dx; view.oy = gesture.oy + dy; request();
+    } else if (gesture.type === "pinch" && ptrs.size === 2) {
+        const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (gesture.d > 0 && d > 0) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / gesture.d);
+        gesture.d = d;
+    }
+});
+function endPtr(e) {
+    const p = ptrs.get(e.pointerId); ptrs.delete(e.pointerId); cv.classList.remove("panning");
+    if (gesture && gesture.type === "pan" && !gesture.moved && p && e.type === "pointerup") { const c = toCell(p.x, p.y); clickCell(c.x, c.y); }
+    if (ptrs.size === 0) gesture = null; else if (ptrs.size === 1) { const q = [...ptrs.values()][0]; gesture = { type:"pan", start:q, ox:view.ox, oy:view.oy, moved:true }; }
+}
+cv.addEventListener("pointerup", endPtr); cv.addEventListener("pointercancel", endPtr);
+cv.addEventListener("pointerleave", () => { hover = null; request(); });
+cv.addEventListener("wheel", e => { e.preventDefault(); const p = pos(e); zoomAt(p.x, p.y, Math.exp(-e.deltaY * .0015)); }, { passive:false });
+
+/* ---------- setup ---------- */
+function setMode(m) {
+    mode = m;
+    $("m-ai").classList.toggle("active", m === "ai");
+    $("m-local").classList.toggle("active", m === "local");
+    $("diffRow").classList.toggle("hidden", m !== "ai");
+    $("nmX").textContent = m === "ai" ? "You (X)" : "Player 1 (X)";
+    $("nmO").textContent = m === "ai" ? "AI (O)" : "Player 2 (O)";
+    resetScores(); startRound("X");
+}
+function setDiff(d) {
+    diff = d;
+    ["easy","medium","hard"].forEach(k => $("d-" + k).classList.toggle("active", k === d));
+    resetScores(); startRound("X");
+}
+function setK(k) {
+    K = k; buildWeights();
+    $("k-4").classList.toggle("active", k === 4); $("k-5").classList.toggle("active", k === 5);
+    $("rule").textContent = "A board with no edges — get " + k + " in a row (across, down or diagonal). There are no draws.";
+    resetScores(); startRound("X");
+}
+function resetScores() { scores = { X:0, O:0, D:0 }; renderScores(); }
+function renderScores() { $("scX").textContent = scores.X; $("scO").textContent = scores.O; $("scD").textContent = scores.D; }
+function newRound() { startRound(starter === "X" ? "O" : "X"); }   // starter alternates
+
+/* ---------- round flow ---------- */
+function startRound(first) {
+    clearTimeout(aiTimer);
+    stones = []; map = new Map(); starter = first; current = first; active = true; last = null; win = null; winP = 0; animP = 1; moves = 0;
+    centerOnDefault(); updateUI(); request();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function centerOnDefault() { target = null; view = { ox:W / 2 - .5 * 44, oy:H / 2 - .5 * 44, s:44 }; }
+function clickCell(x, y) {
+    if (!active || get(x, y)) return;
+    if (mode === "ai" && current !== HUMAN) return;
+    place(x, y);
+}
+function place(x, y) {
+    put(x, y, current); last = { x, y }; moves++; animStart = performance.now();
+    const w = winAt(x, y);
+    if (w) { win = w; winStart = performance.now(); finish(current); request(); return; }
+    ensureVisible(x, y);
+    current = current === "X" ? "O" : "X";
+    updateUI(); request();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function finish(result) {
+    active = false; scores[result]++; renderScores();
+    let msg;
+    if (mode === "ai") msg = result === HUMAN ? "🏆 You win!" : "🤖 AI wins!";
+    else msg = "🏆 Player " + (result === "X" ? "1" : "2") + " wins!";
+    $("status").textContent = msg; $("status").style.color = "#fff";
+    $("cardX").classList.remove("turn"); $("cardO").classList.remove("turn");
+    $("viewport").classList.add("locked");
+    $("hint").textContent = "Round over • " + moves + " moves played";
+}
+function updateUI() {
+    $("viewport").classList.toggle("locked", !active || (mode === "ai" && current !== HUMAN));
+    $("cardX").classList.toggle("turn", active && current === "X");
+    $("cardO").classList.toggle("turn", active && current === "O");
+    $("status").style.color = current === "X" ? "var(--x)" : "var(--o)";
+    $("status").textContent = mode === "ai"
+        ? (current === HUMAN ? "Your turn (X)" : "AI is thinking…")
+        : "Player " + (current === "X" ? "1" : "2") + "'s turn (" + current + ")";
+    if (active) $("hint").textContent = "Move " + (moves + 1) + " • drag to pan • scroll or pinch to zoom • click to play";
+}
+
+/* ---------- AI ---------- */
+let WGT = [];
+function buildWeights() { WGT = K === 5 ? [0, 1, 10, 100, 1200, 100000] : [0, 1, 10, 200, 100000]; }
+buildWeights();
+
+// How useful an empty cell is to either side: every window of K cells through it that is still open to one side.
+function cellValue(x, y) {
+    let v = 0;
+    for (const [dx, dy] of DIRS) for (let t = -(K - 1); t <= 0; t++) {
+        let a = 0, h = 0;
+        for (let j = 0; j < K; j++) {
+            const q = t + j; if (q === 0) continue;
+            const c = get(x + dx * q, y + dy * q);
+            if (c === AI) a++; else if (c === HUMAN) h++;
+        }
+        if (a && h) continue;
+        if (a) v += WGT[a + 1]; else if (h) v += WGT[h + 1] * 1.1; else v += 1;
+    }
+    return v;
+}
+function near() {                                                   // empty cells within 2 squares of any stone
+    const seen = new Set(), out = [];
+    for (const s of stones) for (let dx = -2; dx <= 2; dx++) for (let dy = -2; dy <= 2; dy++) {
+        const x = s.x + dx, y = s.y + dy, k = key(x, y);
+        if (!map.has(k) && !seen.has(k)) { seen.add(k); out.push({ x, y }); }
+    }
+    return out;
+}
+function topCells(limit) {
+    const c = near();
+    if (!c.length) return [{ x:0, y:0 }];
+    for (const q of c) q.v = cellValue(q.x, q.y);
+    c.sort((a, b) => b.v - a.v);
+    return c.slice(0, limit);
+}
+// Static evaluation: score every run of stones by length and how many ends are still open.
+const RT = [null, [0, 2000, 30000], [0, 150, 2000], [0, 12, 150], [0, 1, 12]];       // [distance from K][open ends]
+function evaluate() {
+    let s = 0;
+    for (const st of stones) for (const [dx, dy] of DIRS) {
+        if (get(st.x - dx, st.y - dy) === st.p) continue;                            // only count a run from its start
+        let L = 1; while (get(st.x + dx * L, st.y + dy * L) === st.p) L++;
+        if (L >= K) { s += st.p === AI ? 1e6 : -1e6; continue; }
+        const ends = (get(st.x - dx, st.y - dy) === "" ? 1 : 0) + (get(st.x + dx * L, st.y + dy * L) === "" ? 1 : 0);
+        if (!ends) continue;
+        const dist = K - L, v = dist <= 4 ? RT[dist][ends] : (ends === 2 ? 1 : 0);
+        s += st.p === AI ? v : -v * 1.1;
+    }
+    return s;
+}
+function scheduleAI() {
+    updateUI();
+    aiTimer = setTimeout(() => {
+        const m = diff === "easy" ? easyMove() : diff === "medium" ? mediumMove() : hardMove();
+        if (m && active) place(m.x, m.y);
+    }, 550);
+}
+function immediate(p, pool) {                                       // a cell that completes K for p right now
+    for (const c of pool) { put(c.x, c.y, p); const w = wonAt(c.x, c.y); unput(); if (w) return c; }
+    return null;
+}
+function openingReply() {                                           // board holds a single stone: step next to it
+    const s = stones[0], opts = [[1,0],[0,1],[-1,0],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]];
+    const [dx, dy] = opts[Math.floor(Math.random() * opts.length)]; return { x:s.x + dx, y:s.y + dy };
+}
+function easyMove() {
+    if (!stones.length) return { x:0, y:0 };
+    const c = near(); return c[Math.floor(Math.random() * c.length)];
+}
+function mediumMove() {
+    if (!stones.length) return { x:0, y:0 };
+    const pool = near(); let m = immediate(AI, pool); if (m) return m;
+    m = immediate(HUMAN, pool); if (m) return m;
+    const c = topCells(4);
+    return Math.random() < .2 ? c[Math.floor(Math.random() * c.length)] : c[0];
+}
+let BEAM = 8;
+function search(depth, max, alpha, beta, lx, ly) {
+    if (lx !== null && wonAt(lx, ly)) return max ? -1e7 - depth : 1e7 + depth;      // the player who just moved won
+    if (depth === 0) return evaluate();
+    const c = topCells(BEAM);
+    let best = max ? -Infinity : Infinity;
+    for (const q of c) {
+        put(q.x, q.y, max ? AI : HUMAN);
+        const s = search(depth - 1, !max, alpha, beta, q.x, q.y);
+        unput();
+        if (max) { if (s > best) best = s; if (s > alpha) alpha = s; } else { if (s < best) best = s; if (s < beta) beta = s; }
+        if (beta <= alpha) break;
+    }
+    return best;
+}
+function hardMove() {
+    if (!stones.length) return { x:0, y:0 };
+    if (stones.length === 1) return openingReply();
+    const pool = near();
+    let m = immediate(AI, pool); if (m) return m;                   // win now
+    m = immediate(HUMAN, pool); if (m) return m;                    // block a completed K
+    BEAM = 8;
+    let best = -Infinity, picks = [];
+    for (const q of topCells(12)) {
+        put(q.x, q.y, AI);
+        const s = search(3, false, -Infinity, Infinity, q.x, q.y);  // 4 plies in total
+        unput();
+        if (s > best) { best = s; picks = [q]; } else if (s === best) picks.push(q);
+    }
+    return picks[Math.floor(Math.random() * picks.length)];
+}
+
+/* ---------- start ---------- */
+addEventListener("resize", fit);
+setK(5);
+fit(); setMode("ai");
+</script>
+</body>
+</html>

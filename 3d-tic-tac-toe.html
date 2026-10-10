@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Tic-Tac-Toe | Gaming Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --x:#00eaff; --o:#ff4466; --gold:#ffd54a; --bg:#050b14; }
+        * { box-sizing:border-box; }
+        body {
+            margin:0; min-height:100vh; font-family:'Poppins',sans-serif; color:#fff; display:flex; flex-direction:column;
+            background: linear-gradient(135deg, rgba(5,11,20,.93) 0%, rgba(10,25,47,.88) 100%),
+                        url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center/cover fixed;
+            background-color:var(--bg);
+        }
+        .scan { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.35;
+            background:repeating-linear-gradient(to bottom, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.18) 2px 4px); }
+        nav { padding:16px 28px; display:flex; justify-content:space-between; align-items:center;
+            background:rgba(0,0,0,.3); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,234,255,.2); }
+        nav a { color:#fff; text-decoration:none; font-weight:600; transition:.25s; }
+        nav a:hover { color:var(--x); text-shadow:0 0 10px var(--x); }
+        nav h2 { margin:0; font-size:1.05rem; letter-spacing:2px; text-transform:uppercase; color:var(--x); }
+
+        main { flex:1; display:flex; justify-content:center; align-items:center; padding:20px; }
+        .card { width:100%; max-width:600px; text-align:center; padding:28px 22px 30px; border-radius:28px;
+            background:rgba(15,15,20,.88); backdrop-filter:blur(10px); border:1px solid rgba(0,234,255,.3);
+            box-shadow:0 0 60px rgba(0,234,255,.14), inset 0 0 30px rgba(0,234,255,.05);
+            animation:cardIn .6s cubic-bezier(.2,.8,.2,1); }
+        @keyframes cardIn { from { opacity:0; transform:translateY(24px) scale(.95); filter:blur(8px); } }
+        h1 { margin:0 0 6px; font-size:1.9rem; font-weight:900; text-transform:uppercase; letter-spacing:3px; color:var(--x); text-shadow:0 0 18px rgba(0,234,255,.5); }
+        .rule { margin:0 0 14px; font-size:.8rem; color:#9aa; min-height:1.3em; }
+
+        .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+        .btn { padding:9px 16px; border-radius:30px; border:1px solid rgba(255,255,255,.22); background:transparent; color:#fff; cursor:pointer;
+            font:700 .76rem 'Poppins',sans-serif; text-transform:uppercase; transition:.25s; }
+        .btn:hover { background:rgba(0,234,255,.12); border-color:var(--x); transform:scale(1.05); }
+        .btn.active { background:var(--x); color:#000; border-color:var(--x); box-shadow:0 0 15px rgba(0,234,255,.45); }
+        .btn.hard.active { background:linear-gradient(45deg,#ff4466,#aa0022); color:#fff; border-color:var(--o); box-shadow:0 0 15px rgba(255,68,102,.5); }
+        .btn.gold.active { background:var(--gold); color:#000; border-color:var(--gold); box-shadow:0 0 15px rgba(255,213,74,.5); }
+        .hidden { display:none !important; }
+
+        .scoreboard { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin:6px 0 10px; }
+        .sc { padding:8px 10px; border-radius:14px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.1); transition:.3s; }
+        .sc .nm { font-size:.74rem; color:#bbb; }
+        .sc .pts { font-size:1.6rem; font-weight:800; }
+        .sc.x .pts { color:var(--x); } .sc.o .pts { color:var(--o); }
+        .sc.turn { transform:scale(1.06); }
+        .sc.x.turn { border-color:var(--x); box-shadow:0 0 18px rgba(0,234,255,.35); }
+        .sc.o.turn { border-color:var(--o); box-shadow:0 0 18px rgba(255,68,102,.35); }
+        .dr { font-size:.74rem; color:#aaa; } .dr b { display:block; font-size:1.2rem; color:#fff; }
+
+        #status { min-height:1.7em; font-weight:700; letter-spacing:1px; margin:6px 0 10px; color:var(--x); transition:color .25s; }
+        .hint { font-size:.74rem; color:#789; margin:0 0 6px; min-height:1.2em; }
+
+        /* ---------- Stage: layers of the cube ---------- */
+        .stage { position:relative; margin:0 auto 16px; }
+        .cube { position:relative; }
+        .lw { position:relative; }
+        .lbl { font-size:.72rem; font-weight:700; letter-spacing:2px; color:#8fb; text-transform:uppercase; }
+        .layer { display:grid; grid-template-columns:repeat(var(--n),1fr); grid-template-rows:repeat(var(--n),1fr); width:100%; aspect-ratio:1;
+            border:2px solid rgba(0,234,255,.35); border-radius:10px; background:rgba(0,234,255,.045);
+            box-shadow:0 0 18px rgba(0,234,255,.12); }
+        .cell { position:relative; background:transparent; border:0; padding:0; cursor:pointer; color:inherit;
+            border-right:2px solid rgba(255,255,255,.22); border-bottom:2px solid rgba(255,255,255,.22); transition:background .2s, box-shadow .2s; }
+        .cell.rb { border-right:0; } .cell.bb { border-bottom:0; }
+        .cell:not(.filled):hover { background:rgba(0,234,255,.22); box-shadow:inset 0 0 12px rgba(0,234,255,.5); }
+        .cell.filled { cursor:default; }
+        .locked .cell:not(.filled) { cursor:not-allowed; }
+        .cell:focus-visible { outline:2px solid var(--gold); outline-offset:-3px; }
+        .cell.last { background:rgba(255,255,255,.1); }
+        .cell svg { position:absolute; inset:17%; width:66%; height:66%; overflow:visible; }
+        .cell svg * { fill:none; stroke-width:12; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:1; animation:draw .35s ease-out forwards; }
+        .cell svg *:nth-child(2) { animation-delay:.18s; }
+        .cell.x svg * { stroke:var(--x); filter:drop-shadow(0 0 6px var(--x)); }
+        .cell.o svg * { stroke:var(--o); filter:drop-shadow(0 0 6px var(--o)); animation-duration:.45s; }
+        @keyframes draw { to { stroke-dashoffset:0; } }
+        .cell.dim svg { opacity:.25; transition:opacity .4s; }
+        .cell.win { background:rgba(255,213,74,.28); box-shadow:inset 0 0 16px rgba(255,213,74,.8); animation:winpulse .9s ease-in-out infinite alternate; }
+        @keyframes winpulse { to { background:rgba(255,213,74,.5); } }
+
+        /* Flat view: layers side by side */
+        .stage.flat .cube { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; }
+        .stage.flat .lw { width:var(--flatw); }
+        .stage.flat .lbl { display:block; margin-bottom:5px; }
+
+        /* 3D view: layers stacked like floors, drag to rotate */
+        .stage.d3 { height:var(--stageh); perspective:1300px; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+        .stage.d3:active { cursor:grabbing; }
+        .stage.d3 .cube { position:absolute; left:50%; top:50%; width:0; height:0; transform-style:preserve-3d; }
+        .stage.d3 .lw { position:absolute; width:var(--S); height:var(--S); left:calc(var(--S) / -2); top:calc(var(--S) / -2);
+            transform-style:preserve-3d; transform:translateY(var(--off)) rotateX(90deg); }
+        .stage.d3 .lbl { position:absolute; left:2px; top:-24px; }
+        .stage.d3 .layer { backdrop-filter:none; }
+
+        .wide { width:100%; border-radius:14px; padding:13px; font-size:.95rem; border-color:var(--x); }
+        @media (max-width:420px) { .card { padding:22px 12px 24px; } h1 { font-size:1.45rem; } nav { padding:14px 16px; } .btn { padding:8px 12px; } }
+        @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+    </style>
+</head>
+<body>
+    <div class="scan"></div>
+    <nav>
+        <a href="tictactoe-dashboard.html">&larr; Dashboard</a>
+        <h2>3D</h2>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h1>3D Tic-Tac-Toe</h1>
+            <p class="rule" id="rule"></p>
+
+            <div class="row">
+                <button class="btn active" id="m-ai" onclick="setMode('ai')">vs AI</button>
+                <button class="btn" id="m-local" onclick="setMode('local')">2 Players</button>
+            </div>
+            <div class="row" id="diffRow">
+                <button class="btn" id="d-easy" onclick="setDiff('easy')">Easy</button>
+                <button class="btn" id="d-medium" onclick="setDiff('medium')">Medium</button>
+                <button class="btn hard active" id="d-hard" onclick="setDiff('hard')">Hard</button>
+            </div>
+            <div class="row">
+                <button class="btn gold active" id="n-4" onclick="setSize(4)">4×4×4</button>
+                <button class="btn gold" id="n-3" onclick="setSize(3)">3×3×3</button>
+                <span style="width:8px"></span>
+                <button class="btn active" id="v-3d" onclick="setView('d3')">3D view</button>
+                <button class="btn" id="v-flat" onclick="setView('flat')">Flat view</button>
+                <button class="btn" id="resetView" onclick="resetView()">Reset view</button>
+            </div>
+
+            <div class="scoreboard">
+                <div class="sc x" id="cardX"><div class="nm" id="nmX">You (X)</div><div class="pts" id="scX">0</div></div>
+                <div class="dr">Draws<b id="scD">0</b></div>
+                <div class="sc o" id="cardO"><div class="nm" id="nmO">AI (O)</div><div class="pts" id="scO">0</div></div>
+            </div>
+
+            <div id="status">Your turn</div>
+            <p class="hint" id="hint"></p>
+
+            <div class="stage d3" id="stage"><div class="cube" id="cube"></div></div>
+
+            <button class="btn wide" onclick="newRound()">New Round</button>
+            <button class="btn" style="margin-top:10px;" onclick="resetScores()">Reset Scores</button>
+        </div>
+    </main>
+
+<script>
+const HUMAN = "X", AI = "O";
+const $ = id => document.getElementById(id);
+const SVG = {
+    X: '<svg viewBox="0 0 100 100"><path pathLength="1" d="M18 18 L82 82"/><path pathLength="1" d="M82 18 L18 82"/></svg>',
+    O: '<svg viewBox="0 0 100 100"><circle pathLength="1" cx="50" cy="50" r="33"/></svg>'
+};
+
+let N = 4, SIZE = 64;                // cube is N x N x N, you need N in a row to win
+let LINES = [], LINES_OF = [];
+let board = [], cells = [];
+let current = "X", starter = "X", active = false, lastMove = -1;
+let mode = "ai", diff = "hard", view = "d3", scores = { X:0, O:0, D:0 }, aiTimer = null;
+let rx = -52, ry = -28;              // current 3D camera angles
+const HOME = { rx:-52, ry:-28 };
+
+/* ---------- lines: every straight run of N cells in the cube (rows, columns, pillars, all diagonals) ---------- */
+function buildLines() {
+    LINES = []; LINES_OF = Array.from({ length:SIZE }, () => []);
+    const dirs = [];
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+        if (!dx && !dy && !dz) continue;
+        const first = dx || dy || dz;
+        if (first < 0) continue;                       // count each direction once
+        dirs.push([dx, dy, dz]);
+    }
+    for (let z = 0; z < N; z++) for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) for (const [dx, dy, dz] of dirs) {
+        const ex = x + dx * (N - 1), ey = y + dy * (N - 1), ez = z + dz * (N - 1);
+        if (ex < 0 || ex >= N || ey < 0 || ey >= N || ez < 0 || ez >= N) continue;
+        const l = Array.from({ length:N }, (_, t) => (z + dz * t) * N * N + (y + dy * t) * N + (x + dx * t));
+        const li = LINES.push(l) - 1;
+        l.forEach(c => LINES_OF[c].push(li));
+    }
+}
+
+/* ---------- build the cube ---------- */
+function buildBoard() {
+    SIZE = N * N * N;
+    buildLines();
+    board = Array(SIZE).fill(""); cells = [];
+    const cube = $("cube"); cube.innerHTML = "";
+    const stage = $("stage");
+    const S = N === 4 ? 230 : 210, gap = N === 4 ? 78 : 92;
+    stage.style.setProperty("--n", N);
+    stage.style.setProperty("--S", S + "px");
+    stage.style.setProperty("--stageh", (N === 4 ? 470 : 430) + "px");
+    stage.style.setProperty("--flatw", N === 4 ? "calc(50% - 8px)" : "calc(33.3% - 10px)");
+    for (let z = 0; z < N; z++) {
+        const lw = document.createElement("div"); lw.className = "lw";
+        lw.style.setProperty("--off", (((N - 1) / 2 - z) * gap) + "px");     // layer 1 at the bottom
+        const lbl = document.createElement("div"); lbl.className = "lbl"; lbl.textContent = "Layer " + (z + 1);
+        const layer = document.createElement("div"); layer.className = "layer"; layer.style.setProperty("--n", N);
+        for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+            const i = z * N * N + y * N + x;
+            const b = document.createElement("button");
+            b.className = "cell" + (x === N - 1 ? " rb" : "") + (y === N - 1 ? " bb" : "");
+            b.setAttribute("aria-label", "Layer " + (z + 1) + ", row " + (y + 1) + ", column " + (x + 1));
+            b.onclick = () => clickCell(i);
+            layer.appendChild(b); cells[i] = b;
+        }
+        lw.appendChild(lbl); lw.appendChild(layer); cube.appendChild(lw);
+    }
+    $("rule").textContent = "Get " + N + " in a row — along a row, column, up through the layers, or on any diagonal.";
+    applyCamera(); fitCube();
+}
+
+/* ---------- camera (drag to rotate in 3D view) ---------- */
+let camScale = 1;
+function fitCube() {
+    const w = $("stage").clientWidth || 500, S = N === 4 ? 230 : 210;
+    camScale = Math.max(.55, Math.min(1.15, w / (S * 1.75)));
+    applyCamera();
+}
+function applyCamera() {
+    $("cube").style.transform = view === "d3" ? "scale(" + camScale + ") rotateX(" + rx + "deg) rotateY(" + ry + "deg)" : "none";
+}
+function resetView() { rx = HOME.rx; ry = HOME.ry; applyCamera(); }
+let drag = null, dragged = false;
+$("stage").addEventListener("pointerdown", e => { if (view !== "d3") return; drag = { x:e.clientX, y:e.clientY }; dragged = false; });
+addEventListener("pointermove", e => {
+    if (!drag || view !== "d3") return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!dragged && Math.hypot(dx, dy) < 6) return;
+    dragged = true; drag = { x:e.clientX, y:e.clientY };
+    ry += dx * 0.45; rx = Math.max(-88, Math.min(-6, rx - dy * 0.35)); applyCamera();
+});
+addEventListener("pointerup", () => { drag = null; });
+addEventListener("resize", fitCube);
+
+function setView(v) {
+    view = v;
+    $("stage").classList.toggle("d3", v === "d3");
+    $("stage").classList.toggle("flat", v === "flat");
+    $("v-3d").classList.toggle("active", v === "d3");
+    $("v-flat").classList.toggle("active", v === "flat");
+    $("resetView").classList.toggle("hidden", v !== "d3");
+    $("hint").textContent = v === "d3" ? "Drag to rotate the cube • tap a square to play" : "Layers are shown side by side (Layer 1 = bottom)";
+    applyCamera(); fitCube();
+}
+
+/* ---------- setup ---------- */
+function setMode(m) {
+    mode = m;
+    $("m-ai").classList.toggle("active", m === "ai");
+    $("m-local").classList.toggle("active", m === "local");
+    $("diffRow").classList.toggle("hidden", m !== "ai");
+    $("nmX").textContent = m === "ai" ? "You (X)" : "Player 1 (X)";
+    $("nmO").textContent = m === "ai" ? "AI (O)" : "Player 2 (O)";
+    resetScores(); startRound("X");
+}
+function setDiff(d) {
+    diff = d;
+    ["easy","medium","hard"].forEach(k => $("d-" + k).classList.toggle("active", k === d));
+    resetScores(); startRound("X");
+}
+function setSize(n) {
+    N = n;
+    $("n-4").classList.toggle("active", n === 4); $("n-3").classList.toggle("active", n === 3);
+    buildBoard(); resetScores(); startRound("X");
+}
+function resetScores() { scores = { X:0, O:0, D:0 }; renderScores(); }
+function renderScores() { $("scX").textContent = scores.X; $("scO").textContent = scores.O; $("scD").textContent = scores.D; }
+function newRound() { startRound(starter === "X" ? "O" : "X"); }   // starter alternates
+
+/* ---------- round flow ---------- */
+function startRound(first) {
+    clearTimeout(aiTimer);
+    board.fill(""); starter = first; current = first; active = true; lastMove = -1;
+    cells.forEach((c, i) => { c.className = "cell" + (c.classList.contains("rb") ? " rb" : "") + (c.classList.contains("bb") ? " bb" : ""); c.innerHTML = ""; });
+    updateUI();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function clickCell(i) {
+    if (dragged) { dragged = false; return; }                      // that was a camera drag, not a move
+    if (!active || board[i]) return;
+    if (mode === "ai" && current !== HUMAN) return;
+    place(i);
+}
+function place(i) {
+    if (lastMove >= 0) cells[lastMove].classList.remove("last");
+    board[i] = current; lastMove = i;
+    cells[i].classList.add("filled", current.toLowerCase(), "last");
+    cells[i].innerHTML = SVG[current];
+    const line = winLineAt(i);
+    if (line) { finish(current, line); return; }
+    if (!board.includes("")) { finish("D"); return; }
+    current = current === "X" ? "O" : "X";
+    updateUI();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function finish(result, line) {
+    active = false; scores[result]++; renderScores();
+    if (line) cells.forEach((c, i) => c.classList.add(line.includes(i) ? "win" : "dim"));
+    let msg;
+    if (result === "D") msg = "🤝 It's a draw!";
+    else if (mode === "ai") msg = result === HUMAN ? "🏆 You win!" : "🤖 AI wins!";
+    else msg = "🏆 Player " + (result === "X" ? "1" : "2") + " wins!";
+    $("status").textContent = msg; $("status").style.color = "#fff";
+    $("cardX").classList.remove("turn"); $("cardO").classList.remove("turn");
+    $("stage").classList.add("locked");
+}
+function updateUI() {
+    $("stage").classList.toggle("locked", !active || (mode === "ai" && current !== HUMAN));
+    $("cardX").classList.toggle("turn", active && current === "X");
+    $("cardO").classList.toggle("turn", active && current === "O");
+    $("status").style.color = current === "X" ? "var(--x)" : "var(--o)";
+    $("status").textContent = mode === "ai"
+        ? (current === HUMAN ? "Your turn (X)" : "AI is thinking…")
+        : "Player " + (current === "X" ? "1" : "2") + "'s turn (" + current + ")";
+}
+
+/* ---------- logic ---------- */
+function winLineAt(m) {                                              // winning line through the cell just played, or null
+    for (const li of LINES_OF[m]) { const l = LINES[li]; if (l.every(i => board[i] === board[m])) return l; }
+    return null;
+}
+function wins(m) { return LINES_OF[m].some(li => LINES[li].every(i => board[i] === board[m])); }
+
+/* ---------- AI ---------- */
+function empties() { const e = []; for (let i = 0; i < SIZE; i++) if (board[i] === "") e.push(i); return e; }
+function randomMove() { const e = empties(); return e[Math.floor(Math.random() * e.length)]; }
+
+function scheduleAI() {
+    updateUI();
+    aiTimer = setTimeout(() => {
+        const m = diff === "easy" ? easyMove() : diff === "medium" ? mediumMove() : hardMove();
+        if (m !== undefined && active) place(m);
+    }, 600);
+}
+let W = [];
+function weights() { W = Array.from({ length:N + 1 }, (_, c) => c === N ? 100000 : (c ? Math.pow(10, c - 1) : 0)); }
+
+/* how useful a cell is to either side: sum over every line through it that isn't already contested */
+function cellValue(c) {
+    let v = 0;
+    for (const li of LINES_OF[c]) {
+        let a = 0, h = 0;
+        for (const i of LINES[li]) { if (board[i] === AI) a++; else if (board[i] === HUMAN) h++; }
+        if (a && h) continue;
+        if (a) v += W[a + 1]; else if (h) v += W[h + 1] * 1.05; else v += 1;
+    }
+    return v;
+}
+function topCells(limit) {
+    const arr = [];
+    for (let i = 0; i < SIZE; i++) if (board[i] === "") arr.push([cellValue(i), i]);
+    arr.sort((p, q) => q[0] - p[0]);
+    return arr.slice(0, limit).map(p => p[1]);
+}
+function evaluate() {
+    let s = 0;
+    for (const l of LINES) {
+        let a = 0, h = 0;
+        for (const i of l) { if (board[i] === AI) a++; else if (board[i] === HUMAN) h++; }
+        if (a && h) continue;
+        if (a) s += W[a]; else if (h) s -= W[h] * 1.05;
+    }
+    return s;
+}
+function easyMove() { return Math.random() < .5 ? randomMove() : topCells(6)[Math.floor(Math.random() * Math.min(6, empties().length))]; }
+function immediate(p) {                                              // a cell that wins at once for p
+    for (const i of empties()) { board[i] = p; const w = wins(i); board[i] = ""; if (w) return i; }
+    return -1;
+}
+function mediumMove() {
+    weights();
+    let m = immediate(AI); if (m >= 0) return m;
+    m = immediate(HUMAN); if (m >= 0) return m;
+    const c = topCells(5);
+    return Math.random() < .25 ? c[Math.floor(Math.random() * c.length)] : c[0];
+}
+function search(depth, max, alpha, beta, last) {
+    if (last >= 0 && wins(last)) return max ? -1e6 - depth : 1e6 + depth;   // the player who just moved won
+    if (depth === 0) return evaluate();
+    const c = topCells(BEAM);
+    if (!c.length) return 0;                                                 // full cube = draw
+    let best = max ? -Infinity : Infinity;
+    for (const i of c) {
+        board[i] = max ? AI : HUMAN;
+        const s = search(depth - 1, !max, alpha, beta, i);
+        board[i] = "";
+        if (max) { if (s > best) best = s; if (s > alpha) alpha = s; } else { if (s < best) best = s; if (s < beta) beta = s; }
+        if (beta <= alpha) break;
+    }
+    return best;
+}
+let BEAM = 8;
+function hardMove() {
+    weights();
+    const e = empties(), n = e.length;
+    if (n === SIZE) {                                                        // open on a strong inner cell
+        const inner = e.filter(i => { const x = i % N, y = Math.floor(i / N) % N, z = Math.floor(i / (N * N)), ok = v => N === 3 ? v === 1 : (v === 1 || v === 2); return ok(x) && ok(y) && ok(z); });
+        return inner[Math.floor(Math.random() * inner.length)];
+    }
+    let m = immediate(AI); if (m >= 0) return m;                             // win now
+    m = immediate(HUMAN); if (m >= 0) return m;                              // block
+    BEAM = N === 4 ? 8 : 7;
+    const depth = N === 4 ? (n > 44 ? 4 : 5) : (n > 16 ? 5 : 7);
+    let best = -Infinity, moves = [];
+    for (const i of topCells(N === 4 ? 14 : 12)) {
+        board[i] = AI;
+        const s = search(depth - 1, false, -Infinity, Infinity, i);
+        board[i] = "";
+        if (s > best) { best = s; moves = [i]; } else if (s === best) moves.push(i);
+    }
+    return moves[Math.floor(Math.random() * moves.length)];
+}
+
+/* ---------- start ---------- */
+buildBoard();
+setView("d3");
+setMode("ai");
+</script>
+</body>
+</html>

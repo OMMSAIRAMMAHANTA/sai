@@ -2,317 +2,631 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Tic Tac Toe | Gaming Lab</title>
-    
-    <!-- Dependencies -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts Merged -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- PeerJS: peer-to-peer online play (no server of your own needed) -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
     <style>
-        :root {
-            --primary-accent: #00eaff;
-            --text-main: #ffffff;
-            --bg-dark: #050b14;
-        }
-
+        :root { --accent:#00eaff; --red:#ff4444; --bg:#050b14; }
+        * { box-sizing: border-box; }
         body {
-            margin: 0; padding: 0;
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-main);
-            overflow-x: hidden;
-            background-color: var(--bg-dark);
-            background: linear-gradient(135deg, rgba(5,11,20,0.92) 0%, rgba(10,25,47,0.85) 100%), url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
-            background-attachment: fixed;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin:0; font-family:'Poppins',sans-serif; color:#fff; min-height:100vh;
+            display:flex; flex-direction:column; overflow-x:hidden;
+            background: linear-gradient(135deg, rgba(5,11,20,.92) 0%, rgba(10,25,47,.85) 100%),
+                        url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center/cover fixed;
+            background-color: var(--bg);
         }
+        .scanlines { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,.1) 50%, rgba(0,0,0,.1)); background-size:100% 4px; }
+        .top-nav { padding:18px 32px; display:flex; justify-content:space-between; align-items:center;
+            background:rgba(0,0,0,.3); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,234,255,.2); }
+        .back-btn { color:#fff; text-decoration:none; display:flex; gap:10px; align-items:center; transition:.3s; }
+        .back-btn:hover { color:var(--accent); text-shadow:0 0 10px var(--accent); }
+        .game-wrapper { flex:1; display:flex; justify-content:center; align-items:center; padding:20px; }
+        .game-ui { width:100%; max-width:520px; text-align:center; background:rgba(15,15,20,.9); padding:32px 28px; border-radius:30px;
+            border:1px solid rgba(0,234,255,.3); box-shadow:0 0 60px rgba(0,234,255,.15), inset 0 0 30px rgba(0,234,255,.05);
+            backdrop-filter:blur(10px); animation:focusIn .6s cubic-bezier(.25,1,.5,1); }
+        @keyframes focusIn { from{opacity:0; transform:scale(.9) translateY(20px); filter:blur(10px);} to{opacity:1; transform:none; filter:none;} }
+        h1 { color:var(--accent); margin:0 0 18px; font-size:2.2rem; text-transform:uppercase; font-weight:800; }
 
-        /* Ambient Background FX */
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px; z-index: -1; pointer-events: none; opacity: 0.5;
-        }
-        .bg-glow {
-            position: fixed; top: 50%; left: 50%; width: 80vw; height: 80vw;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle, rgba(0, 234, 255, 0.05) 0%, rgba(0,0,0,0) 70%);
-            border-radius: 50%; z-index: -2;
-        }
+        .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+        .btn { padding:9px 18px; border-radius:30px; border:1px solid rgba(255,255,255,.2); background:transparent; color:#fff;
+            font:700 .8rem 'Poppins',sans-serif; text-transform:uppercase; cursor:pointer; transition:.25s; }
+        .btn:hover { background:rgba(0,234,255,.1); border-color:var(--accent); transform:scale(1.05); }
+        .btn.active { background:var(--accent); color:#000; border-color:var(--accent); box-shadow:0 0 15px rgba(0,234,255,.4); }
+        .btn.red.active { background:linear-gradient(45deg,#ff4444,#aa0000); color:#fff; border-color:var(--red); box-shadow:0 0 15px rgba(255,68,68,.5); }
+        .btn.wide { width:100%; border-radius:15px; padding:14px; font-size:1rem; border-color:var(--accent); }
+        .btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+        input[type=text] { background:rgba(0,0,0,.5); border:1px solid rgba(255,255,255,.2); color:#fff; padding:9px 14px; border-radius:12px;
+            font:600 .9rem 'Poppins',sans-serif; outline:none; min-width:0; }
+        input[type=text]:focus { border-color:var(--accent); box-shadow:0 0 10px rgba(0,234,255,.3); }
 
-        /* Navigation */
-        .top-nav {
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,234,255,0.2);
-            z-index: 10;
-        }
-        .back-btn {
-            color: var(--text-main); text-decoration: none; font-size: 1.1rem;
-            display: flex; align-items: center; gap: 10px; transition: 0.3s;
-        }
-        .back-btn:hover { color: var(--primary-accent); text-shadow: 0 0 10px var(--primary-accent); }
+        .panel { background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:14px; margin-bottom:16px; }
+        .hidden { display:none !important; }
+        .room-code { font-size:2rem; font-weight:800; letter-spacing:6px; color:var(--accent); text-shadow:0 0 15px var(--accent); }
+        .small { font-size:.8rem; color:#9aa; }
 
-        /* Tic Tac Toe Specifics */
-        .game-wrapper {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        /* Scoreboard */
+        .scoreboard { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin-bottom:12px; }
+        .score-card { padding:8px 10px; border-radius:14px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.1); transition:.3s; }
+        .score-card.turn { transform:scale(1.05); }
+        .score-card.x.turn { border-color:var(--accent); box-shadow:0 0 18px rgba(0,234,255,.35); }
+        .score-card.o.turn { border-color:var(--red); box-shadow:0 0 18px rgba(255,68,68,.35); }
+        .score-card .nm { font-size:.75rem; color:#bbb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .score-card .pts { font-size:1.6rem; font-weight:800; }
+        .score-card.x .pts { color:var(--accent); } .score-card.o .pts { color:var(--red); }
+        .draws { font-size:.75rem; color:#aaa; } .draws b { display:block; font-size:1.2rem; color:#fff; }
 
-        .game-ui { 
-            text-align: center; 
-            animation: cinematicFocus 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
-            width: 100%; 
-            max-width: 500px; 
-            background: rgba(15,15,20,0.9); 
-            padding: 40px; 
-            border-radius: 30px; 
-            border: 1px solid rgba(0,234,255,0.3); 
-            box-shadow: 0 0 60px rgba(0,234,255,0.15), inset 0 0 30px rgba(0,234,255,0.05); 
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-        
-        .mode-select { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
-        
-        .btn-hero {
-            padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
-            background: transparent; color: #fff; font-weight: 700; font-size: 0.9rem; transition: 0.3s; text-transform: uppercase;
-        }
-        .btn-hero:hover { background: rgba(0,234,255,0.1); border-color: var(--primary-accent); text-shadow: 0 0 10px var(--primary-accent); transform: scale(1.05); }
-        .btn-hero.active { background: var(--primary-accent); color: black; border-color: var(--primary-accent); box-shadow: 0 0 15px rgba(0,234,255,0.4); text-shadow: none; }
-        .btn-red { background: linear-gradient(45deg, #ff4444, #aa0000); border: none; color: white; }
-        .btn-red:hover { background: #ff4444; border-color: #ff4444; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6); }
+        #status { font-weight:700; font-size:1.05rem; letter-spacing:1px; min-height:1.6em; margin:6px 0 4px; color:var(--accent); }
 
-        .ttt-cell { 
-            cursor: pointer; border: 2px solid rgba(255,255,255,0.1); color: white; background: rgba(0,0,0,0.5); 
-            border-radius: 15px; display: flex; justify-content: center; align-items: center; 
-            font-size: 60px; font-weight: bold; width: 110px; height: 110px; 
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-        .ttt-cell:hover { background: rgba(0, 234, 255, 0.1); transform: scale(1.1); border-color: rgba(0,234,255,0.5); box-shadow: 0 0 20px rgba(0,234,255,0.3); z-index: 10;}
-        .ttt-cell.winner { background: rgba(0, 234, 255, 0.2); text-shadow: 0 0 30px #00eaff; border-color: var(--primary-accent); transform: scale(1.15) rotate(5deg); z-index: 20; box-shadow: 0 0 30px rgba(0,234,255,0.5); }
-        
-        .ttt-cell.human-move { color: #00eaff; text-shadow: 0 0 20px #00eaff; }
-        .ttt-cell.ai-move { color: #ff4444; text-shadow: 0 0 20px #ff4444; border-color: rgba(255,68,68,0.5); }
+        /* Board */
+        #board { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; max-width:360px; margin:18px auto; }
+        .cell { aspect-ratio:1; cursor:pointer; border:2px solid rgba(255,255,255,.1); background:rgba(0,0,0,.5); border-radius:15px;
+            display:flex; justify-content:center; align-items:center; font-size:clamp(36px, 11vw, 64px); font-weight:800;
+            transition:.3s cubic-bezier(.175,.885,.32,1.275); box-shadow:inset 0 0 10px rgba(0,0,0,.8); user-select:none; }
+        .cell:hover:not(.filled) { background:rgba(0,234,255,.1); transform:scale(1.07); border-color:rgba(0,234,255,.5); }
+        .cell.filled { cursor:default; }
+        .cell.pop { animation:pop .25s ease; }
+        @keyframes pop { from{transform:scale(.3); opacity:0;} to{transform:scale(1); opacity:1;} }
+        .cell.X { color:var(--accent); text-shadow:0 0 20px var(--accent); }
+        .cell.O { color:var(--red); text-shadow:0 0 20px var(--red); border-color:rgba(255,68,68,.4); }
+        .cell.winner { transform:scale(1.1); z-index:5; background:rgba(0,234,255,.18); border-color:var(--accent); box-shadow:0 0 30px rgba(0,234,255,.55); }
+        .cell.O.winner { background:rgba(255,68,68,.18); border-color:var(--red); box-shadow:0 0 30px rgba(255,68,68,.55); }
+        .board-locked .cell:not(.filled) { cursor:not-allowed; }
 
-        @keyframes cinematicFocus {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
-        }
+        /* Chat */
+        #chatLog { height:90px; overflow-y:auto; text-align:left; font-size:.82rem; margin-bottom:8px; padding:6px 8px; background:rgba(0,0,0,.35); border-radius:10px; }
+        #chatLog .me { color:var(--accent); } #chatLog .them { color:#ff9a9a; } #chatLog .sys { color:#888; font-style:italic; }
+        .emoji-bar button { background:none; border:none; font-size:1.4rem; cursor:pointer; transition:.2s; }
+        .emoji-bar button:hover { transform:scale(1.3); }
 
-        @media (max-width: 500px) {
-            .ttt-cell { width: 80px; height: 80px; font-size: 40px; }
-            #ttt-board { grid-template-columns: repeat(3, 80px) !important; }
-            .game-ui { padding: 30px 20px; }
-        }
+        /* Coin toss */
+        .toss-overlay { position:absolute; inset:0; z-index:50; border-radius:30px; background:rgba(5,11,20,.97);
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:20px; }
+        .toss-title { font-size:1.4rem; font-weight:800; color:#ffd54a; text-transform:uppercase; letter-spacing:2px; min-height:1.6em; }
+        .toss-result { font-size:1.1rem; font-weight:700; color:#fff; min-height:1.5em; }
+        .coin-stage { position:relative; width:150px; height:190px; margin:6px 0; display:flex; align-items:flex-end; justify-content:center; }
+        .coin { position:absolute; bottom:34px; width:120px; height:120px; border-radius:50%; will-change:transform;
+            background:conic-gradient(from 30deg,#8a5a00,#ffe27a,#c58a00,#fff1a8,#a06b00,#ffe27a,#8a5a00);
+            border:3px solid #7a4e00; display:flex; align-items:center; justify-content:center;
+            box-shadow:0 0 30px rgba(255,200,0,.45), inset 0 0 0 5px #e0a800, inset 0 0 14px rgba(0,0,0,.45); }
+        .coin::before { content:""; position:absolute; inset:11px; border-radius:50%; border:2px dashed rgba(90,55,0,.6); }
+        .coin::after { content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
+            background:linear-gradient(120deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 70%, rgba(255,255,255,.25) 100%); }
+        .coin.tails { filter:hue-rotate(-8deg) brightness(.96); }
+        .coin-inner { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; color:#5a3500;
+            font-weight:800; font-size:.8rem; letter-spacing:1px; text-shadow:0 1px 0 rgba(255,236,150,.8); }
+        .coin-inner i { font-size:2.4rem; margin-bottom:2px; }
+        .coin-shadow { position:absolute; bottom:8px; width:100px; height:16px; border-radius:50%;
+            background:radial-gradient(ellipse, rgba(0,0,0,.7), transparent 70%); }
+        .sparks { position:absolute; bottom:94px; left:50%; width:0; height:0; }
+        .sparks b { position:absolute; width:8px; height:8px; border-radius:50%; background:#ffe066; box-shadow:0 0 10px #ffd54a; animation:spark .9s ease-out forwards; }
+        @keyframes spark { from{transform:translate(0,0) scale(1); opacity:1;} to{transform:translate(var(--dx),var(--dy)) scale(0); opacity:0;} }
+
+        @media (max-width:500px){ .game-ui{padding:24px 16px;} h1{font-size:1.7rem;} .top-nav{padding:14px 18px;} }
     </style>
 </head>
 <body>
-
     <div class="scanlines"></div>
-    <div class="bg-glow"></div>
 
     <nav class="top-nav">
         <a href="games.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Lab Terminal</a>
-        <h2 style="margin:0; font-weight: 700; letter-spacing: 2px; color: var(--primary-accent); text-transform: uppercase; font-size: 1.2rem;">Tic Tac Toe</h2>
+        <h2 style="margin:0; font-weight:700; letter-spacing:2px; color:var(--accent); text-transform:uppercase; font-size:1.1rem;">Tic Tac Toe</h2>
     </nav>
 
     <div class="game-wrapper">
-        <div class="game-ui">
-            <h2 style="color:var(--primary-accent); margin-top:0; font-size:2.5rem; text-transform:uppercase; font-weight: 800;">Tic Tac Toe</h2>
-            
-            <div class="mode-select">
-                <button id="btn-easy" class="btn-hero" onclick="setDifficulty('easy')">Easy</button>
-                <button id="btn-medium" class="btn-hero" onclick="setDifficulty('medium')">Medium</button>
-                <button id="btn-hard" class="btn-hero btn-red active" onclick="setDifficulty('hard')">Hard AI</button>
+        <div class="game-ui" style="position:relative;">
+            <!-- Coin toss overlay -->
+            <div id="tossOverlay" class="toss-overlay hidden">
+                <div class="toss-title" id="tossTitle">Call the toss!</div>
+                <div class="coin-stage" id="coinStage">
+                    <div class="coin-shadow" id="coinShadow"></div>
+                    <div class="coin" id="coin"><div class="coin-inner" id="coinInner"></div></div>
+                    <div class="sparks" id="sparks"></div>
+                </div>
+                <div id="tossBtns" class="row" style="margin:0;">
+                    <button class="btn" onclick="callToss('H')"><i class="fa-solid fa-crown"></i> Heads</button>
+                    <button class="btn" onclick="callToss('T')"><i class="fa-solid fa-star"></i> Tails</button>
+                </div>
+                <div class="toss-result" id="tossResult"></div>
+                <div class="small">Win the toss to make the first move</div>
             </div>
-            
-            <p id="tttStatus" style="color:#aaa; font-weight:bold; font-size:1.1rem; letter-spacing:1px;">Select Difficulty Array</p>
-            
-            <div id="ttt-board" style="display:grid; grid-template-columns:repeat(3, 110px); gap:15px; justify-content:center; margin-top:25px; margin-bottom:15px;"></div>
-            
-            <button class="btn-hero" onclick="setDifficulty(tttDifficulty)" style="margin-top:25px; width:100%; border-radius: 15px; padding: 15px; font-size: 1.1rem; border-color: var(--primary-accent);">
-                <i class="fa-solid fa-rotate-right"></i> Restart System
-            </button>
+
+            <h1>Tic Tac Toe</h1>
+
+            <!-- Mode select -->
+            <div class="row">
+                <button id="m-ai" class="btn active" onclick="setMode('ai')"><i class="fa-solid fa-robot"></i> vs AI</button>
+                <button id="m-local" class="btn" onclick="setMode('local')"><i class="fa-solid fa-user-group"></i> 2 Players</button>
+                <button id="m-online" class="btn" onclick="setMode('online')"><i class="fa-solid fa-globe"></i> Online</button>
+            </div>
+
+            <!-- AI options -->
+            <div id="aiPanel" class="row">
+                <button id="d-easy" class="btn" onclick="setDifficulty('easy')">Easy</button>
+                <button id="d-medium" class="btn" onclick="setDifficulty('medium')">Medium</button>
+                <button id="d-hard" class="btn red active" onclick="setDifficulty('hard')">Hard AI</button>
+            </div>
+
+            <!-- Local names -->
+            <div id="localPanel" class="row hidden">
+                <input type="text" id="nameP1" placeholder="Player 1 (X)" maxlength="12" style="width:42%">
+                <input type="text" id="nameP2" placeholder="Player 2 (O)" maxlength="12" style="width:42%">
+            </div>
+
+            <!-- Online lobby -->
+            <div id="onlinePanel" class="panel hidden">
+                <div id="lobby">
+                    <input type="text" id="myName" placeholder="Your name" maxlength="12" style="width:100%; margin-bottom:10px;">
+                    <div class="row" style="margin-bottom:10px;">
+                        <button class="btn" onclick="createRoom()"><i class="fa-solid fa-plus"></i> Create Room</button>
+                    </div>
+                    <div class="small" style="margin-bottom:8px;">— or join a friend —</div>
+                    <div class="row" style="margin-bottom:0;">
+                        <input type="text" id="joinCode" placeholder="ROOM CODE" maxlength="5" style="width:130px; text-transform:uppercase; text-align:center; letter-spacing:3px;">
+                        <button class="btn" onclick="joinRoom()"><i class="fa-solid fa-right-to-bracket"></i> Join</button>
+                    </div>
+                </div>
+                <div id="roomInfo" class="hidden">
+                    <div class="small">Room code — share it with your friend</div>
+                    <div class="room-code" id="roomCode">-----</div>
+                    <div class="row" style="margin:8px 0 0;">
+                        <button class="btn" onclick="copyInvite()"><i class="fa-solid fa-copy"></i> Copy Invite Link</button>
+                        <button class="btn red" onclick="leaveRoom()"><i class="fa-solid fa-door-open"></i> Leave</button>
+                    </div>
+                </div>
+                <div id="netStatus" class="small" style="margin-top:10px;"></div>
+            </div>
+
+            <!-- Scoreboard -->
+            <div class="scoreboard">
+                <div class="score-card x" id="cardX"><div class="nm" id="nameX">You (X)</div><div class="pts" id="scoreX">0</div></div>
+                <div class="draws">Draws<b id="scoreD">0</b></div>
+                <div class="score-card o" id="cardO"><div class="nm" id="nameO">AI (O)</div><div class="pts" id="scoreO">0</div></div>
+            </div>
+
+            <p id="status">Your Turn</p>
+            <div id="board"></div>
+
+            <div class="row" style="margin-bottom:0;">
+                <button class="btn wide" id="restartBtn" onclick="restartRequest()"><i class="fa-solid fa-rotate-right"></i> New Round</button>
+            </div>
+            <button class="btn" style="margin-top:10px;" onclick="resetScores()"><i class="fa-solid fa-eraser"></i> Reset Scores</button>
+
+            <!-- Chat (online only) -->
+            <div id="chatBox" class="panel hidden" style="margin-top:16px; margin-bottom:0;">
+                <div id="chatLog"></div>
+                <div class="row" style="margin-bottom:6px;">
+                    <input type="text" id="chatInput" placeholder="Say something…" maxlength="120" style="flex:1;" onkeydown="if(event.key==='Enter')sendChat()">
+                    <button class="btn" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+                <div class="emoji-bar">
+                    <button onclick="sendChat('😂')">😂</button><button onclick="sendChat('😎')">😎</button>
+                    <button onclick="sendChat('🔥')">🔥</button><button onclick="sendChat('😭')">😭</button>
+                    <button onclick="sendChat('👏')">👏</button><button onclick="sendChat('GG!')">GG</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        // --- TIC TAC TOE LOGIC ---
-        let tttBoard = ["", "", "", "", "", "", "", "", ""];
-        let tttHuman = "X", tttAi = "O", tttDifficulty = "hard";
-        let tttActive = false;
+<script>
+/* ============================ STATE ============================ */
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board = Array(9).fill("");
+let mode = "ai";                 // 'ai' | 'local' | 'online'
+let difficulty = "hard";
+let current = "X";               // whose turn
+let starter = "X";               // who starts this round (alternates)
+let active = false;
+let winLine = null;
+let scores = { X:0, O:0, D:0 };
+let aiTimer = null;
 
-        function setDifficulty(level) {
-            tttDifficulty = level; 
-            tttBoard.fill(""); 
-            tttActive = true;
-            
-            // Update button styles
-            document.getElementById('btn-easy').classList.remove('active');
-            document.getElementById('btn-medium').classList.remove('active');
-            document.getElementById('btn-hard').classList.remove('active');
-            document.getElementById(`btn-${level}`).classList.add('active');
+// online
+let peer = null, conn = null, isHost = false;
+let myMark = "X", myNameStr = "You", oppName = "Friend";
 
-            document.getElementById("tttStatus").innerText = "Mode: " + level.toUpperCase() + " | Your Turn (X)";
-            document.getElementById("tttStatus").style.color = "var(--primary-accent)";
-            renderTTT();
+const HUMAN = "X", AI = "O";
+const $ = id => document.getElementById(id);
+
+/* ============================ MODES ============================ */
+function setMode(m) {
+    hideToss();
+    if (mode === "online" && m !== "online") leaveRoom(true);
+    mode = m;
+    ["ai","local","online"].forEach(k => $("m-"+k).classList.toggle("active", k === m));
+    $("aiPanel").classList.toggle("hidden", m !== "ai");
+    $("localPanel").classList.toggle("hidden", m !== "local");
+    $("onlinePanel").classList.toggle("hidden", m !== "online");
+    $("chatBox").classList.add("hidden");
+    resetScores(true);
+    if (m === "online") {
+        active = false; board.fill(""); starter = "X"; current = "X"; winLine = null;
+        updateNames(); render();
+        setStatus("Create or join a room to play", "#aaa");
+        $("restartBtn").disabled = true;
+    } else {
+        $("restartBtn").disabled = false;
+        beginToss();
+    }
+}
+
+function setDifficulty(level) {
+    difficulty = level;
+    ["easy","medium","hard"].forEach(k => $("d-"+k).classList.toggle("active", k === level));
+    resetScores(true);
+    beginToss();
+}
+
+function names() {
+    if (mode === "ai") return { X:"You (X)", O:"AI (O)" };
+    if (mode === "local") return {
+        X: ($("nameP1").value.trim() || "Player 1") + " (X)",
+        O: ($("nameP2").value.trim() || "Player 2") + " (O)"
+    };
+    const me = myNameStr + " (" + myMark + ")", op = oppName + " (" + (myMark === "X" ? "O" : "X") + ")";
+    return myMark === "X" ? { X:me, O:op } : { X:op, O:me };
+}
+function updateNames() {
+    const n = names();
+    $("nameX").textContent = n.X; $("nameO").textContent = n.O;
+}
+["nameP1","nameP2"].forEach(id => document.addEventListener("input", e => { if (e.target.id === id) { updateNames(); updateStatus(); } }));
+
+/* ============================ ROUND FLOW ============================ */
+function startRound(first) {
+    clearTimeout(aiTimer);
+    board.fill(""); winLine = null;
+    starter = first; current = first; active = true;
+    updateNames(); render(); updateStatus(); updateTurnCards();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+
+/* ============================ COIN TOSS ============================ */
+let tossTimers = [], tossRaf = null;
+function hideToss() {
+    tossTimers.forEach(clearTimeout); tossTimers = []; cancelAnimationFrame(tossRaf);
+    $("tossOverlay").classList.add("hidden");
+}
+function beginToss() {
+    clearTimeout(aiTimer); hideToss();
+    active = false; board.fill(""); winLine = null;
+    updateNames(); render(); updateTurnCards(true);
+    setFace(true); $("coin").style.transform = "none"; $("sparks").innerHTML = "";
+    $("tossResult").textContent = "";
+    const iCall = mode !== "online" || isHost;
+    $("tossBtns").classList.toggle("hidden", !iCall);
+    const p1 = names().X.replace(/ \(.\)$/, "");
+    $("tossTitle").textContent = !iCall ? oppName + " is calling the toss…"
+                               : mode === "local" ? p1 + ", call it!" : "Call the toss!";
+    $("tossOverlay").classList.remove("hidden");
+    setStatus("Coin toss…", "#ffd54a");
+}
+function coinFlip() {                                   // true = Heads, fresh 50/50 every flip
+    try { return (crypto.getRandomValues(new Uint8Array(1))[0] & 1) === 1; }
+    catch (e) { return Math.random() < 0.5; }
+}
+function callToss(call) {
+    if (mode === "online" && !(conn && conn.open)) return;
+    const result = coinFlip() ? "H" : "T";
+    const st = call === result ? "X" : "O";             // caller is always X (you / Player 1 / host)
+    if (mode === "online") send({ t:"toss", call, result, starter: st });
+    runToss(call, result, st);
+}
+function setFace(isHeads) {
+    $("coinInner").innerHTML = isHeads ? '<i class="fa-solid fa-crown"></i><span>HEADS</span>'
+                                       : '<i class="fa-solid fa-star"></i><span>TAILS</span>';
+    $("coin").classList.toggle("tails", !isHeads);
+}
+function runToss(call, result, st) {
+    $("tossBtns").classList.add("hidden");
+    $("tossOverlay").classList.remove("hidden");
+    $("tossTitle").textContent = "Flipping…"; $("tossResult").textContent = "";
+    $("sparks").innerHTML = "";
+    cancelAnimationFrame(tossRaf);
+    const coin = $("coin"), shadow = $("coinShadow");
+    // Number of half-turns decides the final face: even -> Heads, odd -> Tails
+    const n = 2 * (4 + Math.floor(Math.random() * 3)) + (result === "H" ? 0 : 1);
+    const DUR = 2200, t0 = performance.now();
+    let lastFace = null;
+    function frame(now) {
+        const p = Math.min(1, (now - t0) / DUR);
+        const th = (1 - Math.pow(1 - p, 2.2)) * n * Math.PI;
+        const heads = p >= 1 ? result === "H" : Math.floor(th / Math.PI) % 2 === 0;
+        if (heads !== lastFace) { setFace(heads); lastFace = heads; }
+        const sy = p >= 1 ? 1 : Math.max(0.05, Math.abs(Math.cos(th)));
+        const y = -Math.pow(Math.sin(Math.PI * p), 0.8) * 120;
+        coin.style.transform = "translateY(" + y + "px) scaleY(" + sy + ")";
+        shadow.style.transform = "scale(" + (1 - Math.abs(y) / 260) + ")";
+        shadow.style.opacity = 0.9 - Math.abs(y) / 160;
+        if (p < 1) tossRaf = requestAnimationFrame(frame); else land();
+    }
+    function land() {
+        const sp = $("sparks");
+        for (let i = 0; i < 12; i++) {
+            const b = document.createElement("b"), a = (Math.PI * 2 * i) / 12;
+            b.style.setProperty("--dx", Math.cos(a) * 80 + "px"); b.style.setProperty("--dy", Math.sin(a) * 60 + "px");
+            sp.appendChild(b);
         }
+        const who = mode === "ai" ? (st === HUMAN ? "You" : "AI")
+                  : mode === "online" ? (st === myMark ? "You" : oppName)
+                  : names()[st].replace(/ \(.\)$/, "");
+        const nm = c => c === "H" ? "Heads" : "Tails";
+        $("tossTitle").textContent = nm(result) + "!  (Call: " + nm(call) + ")";
+        $("tossResult").textContent = who + (who === "You" ? " go" : " goes") + " first (" + st + ")";
+        tossTimers.push(setTimeout(() => { hideToss(); startRound(st); }, 1800));
+    }
+    tossRaf = requestAnimationFrame(frame);
+}
 
-        function renderTTT() {
-            const boardDiv = document.getElementById("ttt-board");
-            boardDiv.innerHTML = "";
-            tttBoard.forEach((val, i) => {
-                const cell = document.createElement("div");
-                // User's original logic: add 'winner' class if cell has a value to make it glow.
-                // Added specific color classes for X and O to enhance visual appeal.
-                let classes = "ttt-cell ";
-                if (val !== "") classes += "winner ";
-                if (val === tttHuman) classes += "human-move ";
-                if (val === tttAi) classes += "ai-move ";
-                
-                cell.className = classes;
-                cell.innerText = val; 
-                cell.onclick = () => tttMove(i);
-                boardDiv.appendChild(cell);
-            });
+function restartRequest() {
+    const next = starter === "X" ? "O" : "X";         // alternate who starts
+    if (mode === "online") {
+        if (!conn || !conn.open) return;
+        send({ t:"restart", starter: next });
+    }
+    startRound(next);
+}
+
+function resetScores(silent) {
+    scores = { X:0, O:0, D:0 }; renderScores();
+    if (!silent && mode === "online" && conn && conn.open) send({ t:"resetScores" });
+}
+
+function canIMove() {
+    if (!active) return false;
+    if (mode === "ai") return current === HUMAN;
+    if (mode === "online") return !!(conn && conn.open) && current === myMark;
+    return true;
+}
+
+function handleCell(i) {
+    if (board[i] !== "" || !canIMove()) return;
+    place(i);
+    if (mode === "online") send({ t:"move", i });
+}
+
+function place(i) {
+    board[i] = current;
+    const w = getWinLine(board);
+    if (w) {
+        winLine = w; active = false; scores[current]++;
+        render(); renderScores(); updateStatus(current); updateTurnCards(true);
+        return;
+    }
+    if (!board.includes("")) {
+        active = false; scores.D++;
+        render(); renderScores(); updateStatus("draw"); updateTurnCards(true);
+        return;
+    }
+    current = current === "X" ? "O" : "X";
+    render(); updateStatus(); updateTurnCards();
+    if (mode === "ai" && current === AI && active) scheduleAI();
+}
+
+function scheduleAI() {
+    setStatus("AI System Processing...", "var(--red)");
+    aiTimer = setTimeout(() => {
+        let m = difficulty === "easy" ? randomMove(board)
+              : difficulty === "medium" ? mediumMove() : bestMove();
+        if (m !== undefined) place(m);
+    }, 500);
+}
+
+/* ============================ RENDER ============================ */
+function render() {
+    const el = $("board");
+    if (el.children.length !== 9) {                      // build the cells once
+        el.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+            const c = document.createElement("div");
+            c.className = "cell";
+            c.onclick = () => handleCell(i);
+            el.appendChild(c);
         }
+    }
+    el.classList.toggle("board-locked", !canIMove());
+    board.forEach((v, i) => {                            // then only update what changed
+        const c = el.children[i];
+        const wasEmpty = c.textContent === "";
+        c.className = "cell" + (v ? " filled " + v : "") + (winLine && winLine.includes(i) ? " winner" : "");
+        if (v && wasEmpty) c.classList.add("pop");       // animate only the new mark
+        c.textContent = v;
+    });
+}
+function renderScores() { $("scoreX").textContent = scores.X; $("scoreO").textContent = scores.O; $("scoreD").textContent = scores.D; }
+function setStatus(t, color) { $("status").textContent = t; $("status").style.color = color || "var(--accent)"; }
+function updateTurnCards(over) {
+    $("cardX").classList.toggle("turn", !over && active && current === "X");
+    $("cardO").classList.toggle("turn", !over && active && current === "O");
+}
+function updateStatus(result) {
+    const n = names();
+    if (result === "draw") return setStatus("🤝 Draw!", "#fff");
+    if (result) {
+        let msg;
+        if (mode === "ai") msg = result === HUMAN ? "🏆 You Win!" : "🤖 AI Wins! System Overridden.";
+        else if (mode === "online") msg = result === myMark ? "🏆 You Win!" : "😢 " + oppName + " Wins!";
+        else msg = "🏆 " + n[result].replace(/ \(.\)$/, "") + " Wins!";
+        return setStatus(msg, "#fff");
+    }
+    if (mode === "online" && !(conn && conn.open)) return setStatus("Waiting for opponent…", "#aaa");
+    if (mode === "ai") return setStatus(current === HUMAN ? `Mode: ${difficulty.toUpperCase()} | Your Turn (X)` : "AI System Processing...", current === HUMAN ? "var(--accent)" : "var(--red)");
+    if (mode === "online") return setStatus(current === myMark ? `Your Turn (${myMark})` : `${oppName}'s Turn (${current})`, current === "X" ? "var(--accent)" : "var(--red)");
+    setStatus(n[current].replace(/ \(.\)$/, "") + "'s Turn (" + current + ")", current === "X" ? "var(--accent)" : "var(--red)");
+}
 
-        function tttMove(i) {
-            if (!tttActive || tttBoard[i] !== "") return;
-            
-            // Human Move
-            tttBoard[i] = tttHuman; 
-            renderTTT();
-            
-            if (checkTTTWin(tttHuman)) { endGameTTT("🏆 You Win!"); return; }
-            if (!tttBoard.includes("")) { endGameTTT("🤝 Draw!"); return; }
-            
-            // AI Turn Status
-            document.getElementById("tttStatus").innerText = "AI System Processing...";
-            document.getElementById("tttStatus").style.color = "#ff4444";
-            tttActive = false; // Prevent clicking while AI thinks
-            
-            // AI Move (Delayed for realism)
-            setTimeout(() => {
-                let moveIndex;
-                if (tttDifficulty === 'easy') moveIndex = getRandomMove();
-                else if (tttDifficulty === 'medium') moveIndex = getMediumMove();
-                else moveIndex = getBestMoveTTT();
-                
-                tttBoard[moveIndex] = tttAi; 
-                renderTTT();
-                
-                if (checkTTTWin(tttAi)) {
-                    endGameTTT("🤖 AI Wins! System Overridden.");
-                } else if (!tttBoard.includes("")) {
-                    endGameTTT("🤝 Draw!");
-                } else {
-                    tttActive = true;
-                    document.getElementById("tttStatus").innerText = "Mode: " + tttDifficulty.toUpperCase() + " | Your Turn (X)";
-                    document.getElementById("tttStatus").style.color = "var(--primary-accent)";
-                }
-            }, 500);
+/* ============================ GAME LOGIC ============================ */
+function getWinLine(b) {
+    for (const l of WINS) if (b[l[0]] && b[l[0]] === b[l[1]] && b[l[1]] === b[l[2]]) return l;
+    return null;
+}
+function winnerOf(b) { const l = getWinLine(b); return l ? b[l[0]] : null; }
+
+/* ============================ AI ============================ */
+function randomMove(b) {
+    const e = b.map((v,i) => v === "" ? i : null).filter(v => v !== null);
+    return e[Math.floor(Math.random() * e.length)];
+}
+function mediumMove() {
+    for (const p of [AI, HUMAN]) {                      // win, else block
+        for (let i = 0; i < 9; i++) if (board[i] === "") {
+            board[i] = p; const w = winnerOf(board) === p; board[i] = "";
+            if (w) return i;
         }
+    }
+    return randomMove(board);
+}
+function bestMove() {
+    let best = -Infinity, move;
+    for (let i = 0; i < 9; i++) if (board[i] === "") {
+        board[i] = AI; const s = minimax(board, 0, false, -Infinity, Infinity); board[i] = "";
+        if (s > best) { best = s; move = i; }
+    }
+    return move;
+}
+function minimax(b, depth, max, alpha, beta) {
+    const w = winnerOf(b);
+    if (w === AI) return 10 - depth;
+    if (w === HUMAN) return depth - 10;
+    if (!b.includes("")) return 0;
+    let best = max ? -Infinity : Infinity;
+    for (let i = 0; i < 9; i++) if (b[i] === "") {
+        b[i] = max ? AI : HUMAN;
+        const s = minimax(b, depth + 1, !max, alpha, beta);
+        b[i] = "";
+        if (max) { best = Math.max(best, s); alpha = Math.max(alpha, s); }
+        else     { best = Math.min(best, s); beta = Math.min(beta, s); }
+        if (beta <= alpha) break;
+    }
+    return best;
+}
 
-        function getRandomMove() {
-            let empty = tttBoard.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-            return empty[Math.floor(Math.random() * empty.length)];
-        }
+/* ============================ ONLINE (PeerJS) ============================ */
+const PREFIX = "sttt-gl-";
+const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function genCode() { let s = ""; for (let i = 0; i < 5; i++) s += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]; return s; }
+function net(t, color) { $("netStatus").textContent = t; $("netStatus").style.color = color || "#9aa"; }
+function getMyName() { myNameStr = $("myName").value.trim() || "Player"; return myNameStr; }
 
-        function getMediumMove() {
-            // Check if AI can win
-            for(let i=0; i<9; i++) { 
-                if(tttBoard[i] == "") { 
-                    tttBoard[i] = tttAi; 
-                    if(checkTTTWin(tttAi)) { tttBoard[i] = ""; return i; } 
-                    tttBoard[i] = ""; 
-                } 
-            }
-            // Check if AI needs to block human
-            for(let i=0; i<9; i++) { 
-                if(tttBoard[i] == "") { 
-                    tttBoard[i] = tttHuman; 
-                    if(checkTTTWin(tttHuman)) { tttBoard[i] = ""; return i; } 
-                    tttBoard[i] = ""; 
-                } 
-            }
-            // Otherwise random
-            return getRandomMove();
-        }
+function createRoom(retry = 0) {
+    if (typeof Peer === "undefined") return net("Online engine failed to load. Check your internet.", "#ff6b6b");
+    getMyName(); cleanupPeer();
+    isHost = true; myMark = "X";
+    const code = genCode();
+    net("Creating room…");
+    peer = new Peer(PREFIX + code);
+    peer.on("open", () => {
+        $("lobby").classList.add("hidden"); $("roomInfo").classList.remove("hidden");
+        $("roomCode").textContent = code;
+        net("Waiting for a friend to join…");
+        updateNames(); updateStatus();
+    });
+    peer.on("connection", c => {
+        if (conn && conn.open) { c.on("open", () => { c.send({ t:"full" }); setTimeout(() => c.close(), 300); }); return; }
+        conn = c; wireConn();
+    });
+    peer.on("error", e => {
+        if (e.type === "unavailable-id" && retry < 5) return createRoom(retry + 1);
+        net("Error: " + e.type, "#ff6b6b");
+    });
+}
 
-        function getBestMoveTTT() {
-            let bestScore = -Infinity; 
-            let move;
-            for(let i=0; i<9; i++) {
-                if(tttBoard[i] === "") {
-                    tttBoard[i] = tttAi; 
-                    let score = minimaxTTT(tttBoard, 0, false); 
-                    tttBoard[i] = "";
-                    if(score > bestScore) { bestScore = score; move = i; }
-                }
-            }
-            return move;
-        }
+function joinRoom() {
+    if (typeof Peer === "undefined") return net("Online engine failed to load. Check your internet.", "#ff6b6b");
+    const code = $("joinCode").value.trim().toUpperCase();
+    if (code.length !== 5) return net("Enter the 5-character room code.", "#ff6b6b");
+    getMyName(); cleanupPeer();
+    isHost = false; myMark = "O";
+    net("Connecting…");
+    peer = new Peer();
+    peer.on("open", () => {
+        conn = peer.connect(PREFIX + code, { reliable:true });
+        wireConn();
+        setTimeout(() => { if (conn && !conn.open) net("Couldn't reach that room. Check the code.", "#ff6b6b"); }, 8000);
+    });
+    peer.on("error", e => net(e.type === "peer-unavailable" ? "Room not found. Check the code." : "Error: " + e.type, "#ff6b6b"));
+}
 
-        function minimaxTTT(board, depth, isMaximizing) {
-            if(checkTTTWin(tttAi)) return 10 - depth;
-            if(checkTTTWin(tttHuman)) return depth - 10;
-            if(!board.includes("")) return 0;
+function wireConn() {
+    conn.on("open", () => {
+        $("lobby").classList.add("hidden"); $("roomInfo").classList.remove("hidden");
+        if (!isHost) $("roomCode").textContent = $("joinCode").value.trim().toUpperCase();
+        $("chatBox").classList.remove("hidden"); $("restartBtn").disabled = false;
+        net("Connected ✔", "#6dff9c");
+        send({ t:"hello", name:myNameStr });
+        chatSys("Connected!");
+        resetScores(true); beginToss();
+    });
+    conn.on("data", onData);
+    conn.on("close", () => {
+        net("Friend disconnected.", "#ff6b6b"); chatSys("Friend left the room.");
+        hideToss(); active = false; clearTimeout(aiTimer); render(); setStatus("Opponent disconnected", "#ff6b6b");
+        $("restartBtn").disabled = true;
+    });
+}
 
-            if(isMaximizing) {
-                let bestScore = -Infinity;
-                for(let i=0; i<9; i++) {
-                    if(board[i] === "") {
-                        board[i] = tttAi; 
-                        let score = minimaxTTT(board, depth + 1, false); 
-                        board[i] = "";
-                        bestScore = Math.max(score, bestScore);
-                    }
-                }
-                return bestScore;
-            } else {
-                let bestScore = Infinity;
-                for(let i=0; i<9; i++) {
-                    if(board[i] === "") {
-                        board[i] = tttHuman; 
-                        let score = minimaxTTT(board, depth + 1, true); 
-                        board[i] = "";
-                        bestScore = Math.min(score, bestScore);
-                    }
-                }
-                return bestScore;
-            }
-        }
+function send(obj) { if (conn && conn.open) conn.send(obj); }
 
-        function checkTTTWin(p) {
-            const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            return wins.some(c => c.every(i => tttBoard[i] === p));
-        }
+function onData(d) {
+    switch (d.t) {
+        case "hello":
+            oppName = String(d.name || "Friend").slice(0, 12); updateNames(); updateStatus(); break;
+        case "move":
+            if (active && current !== myMark && Number.isInteger(d.i) && d.i >= 0 && d.i < 9 && board[d.i] === "") place(d.i);
+            break;
+        case "toss":
+            if (!isHost && (d.result === "H" || d.result === "T")) runToss(d.call, d.result, d.starter === "O" ? "O" : "X");
+            break;
+        case "restart": startRound(d.starter === "O" ? "O" : "X"); break;
+        case "resetScores": resetScores(true); break;
+        case "chat": chatAdd(oppName, d.text, "them"); break;
+        case "full": net("That room is already full.", "#ff6b6b"); cleanupPeer(); break;
+    }
+}
 
-        function endGameTTT(msg) { 
-            tttActive = false; 
-            document.getElementById("tttStatus").innerText = msg; 
-            document.getElementById("tttStatus").style.color = "#fff"; 
-        }
+function cleanupPeer() {
+    try { if (conn) conn.close(); } catch(e){}
+    try { if (peer) peer.destroy(); } catch(e){}
+    conn = null; peer = null;
+}
+function leaveRoom(silent) {
+    cleanupPeer(); clearTimeout(aiTimer); hideToss();
+    $("lobby").classList.remove("hidden"); $("roomInfo").classList.add("hidden");
+    $("chatBox").classList.add("hidden"); $("chatLog").innerHTML = "";
+    net("");
+    if (!silent) { active = false; board.fill(""); winLine = null; resetScores(true); render(); setStatus("Create or join a room to play", "#aaa"); $("restartBtn").disabled = true; }
+}
+function copyInvite() {
+    const url = location.origin + location.pathname + "?room=" + $("roomCode").textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(
+        () => net("Invite link copied!", "#6dff9c"),
+        () => prompt("Copy this invite link:", url));
+}
 
-        // Initialize on load
-        window.onload = () => {
-            setDifficulty('hard');
-        };
-    </script>
+/* ---- chat ---- */
+function chatAdd(who, text, cls) {
+    const d = document.createElement("div"); d.className = cls;
+    d.textContent = (cls === "sys" ? "" : who + ": ") + text;
+    $("chatLog").appendChild(d); $("chatLog").scrollTop = 1e6;
+}
+function chatSys(t) { chatAdd("", t, "sys"); }
+function sendChat(preset) {
+    const inp = $("chatInput"); const text = (preset || inp.value).trim();
+    if (!text || !(conn && conn.open)) return;
+    send({ t:"chat", text }); chatAdd("You", text, "me"); if (!preset) inp.value = "";
+}
+
+/* ============================ INIT ============================ */
+window.onload = () => {
+    setMode("ai");
+    const room = new URLSearchParams(location.search).get("room");   // invite link support
+    if (room) { setMode("online"); $("joinCode").value = room.toUpperCase().slice(0, 5); $("myName").focus(); }
+};
+</script>
 </body>
 </html>

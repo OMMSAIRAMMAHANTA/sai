@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giant Tic-Tac-Toe | Gaming Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --x:#00eaff; --o:#ff4466; --gold:#ffd54a; --bg:#050b14; }
+        * { box-sizing:border-box; }
+        body {
+            margin:0; min-height:100vh; font-family:'Poppins',sans-serif; color:#fff; display:flex; flex-direction:column;
+            background: linear-gradient(135deg, rgba(5,11,20,.93) 0%, rgba(10,25,47,.88) 100%),
+                        url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center/cover fixed;
+            background-color:var(--bg);
+        }
+        .scan { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.35;
+            background:repeating-linear-gradient(to bottom, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.18) 2px 4px); }
+        nav { padding:16px 28px; display:flex; justify-content:space-between; align-items:center;
+            background:rgba(0,0,0,.3); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,234,255,.2); }
+        nav a { color:#fff; text-decoration:none; font-weight:600; transition:.25s; }
+        nav a:hover { color:var(--x); text-shadow:0 0 10px var(--x); }
+        nav h2 { margin:0; font-size:1.05rem; letter-spacing:2px; text-transform:uppercase; color:var(--x); }
+
+        main { flex:1; display:flex; justify-content:center; align-items:flex-start; padding:20px; }
+        .card { width:100%; max-width:720px; text-align:center; padding:26px 22px 28px; border-radius:28px;
+            background:rgba(15,15,20,.88); backdrop-filter:blur(10px); border:1px solid rgba(0,234,255,.3);
+            box-shadow:0 0 60px rgba(0,234,255,.14), inset 0 0 30px rgba(0,234,255,.05);
+            animation:cardIn .6s cubic-bezier(.2,.8,.2,1); }
+        @keyframes cardIn { from { opacity:0; transform:translateY(24px) scale(.95); filter:blur(8px); } }
+        h1 { margin:0 0 6px; font-size:1.9rem; font-weight:900; text-transform:uppercase; letter-spacing:3px; color:var(--x); text-shadow:0 0 18px rgba(0,234,255,.5); }
+        .rule { margin:0 0 14px; font-size:.8rem; color:#9aa; }
+
+        .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+        .btn { padding:9px 16px; border-radius:30px; border:1px solid rgba(255,255,255,.22); background:transparent; color:#fff; cursor:pointer;
+            font:700 .76rem 'Poppins',sans-serif; text-transform:uppercase; transition:.25s; }
+        .btn:hover { background:rgba(0,234,255,.12); border-color:var(--x); transform:scale(1.05); }
+        .btn.active { background:var(--x); color:#000; border-color:var(--x); box-shadow:0 0 15px rgba(0,234,255,.45); }
+        .btn.hard.active { background:linear-gradient(45deg,#ff4466,#aa0022); color:#fff; border-color:var(--o); box-shadow:0 0 15px rgba(255,68,102,.5); }
+        .btn.gold.active { background:var(--gold); color:#000; border-color:var(--gold); box-shadow:0 0 15px rgba(255,213,74,.5); }
+        .hidden { display:none !important; }
+
+        .scoreboard { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin:6px 0 10px; }
+        .sc { padding:8px 10px; border-radius:14px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.1); transition:.3s; }
+        .sc .nm { font-size:.74rem; color:#bbb; }
+        .sc .pts { font-size:1.6rem; font-weight:800; }
+        .sc.x .pts { color:var(--x); } .sc.o .pts { color:var(--o); }
+        .sc.turn { transform:scale(1.06); }
+        .sc.x.turn { border-color:var(--x); box-shadow:0 0 18px rgba(0,234,255,.35); }
+        .sc.o.turn { border-color:var(--o); box-shadow:0 0 18px rgba(255,68,102,.35); }
+        .dr { font-size:.74rem; color:#aaa; } .dr b { display:block; font-size:1.2rem; color:#fff; }
+
+        #status { min-height:1.7em; font-weight:700; letter-spacing:1px; margin:6px 0 4px; color:var(--x); transition:color .25s; }
+        .hint { font-size:.74rem; color:#789; margin:0 0 10px; }
+
+        .viewport { margin:0 auto 16px; max-height:72vh; overflow:auto; border-radius:14px; border:1px solid rgba(0,234,255,.3);
+            background:rgba(0,0,0,.35); box-shadow:inset 0 0 24px rgba(0,0,0,.6), 0 0 24px rgba(0,234,255,.1); width:fit-content; max-width:100%; }
+        canvas { display:block; cursor:pointer; touch-action:manipulation; }
+        .locked canvas { cursor:not-allowed; }
+
+        .wide { width:100%; border-radius:14px; padding:13px; font-size:.95rem; border-color:var(--x); }
+        @media (max-width:420px) { .card { padding:20px 12px 22px; } h1 { font-size:1.45rem; } nav { padding:14px 16px; } .btn { padding:8px 12px; } }
+        @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+    </style>
+</head>
+<body>
+    <div class="scan"></div>
+    <nav>
+        <a href="tictactoe-dashboard.html">&larr; Dashboard</a>
+        <h2>Giant</h2>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h1>Giant Tic-Tac-Toe</h1>
+            <p class="rule">A huge board — get <b>5 in a row</b> (across, down or diagonal) to win.</p>
+
+            <div class="row">
+                <button class="btn active" id="m-ai" onclick="setMode('ai')">vs AI</button>
+                <button class="btn" id="m-local" onclick="setMode('local')">2 Players</button>
+            </div>
+            <div class="row" id="diffRow">
+                <button class="btn" id="d-easy" onclick="setDiff('easy')">Easy</button>
+                <button class="btn" id="d-medium" onclick="setDiff('medium')">Medium</button>
+                <button class="btn hard active" id="d-hard" onclick="setDiff('hard')">Hard</button>
+            </div>
+            <div class="row">
+                <button class="btn gold" id="s-10" onclick="setSize(10)">10×10</button>
+                <button class="btn gold active" id="s-15" onclick="setSize(15)">15×15</button>
+                <button class="btn gold" id="s-19" onclick="setSize(19)">19×19</button>
+            </div>
+
+            <div class="scoreboard">
+                <div class="sc x" id="cardX"><div class="nm" id="nmX">You (X)</div><div class="pts" id="scX">0</div></div>
+                <div class="dr">Draws<b id="scD">0</b></div>
+                <div class="sc o" id="cardO"><div class="nm" id="nmO">AI (O)</div><div class="pts" id="scO">0</div></div>
+            </div>
+
+            <div id="status">Your turn</div>
+            <p class="hint">Scroll the board if it doesn't fit • the last move is marked with a glow</p>
+
+            <div class="viewport" id="viewport"><canvas id="cv"></canvas></div>
+
+            <button class="btn wide" onclick="newRound()">New Round</button>
+            <button class="btn" style="margin-top:10px;" onclick="resetScores()">Reset Scores</button>
+        </div>
+    </main>
+
+<script>
+const K = 5, HUMAN = "X", AI = "O";
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d");
+const COL = { X:"#00eaff", O:"#ff4466", gold:"#ffd54a" };
+
+let N = 15, SIZE = N * N, CELL = 36;
+let LINES = [], LINES_OF = [];
+let board = [], current = "X", starter = "X", active = false, lastMove = -1, winCells = null, winLineP = 0, animP = 1;
+let mode = "ai", diff = "hard", scores = { X:0, O:0, D:0 }, aiTimer = null, hover = -1, moves = 0;
+
+/* ---------- every run of 5 cells on the board ---------- */
+function buildLines() {
+    LINES = []; LINES_OF = Array.from({ length:SIZE }, () => []);
+    const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) for (const [dr, dc] of dirs) {
+        const er = r + dr * (K - 1), ec = c + dc * (K - 1);
+        if (er < 0 || er >= N || ec < 0 || ec >= N) continue;
+        const l = Array.from({ length:K }, (_, t) => (r + dr * t) * N + (c + dc * t));
+        const li = LINES.push(l) - 1;
+        l.forEach(i => LINES_OF[i].push(li));
+    }
+}
+
+/* ---------- sizing & drawing ---------- */
+function fit() {
+    const avail = Math.max(260, Math.min(680, $("viewport").parentElement.clientWidth - 44));
+    CELL = Math.max(28, Math.min(44, Math.floor(avail / N)));
+    const px = CELL * N, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.style.width = px + "px"; cv.style.height = px + "px";
+    cv.width = px * dpr; cv.height = px * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+}
+function centerView() {
+    const v = $("viewport");
+    v.scrollLeft = (v.scrollWidth - v.clientWidth) / 2; v.scrollTop = (v.scrollHeight - v.clientHeight) / 2;
+}
+function ctr(i) { return [(i % N + .5) * CELL, (Math.floor(i / N) + .5) * CELL]; }
+
+function drawMark(i, m, p, alpha) {
+    const [cx, cy] = ctr(i), r = CELL * .29;
+    ctx.save();
+    ctx.globalAlpha = alpha; ctx.lineCap = "round"; ctx.lineWidth = Math.max(2.5, CELL * .11);
+    ctx.strokeStyle = COL[m]; ctx.shadowColor = COL[m]; ctx.shadowBlur = CELL * .35;
+    ctx.beginPath();
+    if (m === "X") {
+        const a = Math.min(1, p * 2), b = Math.max(0, p * 2 - 1);
+        ctx.moveTo(cx - r, cy - r); ctx.lineTo(cx - r + 2 * r * a, cy - r + 2 * r * a);
+        if (b > 0) { ctx.moveTo(cx + r, cy - r); ctx.lineTo(cx + r - 2 * r * b, cy - r + 2 * r * b); }
+    } else {
+        ctx.arc(cx, cy, r * 1.08, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * p);
+    }
+    ctx.stroke(); ctx.restore();
+}
+function draw() {
+    const S = CELL * N;
+    ctx.clearRect(0, 0, S, S);
+    // checker tint + grid
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if ((r + c) & 1) { ctx.fillStyle = "rgba(255,255,255,.025)"; ctx.fillRect(c * CELL, r * CELL, CELL, CELL); }
+    ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 1; ctx.beginPath();
+    for (let k = 1; k < N; k++) { ctx.moveTo(k * CELL, 0); ctx.lineTo(k * CELL, S); ctx.moveTo(0, k * CELL); ctx.lineTo(S, k * CELL); }
+    ctx.stroke();
+    // last-move glow
+    if (lastMove >= 0) {
+        const [cx, cy] = ctr(lastMove), g = ctx.createRadialGradient(cx, cy, 0, cx, cy, CELL * .8);
+        g.addColorStop(0, "rgba(255,255,255,.22)"); g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = g; ctx.fillRect(cx - CELL, cy - CELL, CELL * 2, CELL * 2);
+    }
+    // winning cells
+    if (winCells) winCells.forEach(i => { ctx.fillStyle = "rgba(255,213,74,.2)"; ctx.fillRect((i % N) * CELL, Math.floor(i / N) * CELL, CELL, CELL); });
+    // hover ghost
+    if (hover >= 0 && active && !board[hover] && (mode !== "ai" || current === HUMAN)) drawMark(hover, current, 1, .3);
+    // stones
+    for (let i = 0; i < SIZE; i++) if (board[i]) {
+        const dim = winCells && !winCells.includes(i) ? .35 : 1;
+        drawMark(i, board[i], i === lastMove ? animP : 1, dim);
+    }
+    // winning line
+    if (winCells && winLineP > 0) {
+        const [x1, y1] = ctr(winCells[0]), [x2, y2] = ctr(winCells[K - 1]);
+        const len = Math.hypot(x2 - x1, y2 - y1), dx = (x2 - x1) / len, dy = (y2 - y1) / len, e = CELL * .45;
+        const sx = x1 - dx * e, sy = y1 - dy * e, ex = x2 + dx * e, ey = y2 + dy * e;
+        ctx.save(); ctx.strokeStyle = COL.gold; ctx.lineWidth = Math.max(4, CELL * .16); ctx.lineCap = "round";
+        ctx.shadowColor = COL.gold; ctx.shadowBlur = 14;
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + (ex - sx) * winLineP, sy + (ey - sy) * winLineP); ctx.stroke(); ctx.restore();
+    }
+}
+let animRaf = 0;
+function kick() {
+    cancelAnimationFrame(animRaf);
+    const t0 = performance.now();
+    (function step(now) {
+        const t = now - t0;
+        animP = Math.min(1, t / 300);
+        winLineP = winCells ? Math.max(0, Math.min(1, (t - 150) / 550)) : 0;
+        draw();
+        if (animP < 1 || (winCells && winLineP < 1)) animRaf = requestAnimationFrame(step);
+    })(t0);
+}
+
+/* ---------- pointer ---------- */
+function cellAt(e) {
+    const r = cv.getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / CELL), y = Math.floor((e.clientY - r.top) / CELL);
+    return x < 0 || y < 0 || x >= N || y >= N ? -1 : y * N + x;
+}
+cv.addEventListener("pointermove", e => { if (e.pointerType === "touch") return; const h = cellAt(e); if (h !== hover) { hover = h; draw(); } });
+cv.addEventListener("pointerleave", () => { hover = -1; draw(); });
+cv.addEventListener("click", e => { const i = cellAt(e); if (i >= 0) clickCell(i); });
+
+/* ---------- setup ---------- */
+function setMode(m) {
+    mode = m;
+    $("m-ai").classList.toggle("active", m === "ai");
+    $("m-local").classList.toggle("active", m === "local");
+    $("diffRow").classList.toggle("hidden", m !== "ai");
+    $("nmX").textContent = m === "ai" ? "You (X)" : "Player 1 (X)";
+    $("nmO").textContent = m === "ai" ? "AI (O)" : "Player 2 (O)";
+    resetScores(); startRound("X");
+}
+function setDiff(d) {
+    diff = d;
+    ["easy","medium","hard"].forEach(k => $("d-" + k).classList.toggle("active", k === d));
+    resetScores(); startRound("X");
+}
+function setSize(n) {
+    N = n; SIZE = n * n;
+    [10, 15, 19].forEach(k => $("s-" + k).classList.toggle("active", k === n));
+    buildLines(); fit(); resetScores(); startRound("X"); centerView();
+}
+function resetScores() { scores = { X:0, O:0, D:0 }; renderScores(); }
+function renderScores() { $("scX").textContent = scores.X; $("scO").textContent = scores.O; $("scD").textContent = scores.D; }
+function newRound() { startRound(starter === "X" ? "O" : "X"); }   // starter alternates
+
+/* ---------- round flow ---------- */
+function startRound(first) {
+    clearTimeout(aiTimer); cancelAnimationFrame(animRaf);
+    board = Array(SIZE).fill(""); starter = first; current = first; active = true; lastMove = -1; winCells = null; winLineP = 0; animP = 1; moves = 0;
+    updateUI(); draw();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function clickCell(i) {
+    if (!active || board[i]) return;
+    if (mode === "ai" && current !== HUMAN) return;
+    place(i);
+}
+function place(i) {
+    board[i] = current; lastMove = i; moves++;
+    const line = winLineAt(i);
+    if (line) { winCells = line; finish(current); kick(); return; }
+    if (moves === SIZE) { finish("D"); kick(); return; }
+    current = current === "X" ? "O" : "X";
+    updateUI(); kick();
+    if (mode === "ai" && current === AI) scheduleAI();
+}
+function finish(result) {
+    active = false; scores[result]++; renderScores();
+    let msg;
+    if (result === "D") msg = "🤝 It's a draw!";
+    else if (mode === "ai") msg = result === HUMAN ? "🏆 You win!" : "🤖 AI wins!";
+    else msg = "🏆 Player " + (result === "X" ? "1" : "2") + " wins!";
+    $("status").textContent = msg; $("status").style.color = "#fff";
+    $("cardX").classList.remove("turn"); $("cardO").classList.remove("turn");
+    $("viewport").classList.add("locked");
+}
+function updateUI() {
+    $("viewport").classList.toggle("locked", !active || (mode === "ai" && current !== HUMAN));
+    $("cardX").classList.toggle("turn", active && current === "X");
+    $("cardO").classList.toggle("turn", active && current === "O");
+    $("status").style.color = current === "X" ? "var(--x)" : "var(--o)";
+    $("status").textContent = mode === "ai"
+        ? (current === HUMAN ? "Your turn (X)" : "AI is thinking…")
+        : "Player " + (current === "X" ? "1" : "2") + "'s turn (" + current + ")";
+}
+
+/* ---------- logic ---------- */
+function winLineAt(m) {
+    for (const li of LINES_OF[m]) { const l = LINES[li]; if (l.every(i => board[i] === board[m])) return l; }
+    return null;
+}
+function wins(m) { return LINES_OF[m].some(li => LINES[li].every(i => board[i] === board[m])); }
+
+/* ---------- AI ---------- */
+const W = [0, 1, 10, 100, 1200, 100000];
+function empties() { const e = []; for (let i = 0; i < SIZE; i++) if (!board[i]) e.push(i); return e; }
+
+// Empty cells within 2 squares of any stone (the only places worth considering on a big board)
+function near() {
+    const seen = new Uint8Array(SIZE), out = [];
+    for (let i = 0; i < SIZE; i++) if (board[i]) {
+        const r = Math.floor(i / N), c = i % N;
+        for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+            const rr = r + dr, cc = c + dc;
+            if (rr < 0 || rr >= N || cc < 0 || cc >= N) continue;
+            const j = rr * N + cc;
+            if (!board[j] && !seen[j]) { seen[j] = 1; out.push(j); }
+        }
+    }
+    return out;
+}
+function cellValue(c) {                                              // how useful a cell is to either side
+    let v = 0;
+    for (const li of LINES_OF[c]) {
+        let a = 0, h = 0;
+        for (const i of LINES[li]) { if (board[i] === AI) a++; else if (board[i] === HUMAN) h++; }
+        if (a && h) continue;
+        if (a) v += W[a + 1]; else if (h) v += W[h + 1] * 1.1; else v += 1;
+    }
+    const r = Math.floor(c / N), cc = c % N, mid = (N - 1) / 2;
+    return v - (Math.abs(r - mid) + Math.abs(cc - mid)) * .01;      // tiny pull towards the centre
+}
+function topCells(limit) {
+    let cand = near();
+    if (!cand.length) { const m = Math.floor(N / 2) * N + Math.floor(N / 2); return board[m] ? empties().slice(0, limit) : [m]; }
+    const arr = cand.map(i => [cellValue(i), i]);
+    arr.sort((p, q) => q[0] - p[0]);
+    return arr.slice(0, limit).map(p => p[1]);
+}
+function evaluate() {
+    let s = 0;
+    for (const l of LINES) {
+        let a = 0, h = 0;
+        for (const i of l) { if (board[i] === AI) a++; else if (board[i] === HUMAN) h++; }
+        if (a && h) continue;
+        if (a) s += W[a]; else if (h) s -= W[h] * 1.1;
+    }
+    return s;
+}
+function scheduleAI() {
+    updateUI();
+    aiTimer = setTimeout(() => {
+        const m = diff === "easy" ? easyMove() : diff === "medium" ? mediumMove() : hardMove();
+        if (m !== undefined && active) place(m);
+    }, 550);
+}
+function immediate(p, pool) {                                        // a cell that makes 5 at once for p
+    for (const i of pool) { board[i] = p; const w = wins(i); board[i] = ""; if (w) return i; }
+    return -1;
+}
+function easyMove() {
+    const c = near(); if (!c.length) return Math.floor(N / 2) * N + Math.floor(N / 2);
+    return c[Math.floor(Math.random() * c.length)];
+}
+function mediumMove() {
+    const pool = near();
+    if (!pool.length) return Math.floor(N / 2) * N + Math.floor(N / 2);
+    let m = immediate(AI, pool); if (m >= 0) return m;
+    m = immediate(HUMAN, pool); if (m >= 0) return m;
+    const c = topCells(4);
+    return Math.random() < .2 ? c[Math.floor(Math.random() * c.length)] : c[0];
+}
+let BEAM = 8;
+function search(depth, max, alpha, beta, last) {
+    if (last >= 0 && wins(last)) return max ? -1e7 - depth : 1e7 + depth;     // the player who just moved won
+    if (depth === 0) return evaluate();
+    const c = topCells(BEAM);
+    if (!c.length) return 0;
+    let best = max ? -Infinity : Infinity;
+    for (const i of c) {
+        board[i] = max ? AI : HUMAN;
+        const s = search(depth - 1, !max, alpha, beta, i);
+        board[i] = "";
+        if (max) { if (s > best) best = s; if (s > alpha) alpha = s; } else { if (s < best) best = s; if (s < beta) beta = s; }
+        if (beta <= alpha) break;
+    }
+    return best;
+}
+function hardMove() {
+    const pool = near();
+    if (!pool.length) return Math.floor(N / 2) * N + Math.floor(N / 2) + (Math.random() < .5 ? 0 : 1);
+    let m = immediate(AI, pool); if (m >= 0) return m;               // win now
+    m = immediate(HUMAN, pool); if (m >= 0) return m;                // block a five
+    BEAM = 8;
+    let best = -Infinity, picks = [];
+    for (const i of topCells(12)) {
+        board[i] = AI;
+        const s = search(3, false, -Infinity, Infinity, i);          // 4 plies in total
+        board[i] = "";
+        if (s > best) { best = s; picks = [i]; } else if (s === best) picks.push(i);
+    }
+    return picks[Math.floor(Math.random() * picks.length)];
+}
+
+/* ---------- start ---------- */
+addEventListener("resize", fit);
+buildLines(); fit(); setMode("ai"); centerView();
+</script>
+</body>
+</html>

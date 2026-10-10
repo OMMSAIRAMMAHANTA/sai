@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Tic-Tac-Toe | NEON LAB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #050b14;
+            --cyan: #00eaff;
+            --cyan-glow: rgba(0, 234, 255, 0.45);
+            --red: #ff4466;
+            --red-glow: rgba(255, 68, 102, 0.45);
+            --gold: #ffd54a;
+            --gold-glow: rgba(255, 213, 74, 0.6);
+            --card-bg: rgba(7, 18, 34, 0.82);
+            --glass-border: rgba(0, 234, 255, 0.35);
+            --glass-blur: blur(20px);
+            --transition-fast: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(0, 234, 255, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(5, 11, 20, 0.88) 0%, rgba(5, 11, 20, 0.96) 100%),
+                url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg');
+            background-position: center; background-size: cover; background-repeat: no-repeat;
+            background-attachment: fixed; font-family: 'Poppins', sans-serif; color: #e2e8f0;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+            overflow-x: hidden; padding-bottom: 2.5rem;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18) 1.5px, transparent 1.5px, transparent 3px);
+            pointer-events: none; z-index: 999; opacity: 0.85;
+        }
+
+        .top-navbar {
+            width: 100%; height: 58px; background: rgba(5, 11, 20, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1.5px solid var(--cyan); box-shadow: 0 4px 20px rgba(0, 234, 255, 0.2);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.5rem; position: sticky; top: 0; z-index: 100;
+        }
+
+        .nav-link {
+            color: #a0aec0; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all var(--transition-fast); border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.35rem 0.85rem; border-radius: 9999px;
+        }
+        .nav-link:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px var(--cyan-glow); transform: translateX(-2px); }
+        .nav-title { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.15em; color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow); }
+
+        .main-container { width: 100%; max-width: 620px; padding: 1.25rem 1rem; display: flex; justify-content: center; z-index: 10; }
+
+        @keyframes cardEntrance { 0% { opacity: 0; transform: translateY(35px) scale(0.96); filter: blur(12px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+
+        .glass-card {
+            width: 100%; background: var(--card-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 28px; border: 1.5px solid var(--glass-border);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(0, 234, 255, 0.18), inset 0 0 20px rgba(0, 234, 255, 0.05);
+            padding: 1.8rem 1.6rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+            animation: cardEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative; overflow: hidden;
+        }
+
+        .header-group { text-align: center; width: 100%; }
+        .game-heading { font-size: 1.8rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff; text-shadow: 0 0 12px var(--cyan), 0 0 30px var(--cyan-glow); line-height: 1.2; }
+        .rules-hint { margin-top: 0.35rem; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase; }
+        .rules-highlight { color: var(--gold); font-weight: 700; text-shadow: 0 0 8px var(--gold-glow); }
+
+        /* Multi-View System */
+        .view-section { width: 100%; display: none; flex-direction: column; align-items: center; gap: 1rem; animation: fadeIn 0.4s ease-out forwards; }
+        .view-section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Setup View Controls */
+        .controls-wrapper { width: 100%; display: flex; flex-direction: column; gap: 0.65rem; }
+        .pill-group { display: flex; justify-content: center; gap: 0.45rem; flex-wrap: wrap; }
+        .pill-btn {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 234, 255, 0.25); color: #cbd5e1;
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 0.42rem 0.95rem; border-radius: 9999px; cursor: pointer; transition: all var(--transition-fast); outline: none;
+        }
+        .pill-btn:hover:not(:disabled) { transform: scale(1.05); border-color: var(--cyan); color: #ffffff; box-shadow: 0 0 12px var(--cyan-glow); background: rgba(0, 234, 255, 0.1); }
+        .pill-btn.active { background: var(--cyan); color: #050b14; border-color: var(--cyan); box-shadow: 0 0 16px var(--cyan); font-weight: 800; }
+        
+        .btn-large {
+            width: 100%; background: linear-gradient(135deg, rgba(0, 234, 255, 0.18), rgba(0, 234, 255, 0.05));
+            border: 1.5px solid var(--cyan); color: #ffffff; font-family: inherit; font-size: 0.95rem; font-weight: 800;
+            letter-spacing: 0.12em; text-transform: uppercase; padding: 0.82rem 1.2rem; border-radius: 9999px;
+            cursor: pointer; box-shadow: 0 0 16px rgba(0, 234, 255, 0.2); transition: all var(--transition-fast); outline: none; margin-top: 0.5rem;
+        }
+        .btn-large:hover { background: var(--cyan); color: #050b14; box-shadow: 0 0 28px var(--cyan); transform: translateY(-2px); }
+        .btn-large:active { transform: translateY(0); }
+
+        /* Bracket View Styles */
+        .bracket-container { width: 100%; display: flex; justify-content: space-between; gap: 0.5rem; overflow-x: auto; padding: 0.5rem 0; }
+        .bracket-col { display: flex; flex-direction: column; justify-content: space-around; gap: 1rem; flex: 1; min-width: 110px; }
+        .match-box { 
+            background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 12px; 
+            padding: 0.4rem; display: flex; flex-direction: column; gap: 0.2rem; transition: all 0.3s; position: relative;
+        }
+        .match-box.active-match { border-color: var(--gold); box-shadow: 0 0 15px var(--gold-glow); transform: scale(1.05); z-index: 2; }
+        .match-box.completed { opacity: 0.6; }
+        
+        .player-slot { font-size: 0.65rem; font-weight: 700; color: #94a3b8; padding: 0.2rem 0.4rem; border-radius: 6px; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .player-slot.winner { background: rgba(0, 234, 255, 0.15); color: #fff; border: 1px solid var(--cyan); }
+        .player-slot.winner-red { background: rgba(255, 68, 102, 0.15); color: #fff; border: 1px solid var(--red); }
+        
+        .bot-tag { font-size: 0.5rem; padding: 1px 4px; border-radius: 4px; background: rgba(255,255,255,0.1); }
+        .bot-easy { color: #a0aec0; } .bot-medium { color: var(--gold); } .bot-hard { color: var(--red); }
+
+        /* Match View Styles */
+        .scoreboard { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-top: 0.2rem; }
+        .score-card {
+            background: rgba(10, 22, 40, 0.6); border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 0.6rem 0.5rem; text-align: center; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .score-card .player-label { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #ffffff; }
+        .score-card .bot-sub { font-size: 0.55rem; color: #94a3b8; font-weight: 600; margin-top: 0.2rem; letter-spacing: 0.1em; }
+        
+        .score-card.team-cyan { border-color: rgba(0, 234, 255, 0.25); }
+        .score-card.team-red { border-color: rgba(255, 68, 102, 0.25); }
+        .score-card.active-turn-cyan { transform: scale(1.06); border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan-glow), inset 0 0 10px rgba(0, 234, 255, 0.15); z-index: 2; }
+        .score-card.active-turn-cyan .player-label { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+        .score-card.active-turn-red { transform: scale(1.06); border-color: var(--red); box-shadow: 0 0 20px var(--red-glow), inset 0 0 10px rgba(255, 68, 102, 0.15); z-index: 2; }
+        .score-card.active-turn-red .player-label { color: var(--red); text-shadow: 0 0 8px var(--red-glow); }
+
+        .status-line { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; min-height: 1.5rem; display: flex; align-items: center; justify-content: center; text-align: center; transition: color var(--transition-fast), text-shadow var(--transition-fast); margin: 0.2rem 0; }
+        .status-cyan { color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); }
+        .status-red { color: var(--red); text-shadow: 0 0 12px var(--red-glow); }
+        .status-gold { color: var(--gold); text-shadow: 0 0 12px var(--gold-glow); }
+
+        .board-container {
+            position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin: 0 auto;
+            background: rgba(3, 8, 16, 0.65); border-radius: 20px; border: 1px solid rgba(0, 234, 255, 0.2);
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.7); padding: 8px;
+        }
+        
+        .board-grid { display: grid; width: 100%; height: 100%; gap: 6px; }
+        .board-grid.size-3 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; }
+        .board-grid.size-4 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 6px; }
+        .board-grid.size-5 { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); gap: 5px; }
+
+        .cell {
+            background: rgba(14, 29, 51, 0.45); border: 1.5px solid rgba(0, 234, 255, 0.15); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;
+            transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; touch-action: manipulation;
+        }
+        .board-grid.size-3 .cell { border-radius: 12px; }
+
+        .board-container:not(.game-over) .cell:hover:empty { background: rgba(0, 234, 255, 0.08); border-color: rgba(0, 234, 255, 0.45); box-shadow: 0 0 10px rgba(0, 234, 255, 0.2); }
+        
+        .board-container.hover-x:not(.game-over) .cell:hover:empty::after { content: ''; position: absolute; width: 60%; height: 60%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 24 24 L 76 76" stroke="%2300eaff" stroke-width="14" stroke-linecap="round"/><path d="M 76 24 L 24 76" stroke="%2300eaff" stroke-width="14" stroke-linecap="round"/></svg>') center/contain no-repeat; opacity: 0.3; }
+        .board-container.hover-o:not(.game-over) .cell:hover:empty::after { content: ''; position: absolute; width: 60%; height: 60%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="27" fill="none" stroke="%23ff4466" stroke-width="13" stroke-linecap="round"/></svg>') center/contain no-repeat; opacity: 0.3; }
+
+        .cell.last-move { box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4); }
+
+        @keyframes winPulse { 0%, 100% { border-color: #ffffff; box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 12px rgba(255,255,255,0.3); } 50% { border-color: currentColor; box-shadow: 0 0 28px currentColor, inset 0 0 18px currentColor; } }
+        .cell.winning-cell { animation: winPulse 1.4s infinite ease-in-out; z-index: 5; background: rgba(255, 255, 255, 0.1) !important; }
+        .cell.winning-cell.win-cyan { color: var(--cyan); }
+        .cell.winning-cell.win-red { color: var(--red); }
+
+        .board-container.has-winner .cell:not(.winning-cell) .mark-svg { opacity: 0.22; filter: grayscale(80%); transition: opacity 0.5s ease, filter 0.5s ease; }
+
+        @keyframes shakeCell { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-3px) rotate(-1deg); } 40% { transform: translateX(3px) rotate(1deg); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+        .cell.shake { animation: shakeCell 0.32s ease-in-out; }
+
+        .mark-svg { width: 70%; height: 70%; overflow: visible; pointer-events: none; }
+        @keyframes drawStroke { to { stroke-dashoffset: 0; } }
+        
+        .mark-x { stroke: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan-glow)); }
+        .mark-o { stroke: var(--red); filter: drop-shadow(0 0 6px var(--red-glow)); }
+        
+        .mark-x path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+        .mark-x path.stroke-1 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+        .mark-x path.stroke-2 { animation: drawStroke 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) 0.15s forwards; }
+
+        .mark-o circle { stroke-dasharray: 1; stroke-dashoffset: 1; animation: drawStroke 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; transform-origin: center; transform: rotate(-90deg); }
+
+        .win-line-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .win-line-svg line {
+            stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1;
+            animation: drawStroke 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .tournament-winner { text-align: center; margin-top: 1rem; padding: 1rem; border-radius: 16px; background: rgba(255, 213, 74, 0.1); border: 2px solid var(--gold); box-shadow: 0 0 30px var(--gold-glow); animation: fadeIn 0.5s; display: none; }
+        .tournament-winner h3 { color: var(--gold); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.2rem; }
+        .tournament-winner p { color: #fff; font-size: 0.9rem; }
+
+        @media (max-width: 440px) {
+            .glass-card { padding: 1.4rem 1.1rem; border-radius: 22px; }
+            .game-heading { font-size: 1.35rem; }
+            .pill-btn { font-size: 0.65rem; padding: 0.35rem 0.65rem; }
+            .score-card { padding: 0.4rem; }
+            .score-card .player-label { font-size: 0.65rem; }
+            .bracket-col { min-width: 90px; }
+            .player-slot { font-size: 0.55rem; padding: 0.15rem 0.25rem;}
+        }
+        @media (prefers-reduced-motion: reduce) { 
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } 
+            .mark-x path, .mark-o circle, .win-line-svg line { stroke-dashoffset: 0 !important; } 
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-navbar">
+        <a href="tictactoe-dashboard.html" class="nav-link"><span>&#8592;</span> Dashboard</a>
+        <div class="nav-title">TOURNAMENT</div>
+    </nav>
+
+    <main class="main-container">
+        <div class="glass-card">
+            
+            <div class="header-group">
+                <h1 class="game-heading">Tournament</h1>
+                <p class="rules-hint" id="mainHint">Single Elimination Bracket. <span class="rules-highlight">No Draws Allowed!</span></p>
+            </div>
+
+            <!-- VIEW 1: SETUP -->
+            <div class="view-section active" id="viewSetup">
+                <div class="controls-wrapper">
+                    <div class="pill-group" id="tSizeGroup">
+                        <button class="pill-btn active" data-tsize="4">4 Players</button>
+                        <button class="pill-btn" data-tsize="8">8 Players</button>
+                    </div>
+                    <div class="pill-group" id="hSizeGroup">
+                        <button class="pill-btn active" data-hsize="1">1 Human</button>
+                        <button class="pill-btn" data-hsize="2">2 Humans</button>
+                        <button class="pill-btn" data-hsize="4">4 Humans</button>
+                        <button class="pill-btn" data-hsize="8" style="display: none;">8 Humans</button>
+                    </div>
+                    <div class="pill-group" id="bSizeGroup">
+                        <button class="pill-btn option-btn active" data-bsize="3" data-streak="3">3×3</button>
+                        <button class="pill-btn option-btn" data-bsize="4" data-streak="4">4×4</button>
+                        <button class="pill-btn option-btn" data-bsize="5" data-streak="4">5×5</button>
+                    </div>
+                </div>
+                <button class="btn-large" id="btnStartTourney">Generate Bracket</button>
+            </div>
+
+            <!-- VIEW 2: BRACKET -->
+            <div class="view-section" id="viewBracket">
+                <div class="bracket-container" id="bracketContainer">
+                    <!-- Columns injected by JS -->
+                </div>
+                
+                <div class="status-line status-gold" id="bracketStatus">NEXT MATCH: You vs Bot Alpha</div>
+                <button class="btn-large" id="btnActionMatch">Play Match</button>
+                <button class="btn-large" id="btnResetTourney" style="display: none; background: transparent; box-shadow: none; font-size: 0.75rem;">End Tournament</button>
+
+                <div class="tournament-winner" id="tourneyWinnerBox">
+                    <h3>🏆 CHAMPION 🏆</h3>
+                    <p id="tourneyWinnerText">You have conquered the gauntlet!</p>
+                </div>
+            </div>
+
+            <!-- VIEW 3: MATCH -->
+            <div class="view-section" id="viewMatch">
+                <div class="scoreboard">
+                    <div class="score-card team-cyan active-turn-cyan" id="scoreCardX">
+                        <div class="player-label" id="labelPlayerX">You (X)</div>
+                        <div class="bot-sub" id="subPlayerX">HUMAN</div>
+                    </div>
+                    <div class="score-card team-red" id="scoreCardO">
+                        <div class="player-label" id="labelPlayerO">Bot Alpha (O)</div>
+                        <div class="bot-sub" id="subPlayerO">EASY AI</div>
+                    </div>
+                </div>
+
+                <div class="status-line status-cyan" id="matchStatusLine">YOUR TURN (X)</div>
+
+                <div class="board-container hover-x" id="boardContainer">
+                    <div class="board-grid size-3" id="boardGrid">
+                        <!-- Cells injected by JS -->
+                    </div>
+                    <svg class="win-line-svg" id="winLineSvg" viewBox="0 0 100 100" preserveAspectRatio="none" style="display: none;">
+                        <line id="winSvgLine" x1="0" y1="0" x2="0" y2="0" pathLength="1" />
+                    </svg>
+                </div>
+
+                <button class="btn-large" id="btnReturnBracket" style="display: none;">Return to Bracket</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // --- DATA STRUCTURES ---
+            const BOT_NAMES = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Omega'];
+            const DIFFS = ['easy', 'easy', 'medium', 'medium', 'hard', 'hard', 'hard'];
+
+            const state = {
+                tSize: 4,
+                hSize: 1,
+                bSize: 3,
+                streak: 3,
+                players: [],
+                rounds: [], // Array of arrays of match objects
+                currentRoundIdx: 0,
+                currentMatchIdx: 0,
+                matchPlayers: { X: null, O: null },
+                
+                // Match specific state
+                board: [],
+                currentPlayer: 'X',
+                gameOver: false,
+                aiThinking: false,
+                lastMoveIdx: null,
+                winLines: []
+            };
+
+            const dom = {
+                viewSetup: document.getElementById('viewSetup'),
+                viewBracket: document.getElementById('viewBracket'),
+                viewMatch: document.getElementById('viewMatch'),
+                
+                tSizeBtns: document.querySelectorAll('#tSizeGroup .pill-btn'),
+                hSizeBtns: document.querySelectorAll('#hSizeGroup .pill-btn'),
+                bSizeBtns: document.querySelectorAll('#bSizeGroup .pill-btn'),
+                btnStartTourney: document.getElementById('btnStartTourney'),
+                
+                bracketContainer: document.getElementById('bracketContainer'),
+                bracketStatus: document.getElementById('bracketStatus'),
+                btnActionMatch: document.getElementById('btnActionMatch'),
+                btnResetTourney: document.getElementById('btnResetTourney'),
+                tourneyWinnerBox: document.getElementById('tourneyWinnerBox'),
+                tourneyWinnerText: document.getElementById('tourneyWinnerText'),
+                
+                scoreCardX: document.getElementById('scoreCardX'),
+                scoreCardO: document.getElementById('scoreCardO'),
+                labelPlayerX: document.getElementById('labelPlayerX'),
+                labelPlayerO: document.getElementById('labelPlayerO'),
+                subPlayerX: document.getElementById('subPlayerX'),
+                subPlayerO: document.getElementById('subPlayerO'),
+                matchStatusLine: document.getElementById('matchStatusLine'),
+                
+                boardContainer: document.getElementById('boardContainer'),
+                boardGrid: document.getElementById('boardGrid'),
+                winLineSvg: document.getElementById('winLineSvg'),
+                winSvgLine: document.getElementById('winSvgLine'),
+                btnReturnBracket: document.getElementById('btnReturnBracket')
+            };
+
+            let cellEls = [];
+
+            // --- INITIALIZATION ---
+            function init() {
+                attachSetupListeners();
+            }
+
+            function attachSetupListeners() {
+                dom.tSizeBtns.forEach(btn => btn.addEventListener('click', (e) => {
+                    state.tSize = parseInt(e.target.dataset.tsize);
+                    dom.tSizeBtns.forEach(b => b.classList.toggle('active', b === e.target));
+                    
+                    dom.hSizeBtns.forEach(b => {
+                        const val = parseInt(b.dataset.hsize);
+                        if (val > state.tSize) {
+                            b.style.display = 'none';
+                            if (state.hSize === val) {
+                                state.hSize = state.tSize;
+                                dom.hSizeBtns.forEach(hb => hb.classList.toggle('active', parseInt(hb.dataset.hsize) === state.hSize));
+                            }
+                        } else {
+                            b.style.display = 'inline-block';
+                        }
+                    });
+                }));
+
+                dom.hSizeBtns.forEach(btn => btn.addEventListener('click', (e) => {
+                    state.hSize = parseInt(e.target.dataset.hsize);
+                    dom.hSizeBtns.forEach(b => b.classList.toggle('active', b === e.target));
+                }));
+
+                dom.bSizeBtns.forEach(btn => btn.addEventListener('click', (e) => {
+                    state.bSize = parseInt(e.target.dataset.bsize);
+                    state.streak = parseInt(e.target.dataset.streak);
+                    dom.bSizeBtns.forEach(b => b.classList.toggle('active', b === e.target));
+                }));
+                
+                dom.btnStartTourney.addEventListener('click', startTournament);
+                dom.btnActionMatch.addEventListener('click', handleActionMatch);
+                dom.btnReturnBracket.addEventListener('click', returnToBracket);
+                dom.btnResetTourney.addEventListener('click', resetToSetup);
+            }
+
+            // --- TOURNAMENT LOGIC ---
+            function startTournament() {
+                generatePlayers();
+                generateBracket();
+                switchView(dom.viewBracket);
+                updateBracketUI();
+            }
+
+            function generatePlayers() {
+                state.players = [];
+                for (let i = 0; i < state.hSize; i++) {
+                    state.players.push({ id: i, name: state.hSize === 1 ? 'You' : `Player ${i+1}`, isAI: false, diff: null });
+                }
+                
+                for (let i = state.hSize; i < state.tSize; i++) {
+                    state.players.push({
+                        id: i,
+                        name: `Bot ${BOT_NAMES[i - state.hSize]}`,
+                        isAI: true,
+                        diff: DIFFS[i - state.hSize]
+                    });
+                }
+            }
+
+            function generateBracket() {
+                state.rounds = [];
+                state.currentRoundIdx = 0;
+                state.currentMatchIdx = 0;
+                dom.tourneyWinnerBox.style.display = 'none';
+                dom.btnResetTourney.style.display = 'none';
+
+                let numRounds = Math.log2(state.tSize);
+                let currentPlayers = [...state.players];
+                
+                // Shuffle bots to make bracket unpredictable, but keep human at index 0 for top slot
+                const bots = currentPlayers.slice(1);
+                for (let i = bots.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [bots[i], bots[j]] = [bots[j], bots[i]];
+                }
+                currentPlayers = [currentPlayers[0], ...bots];
+
+                // Create initial round
+                const round1 = [];
+                for (let i = 0; i < state.tSize; i += 2) {
+                    round1.push({
+                        id: `r0m${i/2}`,
+                        p1: currentPlayers[i],
+                        p2: currentPlayers[i+1],
+                        winner: null,
+                        status: 'pending' // pending, active, done
+                    });
+                }
+                state.rounds.push(round1);
+
+                // Create empty subsequent rounds
+                let matchesInRound = state.tSize / 2;
+                for (let r = 1; r < numRounds; r++) {
+                    matchesInRound /= 2;
+                    const round = [];
+                    for (let m = 0; m < matchesInRound; m++) {
+                        round.push({
+                            id: `r${r}m${m}`,
+                            p1: null,
+                            p2: null,
+                            winner: null,
+                            status: 'locked'
+                        });
+                    }
+                    state.rounds.push(round);
+                }
+                
+                state.rounds[0][0].status = 'active';
+            }
+
+            function renderBracketDOM() {
+                dom.bracketContainer.innerHTML = '';
+                const numRounds = state.rounds.length;
+
+                state.rounds.forEach((round, rIdx) => {
+                    const col = document.createElement('div');
+                    col.className = 'bracket-col';
+                    
+                    round.forEach((match, mIdx) => {
+                        const box = document.createElement('div');
+                        box.className = `match-box ${match.status === 'active' ? 'active-match' : ''} ${match.status === 'done' ? 'completed' : ''}`;
+                        
+                        const renderPlayer = (p) => {
+                            if (!p) return `<div class="player-slot"><span>TBD</span></div>`;
+                            const isWin = match.winner && match.winner.id === p.id;
+                            const winClass = isWin ? (p.id === match.p1.id ? 'winner' : 'winner-red') : '';
+                            const tag = p.isAI ? `<span class="bot-tag bot-${p.diff}">${p.diff.substring(0,3).toUpperCase()}</span>` : `<span class="bot-tag" style="color:var(--cyan)">HUMAN</span>`;
+                            return `<div class="player-slot ${winClass}"><span>${p.name}</span> ${tag}</div>`;
+                        };
+
+                        box.innerHTML = renderPlayer(match.p1) + renderPlayer(match.p2);
+                        col.appendChild(box);
+                    });
+                    dom.bracketContainer.appendChild(col);
+                });
+            }
+
+            function updateBracketUI() {
+                renderBracketDOM();
+
+                if (state.currentRoundIdx >= state.rounds.length) {
+                    // Tournament Over
+                    const finalMatch = state.rounds[state.rounds.length - 1][0];
+                    dom.bracketStatus.textContent = 'TOURNAMENT COMPLETE';
+                    dom.bracketStatus.className = 'status-line status-gold';
+                    dom.btnActionMatch.style.display = 'none';
+                    dom.btnResetTourney.style.display = 'block';
+                    
+                    dom.tourneyWinnerBox.style.display = 'block';
+                    if (finalMatch.winner.isAI) {
+                        dom.tourneyWinnerText.textContent = `${finalMatch.winner.name} claims the title!`;
+                        dom.tourneyWinnerText.style.color = 'var(--red)';
+                    } else {
+                        dom.tourneyWinnerText.textContent = `${finalMatch.winner.name} conquered the gauntlet!`;
+                        dom.tourneyWinnerText.style.color = 'var(--cyan)';
+                    }
+                    return;
+                }
+
+                const currentMatch = state.rounds[state.currentRoundIdx][state.currentMatchIdx];
+                dom.btnActionMatch.style.display = 'block';
+                dom.btnActionMatch.disabled = false; // FIX: Re-enable the button when UI updates
+
+                if (!currentMatch.p1.isAI || !currentMatch.p2.isAI) {
+                    // Human is in this match
+                    dom.bracketStatus.textContent = `UP NEXT: ${currentMatch.p1.name} vs ${currentMatch.p2.name}`;
+                    dom.bracketStatus.className = 'status-line status-cyan';
+                    dom.btnActionMatch.textContent = 'Play Match';
+                } else {
+                    // AI vs AI
+                    dom.bracketStatus.textContent = `UP NEXT: ${currentMatch.p1.name} vs ${currentMatch.p2.name}`;
+                    dom.bracketStatus.className = 'status-line status-red';
+                    dom.btnActionMatch.textContent = 'Simulate Match';
+                }
+            }
+
+            function handleActionMatch() {
+                // FIX: Prevent double-click spamming from breaking the view state
+                if (dom.btnActionMatch.disabled) return;
+                dom.btnActionMatch.disabled = true;
+
+                const match = state.rounds[state.currentRoundIdx][state.currentMatchIdx];
+                if (!match.p1.isAI || !match.p2.isAI) {
+                    startMatchView(match);
+                } else {
+                    simulateAIAIMatch(match);
+                }
+            }
+
+            // Off-screen instant simulation for AI vs AI to prevent UI lockup
+            function simulateAIAIMatch(match) {
+                dom.btnActionMatch.textContent = 'Simulating...';
+                dom.btnActionMatch.disabled = true;
+
+                setTimeout(() => {
+                    // Weighted random based on difficulty
+                    const diffVal = { 'easy': 1, 'medium': 2, 'hard': 3 };
+                    const v1 = diffVal[match.p1.diff];
+                    const v2 = diffVal[match.p2.diff];
+                    
+                    let winner;
+                    if (v1 > v2) winner = Math.random() < 0.85 ? match.p1 : match.p2;
+                    else if (v2 > v1) winner = Math.random() < 0.85 ? match.p2 : match.p1;
+                    else winner = Math.random() < 0.5 ? match.p1 : match.p2;
+
+                    resolveMatch(winner);
+                    dom.btnActionMatch.disabled = false;
+                }, 500);
+            }
+
+            function resolveMatch(winnerPlayer) {
+                const match = state.rounds[state.currentRoundIdx][state.currentMatchIdx];
+                match.winner = winnerPlayer;
+                match.status = 'done';
+
+                // Advance winner
+                if (state.currentRoundIdx + 1 < state.rounds.length) {
+                    const nextRoundMatchIdx = Math.floor(state.currentMatchIdx / 2);
+                    const nextMatch = state.rounds[state.currentRoundIdx + 1][nextRoundMatchIdx];
+                    if (state.currentMatchIdx % 2 === 0) {
+                        nextMatch.p1 = winnerPlayer;
+                    } else {
+                        nextMatch.p2 = winnerPlayer;
+                    }
+                    // If both players are now present, set status
+                    if (nextMatch.p1 && nextMatch.p2) nextMatch.status = 'pending';
+                }
+
+                // Move to next match
+                state.currentMatchIdx++;
+                if (state.currentMatchIdx >= state.rounds[state.currentRoundIdx].length) {
+                    state.currentRoundIdx++;
+                    state.currentMatchIdx = 0;
+                }
+
+                // Activate next match
+                if (state.currentRoundIdx < state.rounds.length) {
+                    state.rounds[state.currentRoundIdx][state.currentMatchIdx].status = 'active';
+                }
+
+                updateBracketUI();
+            }
+
+            // --- MATCH VIEW LOGIC ---
+            function startMatchView(match) {
+                state.matchPlayers = { X: match.p1, O: match.p2 };
+                state.currentMatchRef = match;
+
+                dom.labelPlayerX.textContent = `${match.p1.name} (X)`;
+                dom.subPlayerX.textContent = match.p1.isAI ? `${match.p1.diff.toUpperCase()} AI` : 'HUMAN';
+                dom.labelPlayerO.textContent = `${match.p2.name} (O)`;
+                dom.subPlayerO.textContent = match.p2.isAI ? `${match.p2.diff.toUpperCase()} AI` : 'HUMAN';
+
+                generateWinLines();
+                buildBoardDOM();
+                
+                state.board.fill(null);
+                state.currentPlayer = 'X';
+                state.gameOver = false;
+                state.aiThinking = false;
+                
+                dom.winLineSvg.style.display = 'none';
+                dom.boardContainer.classList.remove('has-winner', 'game-over');
+                dom.btnReturnBracket.style.display = 'none';
+
+                updateMatchUI();
+                switchView(dom.viewMatch);
+
+                if (state.matchPlayers['X'].isAI) {
+                    state.aiThinking = true;
+                    setTimeout(makeAIMove, 600);
+                }
+            }
+
+            function generateWinLines() {
+                state.winLines = [];
+                const s = state.bSize;
+                const k = state.streak;
+                
+                for (let r = 0; r < s; r++) {
+                    for (let c = 0; c <= s - k; c++) {
+                        const row = []; const col = [];
+                        for (let i = 0; i < k; i++) {
+                            row.push(r * s + (c + i));
+                            col.push((c + i) * s + r);
+                        }
+                        state.winLines.push(row, col);
+                    }
+                }
+                for (let r = 0; r <= s - k; r++) {
+                    for (let c = 0; c <= s - k; c++) {
+                        const diag1 = []; const diag2 = [];
+                        for (let i = 0; i < k; i++) {
+                            diag1.push((r + i) * s + (c + i));
+                            diag2.push((r + i) * s + (c + k - 1 - i));
+                        }
+                        state.winLines.push(diag1, diag2);
+                    }
+                }
+            }
+
+            function buildBoardDOM() {
+                dom.boardGrid.innerHTML = '';
+                dom.boardGrid.className = `board-grid size-${state.bSize}`;
+                state.board = Array(state.bSize * state.bSize).fill(null);
+                cellEls = [];
+                
+                for (let i = 0; i < state.bSize * state.bSize; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.index = i;
+                    cell.addEventListener('click', () => handleCellClick(i));
+                    dom.boardGrid.appendChild(cell);
+                    cellEls.push(cell);
+                }
+            }
+
+            function createMarkSVG(type) {
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 100');
+                svg.setAttribute('class', `mark-svg ${type === 'X' ? 'mark-x' : 'mark-o'}`);
+                
+                const strokeW = state.bSize >= 5 ? '12' : '14';
+
+                if (type === 'X') {
+                    const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p1.setAttribute('d', 'M 24 24 L 76 76'); p1.setAttribute('stroke-width', strokeW); p1.setAttribute('stroke-linecap', 'round'); p1.setAttribute('pathLength', '1'); p1.setAttribute('class', 'stroke-1');
+                    const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p2.setAttribute('d', 'M 76 24 L 24 76'); p2.setAttribute('stroke-width', strokeW); p2.setAttribute('stroke-linecap', 'round'); p2.setAttribute('pathLength', '1'); p2.setAttribute('class', 'stroke-2');
+                    svg.appendChild(p1); svg.appendChild(p2);
+                } else {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', '50'); circle.setAttribute('cy', '50'); circle.setAttribute('r', '27');
+                    circle.setAttribute('fill', 'none'); circle.setAttribute('stroke-width', strokeW); circle.setAttribute('stroke-linecap', 'round'); circle.setAttribute('pathLength', '1');
+                    svg.appendChild(circle);
+                }
+                return svg;
+            }
+
+            function handleCellClick(index) {
+                if (state.gameOver || state.aiThinking || state.board[index] !== null) {
+                    if (state.board[index] !== null && !state.gameOver) shakeCell(index);
+                    return;
+                }
+                executeMove(index, state.currentPlayer);
+            }
+
+            function executeMove(index, player) {
+                state.board[index] = player;
+                state.lastMoveIdx = index;
+                
+                cellEls.forEach(c => c.classList.remove('last-move'));
+                const cell = cellEls[index];
+                cell.innerHTML = '';
+                cell.appendChild(createMarkSVG(player));
+                cell.classList.add('last-move');
+
+                const winResult = checkWin(state.board);
+                if (winResult) {
+                    handleMatchEnd(winResult.winner, winResult.line);
+                    return;
+                } 
+                
+                if (state.board.every(c => c !== null)) {
+                    handleMatchEnd('D', null);
+                    return;
+                }
+
+                state.currentPlayer = player === 'X' ? 'O' : 'X';
+                updateMatchUI();
+
+                if (state.matchPlayers[state.currentPlayer].isAI && !state.gameOver) {
+                    state.aiThinking = true;
+                    setTimeout(makeAIMove, 500);
+                }
+            }
+
+            function checkWin(boardState) {
+                for (const line of state.winLines) {
+                    const first = boardState[line[0]];
+                    if (first !== null) {
+                        let win = true;
+                        for (let i = 1; i < state.streak; i++) {
+                            if (boardState[line[i]] !== first) {
+                                win = false; break;
+                            }
+                        }
+                        if (win) return { winner: first, line: line };
+                    }
+                }
+                return null;
+            }
+
+            function handleMatchEnd(winnerCode, line) {
+                state.gameOver = true;
+                dom.boardContainer.classList.add('game-over');
+                
+                if (winnerCode !== 'D') {
+                    dom.boardContainer.classList.add('has-winner');
+                    line.forEach(idx => {
+                        cellEls[idx].classList.add('winning-cell', winnerCode === 'X' ? 'win-cyan' : 'win-red');
+                    });
+                    drawWinLine(line, winnerCode);
+                    
+                    const winnerName = state.matchPlayers[winnerCode].name;
+                    dom.matchStatusLine.textContent = `${winnerName.toUpperCase()} WINS!`;
+                    dom.matchStatusLine.className = `status-line status-${winnerCode === 'X' ? 'cyan' : 'red'}`;
+                    
+                    dom.btnReturnBracket.style.display = 'block';
+                    dom.btnReturnBracket.textContent = 'Continue to Bracket';
+                    
+                    state.actualWinner = state.matchPlayers[winnerCode];
+
+                } else {
+                    // Tie-breaker logic!
+                    dom.matchStatusLine.textContent = 'DRAW! SUDDEN DEATH...';
+                    dom.matchStatusLine.className = 'status-line status-gold';
+                    
+                    setTimeout(() => {
+                        // Reset board for sudden death
+                        state.board.fill(null);
+                        state.gameOver = false;
+                        dom.boardContainer.classList.remove('game-over');
+                        cellEls.forEach(c => { c.innerHTML = ''; c.className = 'cell'; });
+                        
+                        // Switch starting player for fairness
+                        state.currentPlayer = state.currentPlayer === 'X' ? 'O' : 'X'; 
+                        updateMatchUI();
+                        
+                        if (state.currentPlayer === 'O') {
+                            state.aiThinking = true;
+                            setTimeout(makeAIMove, 500);
+                        }
+                    }, 2000);
+                }
+            }
+
+            function drawWinLine(line, winnerCode) {
+                dom.winLineSvg.style.display = 'block';
+                const s = state.bSize;
+                const getCoord = (idx) => {
+                    const row = Math.floor(idx / s); const col = idx % s;
+                    const cellPct = 100 / s;
+                    return { x: (col * cellPct) + (cellPct / 2), y: (row * cellPct) + (cellPct / 2) };
+                };
+                const start = getCoord(line[0]); const end = getCoord(line[line.length - 1]);
+                dom.winSvgLine.setAttribute('x1', `${start.x}%`); dom.winSvgLine.setAttribute('y1', `${start.y}%`);
+                dom.winSvgLine.setAttribute('x2', `${end.x}%`); dom.winSvgLine.setAttribute('y2', `${end.y}%`);
+                
+                dom.winSvgLine.style.stroke = winnerCode === 'X' ? 'var(--cyan)' : 'var(--red)';
+                dom.winSvgLine.style.filter = `drop-shadow(0 0 10px ${winnerCode === 'X' ? 'var(--cyan)' : 'var(--red)'})`;
+            }
+
+            function shakeCell(index) {
+                const cell = cellEls[index];
+                cell.classList.add('shake');
+                setTimeout(() => cell.classList.remove('shake'), 320);
+            }
+
+            function updateMatchUI() {
+                dom.scoreCardX.classList.remove('active-turn-cyan');
+                dom.scoreCardO.classList.remove('active-turn-red');
+                dom.boardContainer.classList.remove('hover-x', 'hover-o');
+                
+                if (!state.gameOver) {
+                    dom.boardContainer.classList.add(state.currentPlayer === 'X' ? 'hover-x' : 'hover-o');
+                    if (state.currentPlayer === 'X') dom.scoreCardX.classList.add('active-turn-cyan');
+                    else dom.scoreCardO.classList.add('active-turn-red');
+                    
+                    dom.matchStatusLine.textContent = `${state.currentPlayer === 'X' ? 'YOUR' : 'BOT\'S'} TURN`;
+                    dom.matchStatusLine.className = `status-line status-${state.currentPlayer === 'X' ? 'cyan' : 'red'}`;
+                }
+            }
+
+            function returnToBracket() {
+                // FIX: Hide button immediately to prevent double-clicking and skipping matches
+                dom.btnReturnBracket.style.display = 'none';
+                resolveMatch(state.actualWinner);
+                switchView(dom.viewBracket);
+            }
+
+            // --- VIEW MANAGEMENT ---
+            function switchView(viewEl) {
+                dom.viewSetup.classList.remove('active');
+                dom.viewBracket.classList.remove('active');
+                dom.viewMatch.classList.remove('active');
+                viewEl.classList.add('active');
+            }
+
+            function resetToSetup() {
+                state.rounds = [];
+                state.players = [];
+                dom.bracketContainer.innerHTML = '';
+                dom.tourneyWinnerBox.style.display = 'none';
+                dom.btnResetTourney.style.display = 'none';
+                dom.btnActionMatch.style.display = 'block';
+                switchView(dom.viewSetup);
+            }
+
+            function evaluateHeuristic(b, aiSym) {
+                const oppSym = aiSym === 'X' ? 'O' : 'X';
+                let score = 0;
+                for (const line of state.winLines) {
+                    let aiCount = 0, oppCount = 0;
+                    for (const idx of line) {
+                        if (b[idx] === aiSym) aiCount++;
+                        else if (b[idx] === oppSym) oppCount++;
+                    }
+                    if (oppCount > 0 && aiCount > 0) continue; // Blocked line
+                    if (aiCount > 0) score += Math.pow(10, aiCount);
+                    if (oppCount > 0) score -= Math.pow(10, oppCount) * 1.2; // Defense bias
+                }
+                
+                // FIX: Accurate center calculation for variable board sizes (3x3, 4x4, 5x5)
+                const centerOffset = Math.floor(state.bSize / 2);
+                const center = (centerOffset * state.bSize) + centerOffset;
+                
+                if (b[center] === aiSym) score += 5;
+                else if (b[center] === oppSym) score -= 5;
+                
+                return score;
+            }
+
+            function minimax(b, depth, alpha, beta, isMax, aiSym) {
+                const oppSym = aiSym === 'X' ? 'O' : 'X';
+                const winRes = checkWin(b);
+                if (winRes) {
+                    if (winRes.winner === aiSym) return 10000 + depth;
+                    if (winRes.winner === oppSym) return -10000 - depth;
+                }
+                
+                const moves = getLegalMoves(b);
+                if (moves.length === 0) return 0;
+                if (depth === 0) return evaluateHeuristic(b, aiSym);
+
+                if (isMax) {
+                    let maxEval = -Infinity;
+                    for (let m of moves) {
+                        b[m] = aiSym;
+                        const ev = minimax(b, depth - 1, alpha, beta, false, aiSym);
+                        b[m] = null;
+                        maxEval = Math.max(maxEval, ev);
+                        alpha = Math.max(alpha, ev);
+                        if (beta <= alpha) break;
+                    }
+                    return maxEval;
+                } else {
+                    let minEval = Infinity;
+                    for (let m of moves) {
+                        b[m] = oppSym;
+                        const ev = minimax(b, depth - 1, alpha, beta, true, aiSym);
+                        b[m] = null;
+                        minEval = Math.min(minEval, ev);
+                        beta = Math.min(beta, ev);
+                        if (beta <= alpha) break;
+                    }
+                    return minEval;
+                }
+            }
+
+            function makeAIMove() {
+                if (state.gameOver) return;
+                const moves = getLegalMoves(state.board);
+                if (moves.length === 0) return;
+
+                const aiSym = state.currentPlayer;
+                const oppSym = aiSym === 'X' ? 'O' : 'X';
+                const diff = state.matchPlayers[aiSym].diff;
+
+                let bestMove = moves[Math.floor(Math.random() * moves.length)];
+
+                if (diff === 'easy') {
+                    // Random but take obvious win if available
+                    for(let m of moves) {
+                        state.board[m] = aiSym;
+                        if(checkWin(state.board)) { bestMove = m; break; }
+                        state.board[m] = null;
+                    }
+                } else if (diff === 'medium') {
+                    // 1-ply search
+                    let bestScore = -Infinity;
+                    for (let m of moves) {
+                        state.board[m] = aiSym;
+                        let score = evaluateHeuristic(state.board, aiSym);
+                        if (checkWin(state.board)) score = 10000;
+                        state.board[m] = oppSym;
+                        if (checkWin(state.board)) score += 5000; // Block
+                        state.board[m] = null;
+                        
+                        score += Math.random() * 15;
+                        if (score > bestScore) {
+                            bestScore = score; bestMove = m;
+                        }
+                    }
+                } else {
+                    // Hard: Alpha-Beta. Depth scales down for larger boards to prevent lag
+                    let depthLimit = state.bSize === 3 ? 9 : (state.bSize === 4 ? 4 : 3);
+                    let bestScore = -Infinity;
+                    let picks = [];
+                    
+                    if (moves.length >= state.bSize * state.bSize - 1) {
+                        const centerOffset = Math.floor(state.bSize / 2);
+                        const center = (centerOffset * state.bSize) + centerOffset;
+                        if (moves.includes(center)) {
+                            bestMove = center;
+                        } else {
+                            bestMove = moves[Math.floor(Math.random() * moves.length)];
+                        }
+                    } else {
+                        for (let m of moves) {
+                            state.board[m] = aiSym;
+                            const score = minimax(state.board, depthLimit - 1, -Infinity, Infinity, false, aiSym);
+                            state.board[m] = null;
+                            
+                            if (score > bestScore) {
+                                bestScore = score;
+                                picks = [m];
+                            } else if (score === bestScore) {
+                                picks.push(m);
+                            }
+                        }
+                        bestMove = picks[Math.floor(Math.random() * picks.length)];
+                    }
+                }
+
+                state.aiThinking = false;
+                executeMove(bestMove, aiSym);
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

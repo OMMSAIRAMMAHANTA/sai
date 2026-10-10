@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe Dashboard | Gaming Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @property --angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+        :root { --accent:#00eaff; --red:#ff4466; --gold:#ffd54a; --bg:#050b14; }
+        * { box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            margin:0; min-height:100vh; font-family:'Poppins',sans-serif; color:#fff; overflow-x:hidden;
+            background: linear-gradient(135deg, rgba(5,11,20,.93) 0%, rgba(10,25,47,.88) 100%),
+                        url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center/cover fixed;
+            background-color:var(--bg);
+            transition:opacity .35s ease, transform .35s ease, filter .35s ease;
+        }
+        body.leaving { opacity:0; transform:scale(1.04); filter:blur(8px); }
+
+        /* ---------- Background FX ---------- */
+        #fx { position:fixed; inset:0; width:100%; height:100%; z-index:-3; pointer-events:none; }
+        .orb { position:fixed; border-radius:50%; filter:blur(90px); z-index:-2; pointer-events:none; opacity:.35; }
+        .orb.a { width:46vw; height:46vw; left:-12vw; top:-14vw; background:#00eaff; animation:drift1 16s ease-in-out infinite alternate; }
+        .orb.b { width:40vw; height:40vw; right:-10vw; bottom:-12vw; background:#ff4466; animation:drift2 19s ease-in-out infinite alternate; opacity:.25; }
+        @keyframes drift1 { to { transform:translate(14vw, 12vw) scale(1.2); } }
+        @keyframes drift2 { to { transform:translate(-12vw, -10vw) scale(1.15); } }
+        .scan { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.35;
+            background:repeating-linear-gradient(to bottom, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.18) 2px 4px); }
+        .cursor-glow { position:fixed; width:420px; height:420px; border-radius:50%; left:0; top:0; z-index:-1; pointer-events:none;
+            background:radial-gradient(circle, rgba(0,234,255,.14), transparent 65%); transform:translate(-50%,-50%); transition:opacity .3s; opacity:0; }
+
+        .wrap { max-width:1120px; margin:0 auto; padding:44px 20px 70px; position:relative; }
+
+        /* ---------- Hero ---------- */
+        .hero { display:flex; flex-direction:column; align-items:center; gap:22px; margin-bottom:38px; }
+        .mini { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; width:122px; padding:8px; border-radius:18px;
+            background:rgba(0,0,0,.45); border:1px solid rgba(0,234,255,.35); box-shadow:0 0 30px rgba(0,234,255,.25), inset 0 0 14px rgba(0,234,255,.08);
+            animation:floaty 4s ease-in-out infinite; }
+        @keyframes floaty { 50% { transform:translateY(-8px) rotate(-1.5deg); } }
+        .mini i { aspect-ratio:1; border-radius:8px; background:rgba(255,255,255,.05); display:flex; align-items:center; justify-content:center;
+            font-style:normal; font-weight:900; font-size:1.35rem; transition:.25s; }
+        .mini i.x { color:var(--accent); text-shadow:0 0 12px var(--accent); animation:stamp .35s cubic-bezier(.2,1.6,.4,1); }
+        .mini i.o { color:var(--red); text-shadow:0 0 12px var(--red); animation:stamp .35s cubic-bezier(.2,1.6,.4,1); }
+        .mini i.win { background:rgba(255,213,74,.22); box-shadow:0 0 16px rgba(255,213,74,.7); animation:stamp .35s cubic-bezier(.2,1.6,.4,1), blink .5s .35s 3; }
+        @keyframes stamp { from { transform:scale(0) rotate(-90deg); opacity:0; } }
+        @keyframes blink { 50% { background:rgba(255,213,74,.5); } }
+
+        h1 { margin:0; text-align:center; font-weight:900; text-transform:uppercase; letter-spacing:6px; line-height:1.1;
+            font-size:clamp(2rem, 6.5vw, 3.6rem);
+            background:linear-gradient(100deg, #00eaff 0%, #ffffff 25%, #ffd54a 50%, #ff4466 75%, #00eaff 100%); background-size:250% 100%;
+            -webkit-background-clip:text; background-clip:text; color:transparent; animation:shimmer 6s linear infinite, titleIn 1s cubic-bezier(.2,.8,.2,1) backwards;
+            filter:drop-shadow(0 0 18px rgba(0,234,255,.35)); }
+        @keyframes shimmer { to { background-position:-250% 0; } }
+        @keyframes titleIn { from { opacity:0; transform:translateY(-24px) scale(.92); letter-spacing:18px; } }
+
+        /* ---------- Buttons ---------- */
+        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:18px; perspective:1200px; }
+        .game-btn {
+            --rx:0deg; --ry:0deg; --lift:0px; --s:1; --mx:50%; --my:50%;
+            position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center;
+            min-height:74px; padding:14px 16px; color:#fff; text-decoration:none; font-weight:700; font-size:.95rem; letter-spacing:.5px;
+            background:rgba(15,15,20,.78); backdrop-filter:blur(6px);
+            border:1px solid rgba(0,234,255,.28); border-radius:18px;
+            box-shadow:0 0 18px rgba(0,234,255,.08), inset 0 0 14px rgba(0,234,255,.04);
+            transform:perspective(800px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift)) scale(var(--s));
+            transition:transform .18s ease-out, border-color .25s, box-shadow .25s, color .25s;
+            animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards; animation-delay:calc(var(--i) * 45ms + 250ms);
+            -webkit-tap-highlight-color:transparent; will-change:transform;
+        }
+        @keyframes rise { from { opacity:0; transform:translateY(34px) scale(.85) rotateX(-25deg); filter:blur(6px); } }
+        .game-btn::before {                         /* cursor spotlight */
+            content:""; position:absolute; inset:0; opacity:0; transition:opacity .25s;
+            background:radial-gradient(180px circle at var(--mx) var(--my), rgba(0,234,255,.38), transparent 70%);
+        }
+        .game-btn::after {                          /* light sweep */
+            content:""; position:absolute; top:0; bottom:0; width:45%; left:-60%; transform:skewX(-20deg);
+            background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+        }
+        .game-btn span.label { position:relative; z-index:2; transition:transform .25s, text-shadow .25s; }
+        .game-btn:hover, .game-btn:focus-visible {
+            outline:none; --lift:-6px; --s:1.04; border-color:var(--accent);
+            box-shadow:0 14px 34px rgba(0,0,0,.5), 0 0 28px rgba(0,234,255,.45), inset 0 0 18px rgba(0,234,255,.12);
+        }
+        .game-btn:hover::before, .game-btn:focus-visible::before { opacity:1; }
+        .game-btn:hover::after, .game-btn:focus-visible::after { left:130%; transition:left .75s ease; }
+        .game-btn:hover span.label, .game-btn:focus-visible span.label { transform:translateZ(0) scale(1.06); text-shadow:0 0 14px rgba(0,234,255,.9); }
+        .game-btn:active { --s:.97; transition-duration:.08s; }
+
+        /* Featured (Sai's) */
+        .game-btn.featured {
+            grid-column:1 / -1; min-height:92px; font-size:1.3rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold);
+            border:2px solid transparent;
+            background:linear-gradient(#0b0e16,#0b0e16) padding-box,
+                       conic-gradient(from var(--angle), #ffd54a, rgba(255,213,74,0) 25%, #ff4466 50%, rgba(255,213,74,0) 75%, #ffd54a) border-box;
+            animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards, spin 4s linear infinite, pulse 2.6s ease-in-out infinite;
+            animation-delay:.2s, 0s, 0s;
+            box-shadow:0 0 30px rgba(255,213,74,.25), inset 0 0 20px rgba(255,213,74,.08);
+        }
+        .game-btn.featured::before { background:radial-gradient(260px circle at var(--mx) var(--my), rgba(255,213,74,.35), transparent 70%); }
+        .game-btn.featured:hover, .game-btn.featured:focus-visible { color:#fff; box-shadow:0 16px 40px rgba(0,0,0,.5), 0 0 44px rgba(255,213,74,.7); }
+        .game-btn.featured:hover span.label { text-shadow:0 0 18px rgba(255,213,74,1); }
+        @keyframes spin { to { --angle:360deg; } }
+        @keyframes pulse { 50% { box-shadow:0 0 52px rgba(255,213,74,.5), inset 0 0 26px rgba(255,213,74,.14); } }
+
+        /* Click ripple */
+        .ripple { position:absolute; z-index:1; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; pointer-events:none;
+            background:rgba(255,255,255,.7); animation:ripple .6s ease-out forwards; }
+        @keyframes ripple { to { transform:scale(24); opacity:0; } }
+
+        @media (hover:none) { .game-btn { transform:none !important; } }
+        @media (prefers-reduced-motion:reduce) {
+            *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+        }
+        @media (max-width:520px) { .grid { grid-template-columns:1fr 1fr; gap:12px; } .game-btn { font-size:.82rem; min-height:68px; padding:10px; } .game-btn.featured { font-size:1.05rem; letter-spacing:1.5px; } }
+        @media (max-width:360px) { .grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <canvas id="fx"></canvas>
+    <div class="orb a"></div><div class="orb b"></div>
+    <div class="scan"></div>
+    <div class="cursor-glow" id="glow"></div>
+
+    <div class="wrap">
+        <div class="hero">
+            <div class="mini" id="mini"></div>
+            <h1>Tic Tac Toe</h1>
+        </div>
+        <div class="grid" id="grid"></div>
+    </div>
+
+<script>
+/* ============ Buttons ============ */
+// [button name, page it opens]. Change the file names to match the pages you create.
+const GAMES = [
+    ["Sai's Tic Tac Toe", "tictactoe.html"],
+    ["Classic Tic-Tac-Toe", "classic-tic-tac-toe.html"],
+    ["4×4 Tic-Tac-Toe", "4x4-tic-tac-toe.html"],
+    ["5×5 Tic-Tac-Toe", "5x5-tic-tac-toe.html"],
+    ["3D Tic-Tac-Toe", "3d-tic-tac-toe.html"],
+    ["Giant Tic-Tac-Toe", "giant-tic-tac-toe.html"],
+    ["Infinite Tic-Tac-Toe", "infinite-tic-tac-toe.html"],
+    ["Vanishing Tic-Tac-Toe", "vanishing-tic-tac-toe.html"],
+    ["Ultimate Tic-Tac-Toe", "ultimate-tic-tac-toe.html"],
+    ["Misère Tic-Tac-Toe", "misere-tic-tac-toe.html"],
+    ["Notakto", "notakto.html"],
+    ["Wild Tic-Tac-Toe", "wild-tic-tac-toe.html"],
+    ["Reverse Tic-Tac-Toe", "reverse-tic-tac-toe.html"],
+    ["Gravity Tic-Tac-Toe", "gravity-tic-tac-toe.html"],
+    ["Quantum Tic-Tac-Toe", "quantum-tic-tac-toe.html"],
+    ["Rotating Tic-Tac-Toe", "rotating-tic-tac-toe.html"],
+    ["Three-Move Tic-Tac-Toe", "three-move-tic-tac-toe.html"],
+    ["Four-Player Tic-Tac-Toe", "four-player-tic-tac-toe.html"],
+    ["Timed Tic-Tac-Toe", "timed-tic-tac-toe.html"],
+    ["Power-Up Tic-Tac-Toe", "power-up-tic-tac-toe.html"],
+    ["Blocked-Cell Tic-Tac-Toe", "blocked-cell-tic-tac-toe.html"],
+    ["Team Tic-Tac-Toe", "team-tic-tac-toe.html"],
+    ["Tournament Tic-Tac-Toe", "tournament-tic-tac-toe.html"],
+    ["AI Tic-Tac-Toe", "ai-tic-tac-toe.html"],
+    ["Online Multiplayer Tic-Tac-Toe", "online-multiplayer-tic-tac-toe.html"],
+    ["Memory Tic-Tac-Toe", "memory-tic-tac-toe.html"]
+];
+
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const grid = document.getElementById("grid");
+
+GAMES.forEach(([name, href], i) => {
+    const a = document.createElement("a");
+    a.className = "game-btn" + (i === 0 ? " featured" : "");
+    a.href = href;
+    a.style.setProperty("--i", i);
+    a.innerHTML = '<span class="label"></span>';
+    a.firstChild.textContent = name;
+
+    // 3D tilt + spotlight following the cursor
+    a.addEventListener("pointermove", e => {
+        if (e.pointerType === "touch") return;
+        const r = a.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        a.style.setProperty("--mx", (px * 100) + "%");
+        a.style.setProperty("--my", (py * 100) + "%");
+        if (!reduceMotion) {
+            a.style.setProperty("--ry", ((px - .5) * 16) + "deg");
+            a.style.setProperty("--rx", ((.5 - py) * 16) + "deg");
+        }
+    });
+    a.addEventListener("pointerleave", () => { a.style.setProperty("--rx", "0deg"); a.style.setProperty("--ry", "0deg"); });
+
+    // Ripple, then fade out and open the page
+    a.addEventListener("click", e => {
+        if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        const r = a.getBoundingClientRect(), d = document.createElement("span");
+        d.className = "ripple";
+        d.style.left = (e.clientX - r.left || r.width / 2) + "px";
+        d.style.top = (e.clientY - r.top || r.height / 2) + "px";
+        a.appendChild(d);
+        setTimeout(() => document.body.classList.add("leaving"), 180);
+        setTimeout(() => { location.href = href; }, reduceMotion ? 0 : 480);
+    });
+    grid.appendChild(a);
+});
+// If the browser restores this page from the back button, undo the fade-out
+addEventListener("pageshow", () => document.body.classList.remove("leaving"));
+
+/* ============ Self-playing mini board ============ */
+(function () {
+    const mini = document.getElementById("mini");
+    const cells = [];
+    for (let i = 0; i < 9; i++) { const c = document.createElement("i"); mini.appendChild(c); cells.push(c); }
+    const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    // [cell, mark] sequences that finish in a win
+    const SCRIPTS = [
+        [[4,"x"],[0,"o"],[2,"x"],[1,"o"],[6,"x"]],
+        [[0,"x"],[4,"o"],[1,"x"],[8,"o"],[2,"x"]],
+        [[4,"x"],[0,"o"],[8,"x"],[2,"o"],[3,"x"],[1,"o"],[5,"x"]],
+        [[0,"x"],[2,"o"],[1,"x"],[5,"o"],[8,"x"],[4,"o"],[6,"x"],[3,"o"]],
+    ];
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    async function loop() {
+        let n = 0;
+        while (true) {
+            const script = SCRIPTS[n++ % SCRIPTS.length];
+            cells.forEach(c => { c.className = ""; c.textContent = ""; });
+            await sleep(600);
+            for (const [i, m] of script) { cells[i].className = m; cells[i].textContent = m === "x" ? "X" : "O"; await sleep(520); }
+            const marks = cells.map(c => c.className);
+            const win = LINES.find(l => marks[l[0]] && marks[l[0]] === marks[l[1]] && marks[l[1]] === marks[l[2]]);
+            if (win) win.forEach(i => cells[i].classList.add("win"));
+            await sleep(1900);
+        }
+    }
+    loop();
+})();
+
+/* ============ Floating X / O background ============ */
+(function () {
+    const cv = document.getElementById("fx"), ctx = cv.getContext("2d");
+    const glow = document.getElementById("glow");
+    let W, H, dpr, parts = [], mx = 0, my = 0, tx = 0, ty = 0, running = true;
+
+    function resize() {
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        W = innerWidth; H = innerHeight;
+        cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const count = Math.round(Math.min(46, (W * H) / 30000));
+        parts = Array.from({ length: count }, () => ({
+            x: Math.random() * W, y: Math.random() * H, z: .3 + Math.random() * .9,
+            vy: -(.12 + Math.random() * .35), vx: (Math.random() - .5) * .2,
+            ch: Math.random() < .5 ? "X" : "O", rot: Math.random() * 6.28, vr: (Math.random() - .5) * .01
+        }));
+    }
+    function draw() {
+        if (!running) return;
+        ctx.clearRect(0, 0, W, H);
+        mx += (tx - mx) * .06; my += (ty - my) * .06;
+        for (const p of parts) {
+            p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+            if (p.y < -50) { p.y = H + 50; p.x = Math.random() * W; }
+            if (p.x < -50) p.x = W + 50; if (p.x > W + 50) p.x = -50;
+            const ox = mx * 40 * p.z, oy = my * 40 * p.z, size = 18 + p.z * 42;
+            ctx.save();
+            ctx.translate(p.x + ox, p.y + oy); ctx.rotate(p.rot);
+            ctx.globalAlpha = .06 + p.z * .13;
+            ctx.font = "800 " + size + "px Poppins, sans-serif";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillStyle = p.ch === "X" ? "#00eaff" : "#ff4466";
+            ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 14;
+            ctx.fillText(p.ch, 0, 0);
+            ctx.restore();
+        }
+        if (!reduceMotion) requestAnimationFrame(draw);
+    }
+    addEventListener("pointermove", e => {
+        tx = e.clientX / W - .5; ty = e.clientY / H - .5;
+        glow.style.opacity = 1; glow.style.left = e.clientX + "px"; glow.style.top = e.clientY + "px";
+    });
+    document.addEventListener("mouseleave", () => glow.style.opacity = 0);
+    document.addEventListener("visibilitychange", () => { running = !document.hidden; if (running && !reduceMotion) requestAnimationFrame(draw); });
+    addEventListener("resize", resize);
+    resize(); requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
