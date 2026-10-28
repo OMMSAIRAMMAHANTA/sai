@@ -630,7 +630,37 @@
                 background: rgba(255, 255, 255, 0.15); /* Slightly more visible on mobile */
             }
         }
-    </style>
+    
+        /* Mobile stability: avoid fixed-layer repainting and continuous GPU effects */
+        @media (hover: none), (max-width: 768px), (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto !important; }
+            body { background-attachment: scroll !important; }
+            .scanlines, #reptileCanvas, #particles-container { display: none !important; }
+            .bg-glow, .bg-glow-2 { display: none !important; animation: none !important; }
+            .hamburger-btn, .music-btn { animation: none !important; will-change: auto !important; }
+            .section-title, .shimmer-text, .card-levitate-wrapper, .stagger-item,
+            .embedded-glass-profile .hologram-sweep {
+                animation: none !important; transition: none !important; will-change: auto !important;
+            }
+            .section-title, .card-levitate-wrapper, .stagger-item {
+                opacity: 1 !important; transform: none !important;
+            }
+            .glass-card-contact, .embedded-glass-profile .glass-card, .full-menu,
+            .insta-modal-overlay, #unfollowContent, #unsubscribeContent, #waBlockContent, #mailSpamContent {
+                -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+            }
+            .glass-card-contact, .embedded-glass-profile .glass-card {
+                transform: none !important; transform-style: flat !important; will-change: auto !important;
+            }
+            .contact-text, .contact-socials-wrapper { transform: none !important; will-change: auto !important; }
+        }
+        @media (max-width: 768px) {
+            .page-section { min-height: 100vh; min-height: 100svh; }
+            footer { position: static; margin-top: 2rem; }
+            .content-wrapper { min-height: 100vh; min-height: 100svh; }
+        }
+
+</style>
 </head>
 <body>
 
@@ -1169,7 +1199,7 @@
         // New: Particle Generation Engine
         function initParticles() {
             const container = document.getElementById('particles-container');
-            const particleCount = 25; // Number of glowing orbs
+            const particleCount = window.matchMedia('(hover: none), (max-width: 768px)').matches ? 0 : 14; // Lower load on phones
             
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -1193,22 +1223,34 @@
         initParticles();
 
         const rCanvas = document.getElementById('reptileCanvas');
-        const rCtx = rCanvas.getContext('2d');
+        const rCtx = rCanvas ? rCanvas.getContext('2d') : null;
+        const rPointerEffectsAllowed = window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+            !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         let rWidth, rHeight, rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 }, rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
-        const rSegments = [], rSegCount = 45, rSegDist = 12; let rWalkCycle = 0;
-        
+        const rSegments = [], rSegCount = 30, rSegDist = 12; let rWalkCycle = 0;
+
         for (let i = 0; i < rSegCount; i++) { rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 }); }
-        
-        function rResize() { rWidth = rCanvas.width = window.innerWidth; rHeight = rCanvas.height = window.innerHeight; }
-        window.addEventListener('mousemove', e => { rMouse.x = e.clientX; rMouse.y = e.clientY; });
-        
+
+        function rResize() {
+            if (!rCanvas || !rCtx || !rPointerEffectsAllowed) return;
+            const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+            rWidth = window.innerWidth; rHeight = window.innerHeight;
+            rCanvas.width = Math.round(rWidth * dpr); rCanvas.height = Math.round(rHeight * dpr);
+            rCanvas.style.width = rWidth + 'px'; rCanvas.style.height = rHeight + 'px';
+            rCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        if (rPointerEffectsAllowed) {
+            window.addEventListener('mousemove', e => { rMouse.x = e.clientX; rMouse.y = e.clientY; }, { passive: true });
+        }
+
         function drawReptileEngine() {
+            if (!rPointerEffectsAllowed || !rCtx || document.hidden) return;
             rCtx.clearRect(0, 0, rWidth, rHeight);
             rHead.x += (rMouse.x - rHead.x) * 0.12; rHead.y += (rMouse.y - rHead.y) * 0.12;
             let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
             if (dHead > 1) rWalkCycle += dHead * 0.08;
             rSegments[0].x = rHead.x; rSegments[0].y = rHead.y;
-            
+
             for (let i = 1; i < rSegCount; i++) {
                 let s1 = rSegments[i - 1], s2 = rSegments[i];
                 let dx = s1.x - s2.x, dy = s1.y - s2.y;
@@ -1218,7 +1260,7 @@
             }
             requestAnimationFrame(drawReptileEngine);
         }
-        
+
         function renderReptileBody(seg, i) {
             rCtx.save(); rCtx.translate(seg.x, seg.y); rCtx.rotate(seg.angle);
             let hue = 190 + (i * 2); 
@@ -1230,9 +1272,14 @@
             rCtx.restore();
         }
         
-        window.addEventListener('resize', rResize); 
+        window.addEventListener('resize', rResize, { passive: true }); 
         rResize(); 
-        drawReptileEngine();
+        if (rPointerEffectsAllowed) {
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) requestAnimationFrame(drawReptileEngine);
+            });
+            drawReptileEngine();
+        }
 
         function openInstaModal(e) {
             e.preventDefault(); // Prevent default link behavior
