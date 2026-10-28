@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,11 +62,17 @@
             --kbd-text: #38bdf8;
         }
 
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
+            position: relative;
+        }
+
         body {
             background-color: var(--bg-primary);
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Realistic 3D Mechanical Keycap Styling */
@@ -74,26 +80,43 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 1.85rem;
-            padding: 0.2rem 0.5rem;
+            min-width: 1.55rem;
+            padding: 0.15rem 0.4rem;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 600;
             line-height: 1.2;
             color: var(--kbd-text);
             background: var(--kbd-bg);
             border: 1px solid var(--kbd-border);
-            border-radius: 0.375rem;
+            border-radius: 0.35rem;
             box-shadow: 0 2px 0 1px var(--kbd-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
             transition: all 0.12s ease;
             user-select: none;
             white-space: nowrap;
         }
 
+        @media (min-width: 640px) {
+            kbd.keycap {
+                min-width: 1.85rem;
+                padding: 0.2rem 0.5rem;
+                font-size: 0.78rem;
+            }
+        }
+
         .shortcut-card:hover kbd.keycap {
             transform: translateY(-1px);
             border-color: #06b6d4;
             box-shadow: 0 3px 0 1px var(--kbd-shadow), 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Hide scrollbars on horizontal pill bars on mobile */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
         /* Subtle Grid Background */
@@ -129,346 +152,356 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+<body class="min-h-screen w-full flex flex-col selection:bg-cyan-500 selection:text-slate-950">
 
-    <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-[#070a12]/85 border-b border-slate-200 dark:border-slate-800/80 transition-colors">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-            <!-- Brand & Portfolio Back Link -->
-            <div class="flex items-center gap-3">
-                <a href="index.html" title="Return to Portfolio" class="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 border border-slate-200 dark:border-slate-700/70 transition">
-                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-                    <span class="hidden sm:inline">Portfolio</span>
-                </a>
-                <a href="#top" class="flex items-center gap-2.5 group focus:outline-none">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
-                        <i data-lucide="command" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-violet-600 dark:from-white dark:via-cyan-300 dark:to-violet-400">Shortcut Atlas</span>
-                        <span class="hidden md:inline-block ml-2 text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">v2.5 Reference</span>
-                    </div>
-                </a>
+    <!-- Top Navigation Bar (Compact & 2-Row Mobile Safe so it NEVER overflows screen width) -->
+    <header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/90 dark:bg-[#070a12]/90 border-b border-slate-200 dark:border-slate-800/80 transition-colors">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            
+            <!-- Top Row on Mobile: Brand + Quick Action Icons -->
+            <div class="flex items-center justify-between w-full sm:w-auto gap-2">
+                <!-- Brand & Portfolio Back Link -->
+                <div class="flex items-center gap-2 min-w-0">
+                    <a href="index.html" title="Return to Portfolio" class="shrink-0 flex items-center gap-1 text-xs font-medium px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 border border-slate-200 dark:border-slate-700/70 transition">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Portfolio</span>
+                    </a>
+                    <a href="#top" class="flex items-center gap-2 group focus:outline-none min-w-0">
+                        <div class="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/20 group-hover:scale-105 transition">
+                            <i data-lucide="command" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                        </div>
+                        <div class="truncate">
+                            <span class="font-bold text-base sm:text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-violet-600 dark:from-white dark:via-cyan-300 dark:to-violet-400 whitespace-nowrap">Shortcut Atlas</span>
+                            <span class="hidden xl:inline-block ml-1.5 text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">v3.0</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Mobile-Right Action Icons (Visible on mobile in row 1, and desktop right) -->
+                <div class="flex sm:hidden items-center gap-1.5 shrink-0">
+                    <button id="favorites-toggle-btn-mobile" class="fav-filter-trigger relative p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-amber-500/50 hover:text-amber-500 transition" title="View Saved Bookmarks">
+                        <i data-lucide="bookmark" class="w-4 h-4"></i>
+                        <span class="fav-count-badge hidden absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-amber-500 text-slate-950 font-mono text-[10px] font-bold flex items-center justify-center">0</span>
+                    </button>
+
+                    <button id="mobile-quiz-btn" class="p-2 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-500 hover:bg-violet-500/20 transition" title="Shortcut Quiz">
+                        <i data-lucide="award" class="w-4 h-4"></i>
+                    </button>
+
+                    <button class="theme-toggle-trigger p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-500/50 hover:text-cyan-400 transition" title="Toggle Dark/Light Theme" aria-label="Toggle Theme">
+                        <i data-lucide="sun" class="theme-icon-light w-4 h-4"></i>
+                        <i data-lucide="moon" class="theme-icon-dark w-4 h-4 hidden"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Navigation Links -->
-            <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
-                <a href="#front-shelf" class="hover:text-cyan-500 dark:hover:text-cyan-400 transition flex items-center gap-1.5">
-                    <i data-lucide="flame" class="w-4 h-4 text-amber-500"></i> Front Shelf
-                </a>
-                <a href="#whatsapp-spotlight" class="hover:text-emerald-500 dark:hover:text-emerald-400 transition flex items-center gap-1.5">
-                    <i data-lucide="message-circle" class="w-4 h-4 text-emerald-500"></i> WhatsApp Hub
-                </a>
-                <a href="#main-library" class="hover:text-cyan-500 dark:hover:text-cyan-400 transition flex items-center gap-1.5">
-                    <i data-lucide="library" class="w-4 h-4 text-cyan-500"></i> Full Library
-                </a>
-                <button id="nav-quiz-btn" class="hover:text-violet-500 dark:hover:text-violet-400 transition flex items-center gap-1.5">
-                    <i data-lucide="award" class="w-4 h-4 text-violet-500"></i> Practice Quiz
+            <!-- Navigation Links (Desktop Tab Triggers) -->
+            <nav class="hidden lg:flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 shrink-0">
+                <button type="button" data-shelf-tab="front" class="shelf-tab-trigger px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                    <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-500"></i> Front Shelf
+                </button>
+                <button type="button" data-shelf-tab="whatsapp" class="shelf-tab-trigger px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                    <i data-lucide="message-circle" class="w-3.5 h-3.5 text-emerald-500"></i> WhatsApp Hub
+                </button>
+                <button type="button" data-shelf-tab="library" class="shelf-tab-trigger px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                    <i data-lucide="library" class="w-3.5 h-3.5 text-cyan-500"></i> 35 Categories
+                </button>
+                <button type="button" id="nav-quiz-btn" class="px-3 py-1.5 rounded-xl hover:bg-violet-500/10 text-violet-600 dark:text-violet-400 transition flex items-center gap-1.5">
+                    <i data-lucide="award" class="w-3.5 h-3.5 text-violet-500"></i> Practice Quiz
                 </button>
             </nav>
 
-            <!-- Action Controls: OS Switcher, Favorites, Theme -->
-            <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Second Row on Mobile / Right Area on Tablet+Desktop: OS Switcher & Desktop Controls -->
+            <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
                 <!-- Global OS Display Perspective Switcher -->
-                <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800" role="group" aria-label="Operating System Key View">
-                    <button data-os-mode="all" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium transition bg-cyan-500 text-slate-950 font-semibold shadow-sm" title="Show All OS Keys">All</button>
-                    <button data-os-mode="windows" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" title="Prioritize Windows Keys">Win</button>
-                    <button data-os-mode="mac" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" title="Prioritize macOS Keys">Mac</button>
-                    <button data-os-mode="linux" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" title="Prioritize Linux Keys">Linux</button>
+                <div class="grid grid-cols-4 sm:flex items-center w-full sm:w-auto bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800" role="group" aria-label="Operating System Key View">
+                    <button data-os-mode="all" class="os-mode-btn px-2 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition bg-cyan-500 text-slate-950 shadow-sm text-center" title="Show All OS Keys">All</button>
+                    <button data-os-mode="windows" class="os-mode-btn px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition text-center" title="Prioritize Windows Keys">Win</button>
+                    <button data-os-mode="mac" class="os-mode-btn px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition text-center" title="Prioritize macOS Keys">Mac</button>
+                    <button data-os-mode="linux" class="os-mode-btn px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition text-center" title="Prioritize Linux Keys">Linux</button>
                 </div>
 
-                <!-- Favorites Filter Toggle -->
-                <button id="favorites-toggle-btn" class="relative p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-amber-500/50 hover:text-amber-500 transition" title="View Saved Bookmarks">
-                    <i data-lucide="bookmark" class="w-4 h-4"></i>
-                    <span id="fav-count-badge" class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-slate-950 font-mono text-[10px] font-bold flex items-center justify-center">0</span>
-                </button>
+                <!-- Desktop Action Buttons (Hidden on mobile because they are in row 1) -->
+                <div class="hidden sm:flex items-center gap-2 shrink-0">
+                    <button id="favorites-toggle-btn" class="fav-filter-trigger relative p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-amber-500/50 hover:text-amber-500 transition" title="View Saved Bookmarks">
+                        <i data-lucide="bookmark" class="w-4 h-4"></i>
+                        <span id="fav-count-badge" class="fav-count-badge hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-slate-950 font-mono text-[10px] font-bold flex items-center justify-center">0</span>
+                    </button>
 
-                <!-- Quiz Modal Button (Mobile visible) -->
-                <button id="mobile-quiz-btn" class="lg:hidden p-2 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-500 hover:bg-violet-500/20 transition" title="Shortcut Quiz">
-                    <i data-lucide="award" class="w-4 h-4"></i>
-                </button>
+                    <button id="tablet-quiz-btn" class="lg:hidden p-2 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-500 hover:bg-violet-500/20 transition" title="Shortcut Quiz">
+                        <i data-lucide="award" class="w-4 h-4"></i>
+                    </button>
 
-                <!-- Theme Switcher -->
-                <button id="theme-toggle-btn" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-500/50 hover:text-cyan-400 transition" title="Toggle Dark/Light Theme" aria-label="Toggle Theme">
-                    <i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i>
-                    <i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i>
-                </button>
+                    <button id="theme-toggle-btn" class="theme-toggle-trigger p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-500/50 hover:text-cyan-400 transition" title="Toggle Dark/Light Theme" aria-label="Toggle Theme">
+                        <i data-lucide="sun" id="theme-icon-light" class="theme-icon-light w-4 h-4"></i>
+                        <i data-lucide="moon" id="theme-icon-dark" class="theme-icon-dark w-4 h-4 hidden"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="top" class="relative pt-12 pb-14 md:pt-16 md:pb-20 border-b border-slate-200 dark:border-slate-800/80 bg-grid-pattern overflow-hidden">
+    <!-- Compact Hero + Search Control Deck (Zero Wasted Space) -->
+    <section id="top" class="relative w-full pt-4 pb-4 sm:pt-7 sm:pb-6 border-b border-slate-200 dark:border-slate-800/80 bg-grid-pattern overflow-hidden">
         <!-- Ambient Background Glows -->
-        <div class="pointer-events-none absolute -top-24 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
-        <div class="pointer-events-none absolute top-10 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl"></div>
+        <div class="pointer-events-none absolute -top-24 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div class="pointer-events-none absolute top-10 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-violet-600/10 rounded-full blur-3xl"></div>
 
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            <!-- Live Statistics Pill -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 text-xs font-mono text-slate-600 dark:text-slate-300 mb-6 shadow-sm">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                <span id="hero-stats-text">Indexing 160+ Verified Shortcuts across 35 Categories</span>
+        <div class="max-w-5xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10 text-center">
+            <!-- Compact Title & Live Badge Row -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 mb-2">
+                <h1 class="text-xl sm:text-4xl font-extrabold tracking-tight">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-violet-600 dark:from-white dark:via-cyan-300 dark:to-violet-400">
+                        Shortcut Atlas
+                    </span>
+                </h1>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 text-[10px] sm:text-xs font-mono text-slate-600 dark:text-slate-300 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse shrink-0"></span>
+                    <span id="hero-stats-text" class="truncate">160+ Shortcuts • 35 Categories</span>
+                </div>
             </div>
 
-            <!-- Title & Subtitle -->
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
-                <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-violet-600 dark:from-white dark:via-cyan-300 dark:to-violet-400">
-                    Shortcut Atlas
-                </span>
-            </h1>
-            <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8 font-normal">
-                Every shortcut. Every tool. One library. Built like a real reference library—essential daily keys on the front shelf, and deep, organized catalogs below.
+            <p class="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto mb-3.5 sm:mb-5">
+                Every shortcut. Every tool. One organized library—switch shelves below without endless scrolling.
             </p>
 
             <!-- Master Search Bar -->
-            <div class="max-w-3xl mx-auto mb-6">
+            <div class="max-w-3xl mx-auto mb-2.5 sm:mb-3.5">
                 <div class="relative group">
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-2xl blur opacity-25 group-focus-within:opacity-60 transition duration-300"></div>
-                    <div class="relative flex items-center bg-white dark:bg-[#0d1322] border border-slate-300 dark:border-slate-700/80 rounded-2xl shadow-xl overflow-hidden">
-                        <div class="pl-4 pr-2 text-slate-400 flex items-center">
-                            <i data-lucide="search" class="w-5 h-5 text-cyan-500"></i>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl sm:rounded-2xl blur opacity-25 group-focus-within:opacity-60 transition duration-300"></div>
+                    <div class="relative flex items-center bg-white dark:bg-[#0d1322] border border-slate-300 dark:border-slate-700/80 rounded-xl sm:rounded-2xl shadow-md overflow-hidden">
+                        <div class="pl-3 sm:pl-4 pr-1.5 text-slate-400 flex items-center shrink-0">
+                            <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5 text-cyan-500"></i>
                         </div>
                         <input 
                             type="text" 
                             id="global-search-input"
-                            placeholder="Search by key (Ctrl+Shift+T), action (screenshot, copy), app (WhatsApp, VS Code, Excel)..."
-                            class="w-full py-4 px-2 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none text-sm sm:text-base"
+                            placeholder="Search any shortcut (Ctrl+C, WhatsApp, VS Code, screenshot)..."
+                            class="w-full min-w-0 py-2.5 sm:py-3 px-1.5 sm:px-2 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none text-xs sm:text-sm"
                             autocomplete="off"
                         >
-                        <button id="clear-search-btn" class="hidden px-3 py-1.5 mr-2 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition">
+                        <button id="clear-search-btn" class="hidden shrink-0 px-2.5 py-1 mr-1.5 rounded-lg text-[11px] font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition">
                             Clear
                         </button>
-                        <div class="hidden sm:flex items-center gap-1 pr-4 text-xs text-slate-400 font-mono">
+                        <div class="hidden sm:flex items-center gap-1 pr-3.5 text-xs text-slate-400 font-mono shrink-0">
                             <kbd class="keycap">/</kbd>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Interactive Filter Controls Row -->
-            <div class="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3 mb-7">
-                <!-- Category Select -->
-                <div class="relative">
-                    <select id="filter-category-select" aria-label="Filter by Category" class="w-full appearance-none bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-8 text-xs sm:text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition">
-                        <option value="all">All 35 Categories</option>
-                    </select>
-                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                </div>
-
-                <!-- Platform Select -->
-                <div class="relative">
-                    <select id="filter-platform-select" aria-label="Filter by Platform" class="w-full appearance-none bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-8 text-xs sm:text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition">
-                        <option value="all">All Platforms (Win / Mac / Linux / Web)</option>
-                        <option value="Windows">Windows</option>
-                        <option value="macOS">macOS</option>
-                        <option value="Linux">Linux / Ubuntu</option>
-                        <option value="Web">Web / Cross-Platform</option>
-                    </select>
-                    <i data-lucide="monitor" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                </div>
-
-                <!-- Application Select -->
-                <div class="relative">
-                    <select id="filter-app-select" aria-label="Filter by Application" class="w-full appearance-none bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-8 text-xs sm:text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition">
-                        <option value="all">All Applications</option>
-                    </select>
-                    <i data-lucide="layers" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                </div>
-            </div>
-
-            <!-- Quick Search & Category Pills -->
-            <div class="flex flex-wrap items-center justify-center gap-2 text-xs">
-                <span class="text-slate-400 dark:text-slate-500 font-medium mr-1">Quick Jump:</span>
-                <button data-quick-query="WhatsApp" class="quick-chip px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-medium transition flex items-center gap-1">
-                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp
+            <!-- Quick Search & Filter Row (Single compact line on desktop, tidy wrap on mobile) -->
+            <div class="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-1.5 text-[11px]">
+                <span class="text-slate-400 dark:text-slate-500 font-medium">Quick:</span>
+                <button data-quick-query="WhatsApp" class="quick-chip px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-medium transition">
+                    WhatsApp
                 </button>
-                <button data-quick-query="VS Code" class="quick-chip px-3 py-1.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-medium transition">
+                <button data-quick-query="VS Code" class="quick-chip px-2.5 py-0.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30 font-medium transition">
                     VS Code
                 </button>
-                <button data-quick-query="Windows" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
-                    Windows 11
+                <button data-quick-query="Screenshot" class="quick-chip px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Screenshot
                 </button>
-                <button data-quick-query="macOS" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
-                    macOS
-                </button>
-                <button data-quick-query="Screenshot" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
-                    Screenshots
-                </button>
-                <button data-quick-query="Terminal" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
-                    Terminal & Bash
-                </button>
-                <button data-quick-query="Excel" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                <button data-quick-query="Excel" class="quick-chip px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
                     Excel
                 </button>
-                <button data-quick-query="Git" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
-                    Git & GitHub
+                <button data-quick-query="Terminal" class="quick-chip px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Terminal
+                </button>
+                <button data-quick-query="Git" class="quick-chip px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Git
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- Active Filter Status Bar (Hidden when no filters active) -->
-    <div id="active-filter-bar" class="hidden bg-cyan-500/10 border-b border-cyan-500/20 py-3 px-4">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-2 text-sm">
-                <i data-lucide="filter" class="w-4 h-4 text-cyan-500"></i>
-                <span id="filter-results-summary" class="font-medium text-slate-800 dark:text-slate-200">Showing filtered results</span>
+    <!-- STICKY SHELF NAVIGATION TABS (Solves Endless Scrolling & Confusion!) -->
+    <div class="sticky top-[88px] sm:top-16 z-30 bg-white/95 dark:bg-[#0a0f1d]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+            <!-- 4 Clear Section Tabs -->
+            <div class="grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                <button type="button" data-shelf-tab="front" class="shelf-tab-trigger px-2 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5">
+                    <i data-lucide="flame" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span class="truncate">Front Shelf</span>
+                </button>
+                <button type="button" data-shelf-tab="library" class="shelf-tab-trigger px-2 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span class="truncate">Categories (35)</span>
+                </button>
+                <button type="button" data-shelf-tab="whatsapp" class="shelf-tab-trigger px-2 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5">
+                    <i data-lucide="message-circle" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span class="truncate">WhatsApp</span>
+                </button>
+                <button type="button" data-shelf-tab="saved" class="shelf-tab-trigger px-2 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5">
+                    <i data-lucide="bookmark" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span class="truncate">Saved</span>
+                    <span class="fav-count-badge hidden px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-mono text-[10px] font-bold">0</span>
+                </button>
             </div>
-            <button id="reset-all-filters-btn" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition flex items-center gap-1.5 shadow-sm">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset All Filters
+
+            <!-- Compact Platform & App Filter Dropdowns -->
+            <div class="grid grid-cols-2 sm:flex items-center gap-1.5">
+                <div class="relative">
+                    <select id="filter-platform-select" aria-label="Filter by Platform" class="w-full appearance-none bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 pr-6 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition truncate">
+                        <option value="all">OS: All Platforms</option>
+                        <option value="Windows">Windows</option>
+                        <option value="macOS">macOS</option>
+                        <option value="Linux">Linux / Ubuntu</option>
+                        <option value="Web">Web Apps</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+
+                <div class="relative">
+                    <select id="filter-app-select" aria-label="Filter by Application" class="w-full appearance-none bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 pr-6 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition truncate">
+                        <option value="all">App: All Tools</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Filter Status Bar (Shown only when user searches or applies filters) -->
+    <div id="active-filter-bar" class="hidden bg-cyan-500/10 border-b border-cyan-500/20 py-2.5 px-3.5">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-xs sm:text-sm">
+                <i data-lucide="filter" class="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0"></i>
+                <span id="filter-results-summary" class="font-semibold text-slate-800 dark:text-slate-200">Showing filtered results</span>
+            </div>
+            <button id="reset-all-filters-btn" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition flex items-center gap-1 shadow-sm">
+                <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset Search &amp; Filters
             </button>
         </div>
     </div>
 
-    <!-- Recently Viewed / Copied Shelf (Appears dynamically as user interacts) -->
-    <section id="recently-viewed-section" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div class="p-4 rounded-2xl bg-slate-100/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-500"></i> Recently Interacted Shortcuts
-                </div>
-                <button id="clear-recent-btn" class="text-xs text-slate-400 hover:text-rose-400 transition">Clear History</button>
-            </div>
-            <div id="recently-viewed-list" class="flex flex-wrap gap-2"></div>
-        </div>
-    </section>
-
-    <!-- SECTION B: THE FRONT SHELF (Most-Used Essential Shortcuts) -->
-    <section id="front-shelf" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-b border-slate-200 dark:border-slate-800/80">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+    <!-- VIEW 1: THE FRONT SHELF (Default View - No Long Scrolling Needed!) -->
+    <section id="front-shelf" class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1 w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2.5 p-3.5 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-cyan-500/5 to-violet-500/10 border border-amber-500/20">
             <div>
-                <div class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-amber-500 mb-2">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Front Shelf Collection
+                <div class="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 font-semibold">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Front Shelf • 14 Daily Essentials
                 </div>
-                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                     Most-Used Daily Shortcuts
                 </h2>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                    The essential foundation: high-frequency commands displayed on the front shelf for instant access.
+                <p class="text-xs text-slate-600 dark:text-slate-400">
+                    The universal shortcuts everyone uses daily. Want specific apps? Switch to the <strong>Categories (35)</strong> tab above.
                 </p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="#main-library" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-cyan-600 dark:hover:bg-cyan-500 text-white dark:hover:text-slate-950 text-xs sm:text-sm font-semibold transition shadow-sm">
-                    <span>Explore Full 35-Category Library</span>
-                    <i data-lucide="arrow-down-right" class="w-4 h-4"></i>
-                </a>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" data-shelf-tab="library" class="shelf-tab-trigger w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold transition shadow-sm">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                    <span>Browse All 35 Categories →</span>
+                </button>
             </div>
         </div>
 
         <!-- Front Shelf Cards Grid -->
-        <div id="front-shelf-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div id="front-shelf-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3.5">
             <!-- Populated via JavaScript -->
         </div>
     </section>
 
-    <!-- DEDICATED WHATSAPP DESKTOP & WEB SPOTLIGHT -->
-    <section id="whatsapp-spotlight" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-b border-slate-200 dark:border-slate-800/80">
-        <div class="rounded-3xl bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-slate-950 border border-emerald-500/30 p-6 sm:p-8 shadow-xl relative overflow-hidden">
-            <div class="pointer-events-none absolute -right-16 -bottom-16 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
-            
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+    <!-- VIEW 2: DEDICATED WHATSAPP DESKTOP & WEB SPOTLIGHT -->
+    <section id="whatsapp-spotlight" class="hidden max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1 w-full">
+        <div class="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/60 dark:from-emerald-950/60 dark:via-slate-900/95 dark:to-slate-950 border border-emerald-500/30 p-4 sm:p-6 shadow-md relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-6 mb-4 sm:mb-6">
                 <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold mb-3">
-                        <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Dedicated Productivity Wing
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-mono font-semibold mb-1.5">
+                        <i data-lucide="message-circle" class="w-3 h-3"></i> Dedicated WhatsApp Reference
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-bold text-white">
-                        WhatsApp Desktop &amp; WhatsApp Web Shortcuts
+                    <h2 class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">
+                        WhatsApp Desktop &amp; Web Shortcuts
                     </h2>
-                    <p class="text-sm text-slate-300 mt-1 max-w-2xl">
-                        Verified keyboard combinations for supercharging messaging without touching your mouse. Notice how <span class="text-emerald-400 font-semibold">WhatsApp Web</span> uses <code class="font-mono text-xs bg-slate-800 px-1.5 py-0.5 rounded">Ctrl + Alt</code> modifiers to prevent conflicts with standard browser shortcuts, whereas the <span class="text-cyan-400 font-semibold">Native Desktop App</span> uses direct <code class="font-mono text-xs bg-slate-800 px-1.5 py-0.5 rounded">Ctrl</code> or <code class="font-mono text-xs bg-slate-800 px-1.5 py-0.5 rounded">Cmd</code> bindings.
+                    <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
+                        <span class="text-emerald-600 dark:text-emerald-400 font-semibold">WhatsApp Web</span> uses <code class="font-mono text-[11px] bg-slate-200/80 dark:bg-slate-800 px-1 py-0.5 rounded">Ctrl + Alt</code> modifiers to prevent browser conflicts, while <span class="text-cyan-600 dark:text-cyan-400 font-semibold">Desktop</span> uses direct <code class="font-mono text-[11px] bg-slate-200/80 dark:bg-slate-800 px-1 py-0.5 rounded">Ctrl / Cmd</code> keys.
                     </p>
                 </div>
 
                 <!-- Sub-filter for WhatsApp Variant -->
-                <div class="flex items-center self-start lg:self-center bg-slate-900/90 p-1 rounded-xl border border-slate-700/80">
-                    <button data-wa-tab="all" class="wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition">All WhatsApp</button>
-                    <button data-wa-tab="desktop" class="wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">Desktop App</button>
-                    <button data-wa-tab="web" class="wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">WhatsApp Web</button>
+                <div class="grid grid-cols-3 sm:flex items-center w-full sm:w-auto bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 shrink-0">
+                    <button data-wa-tab="all" class="wa-tab-btn px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-emerald-500 text-slate-950 transition text-center">All (16)</button>
+                    <button data-wa-tab="desktop" class="wa-tab-btn px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition text-center">Desktop</button>
+                    <button data-wa-tab="web" class="wa-tab-btn px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition text-center">Web</button>
                 </div>
             </div>
 
-            <div id="whatsapp-spotlight-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="whatsapp-spotlight-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5">
                 <!-- Populated via JavaScript -->
             </div>
         </div>
     </section>
 
-    <!-- SECTION C: COMPLETE SHORTCUT LIBRARY (35 Organized Categories) -->
-    <main id="main-library" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
-        <div class="flex flex-col lg:flex-row gap-8">
-            
-            <!-- Left Sidebar: Library Directory / Index -->
-            <aside class="lg:w-72 shrink-0">
-                <div class="sticky top-20 bg-white dark:bg-[#0c1220] border border-slate-200 dark:border-slate-800/90 rounded-2xl p-4 shadow-sm">
-                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
-                        <h3 class="font-bold text-sm flex items-center gap-2 text-slate-900 dark:text-white">
-                            <i data-lucide="folder-tree" class="w-4 h-4 text-cyan-500"></i>
-                            Category Index
-                        </h3>
-                        <span id="sidebar-cat-count" class="text-xs font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">35</span>
-                    </div>
-
-                    <!-- Quick Filter Inside Sidebar -->
-                    <div class="relative mb-3">
-                        <input 
-                            type="text" 
-                            id="sidebar-cat-search" 
-                            placeholder="Filter categories..." 
-                            class="w-full text-xs px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
-                        >
-                    </div>
-
-                    <!-- Scrollable Category List -->
-                    <div id="category-sidebar-list" class="space-y-1 max-h-[55vh] overflow-y-auto pr-1 text-xs">
-                        <!-- Populated via JavaScript -->
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Right Area: Expandable / Searchable Category Shelves -->
-            <div class="flex-1 min-w-0">
-                <!-- Library Shelf Controls Header -->
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>Complete Reference Stacks</span>
-                        </h2>
-                        <p id="library-status-subtitle" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                            Organized into 35 specialized sections. Expand any shelf or search inside a category.
-                        </p>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <button id="expand-all-btn" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5">
-                            <i data-lucide="chevrons-down" class="w-3.5 h-3.5 text-cyan-500"></i> Expand All
-                        </button>
-                        <button id="collapse-all-btn" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5">
-                            <i data-lucide="chevrons-up" class="w-3.5 h-3.5 text-violet-500"></i> Collapse All
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Empty State (Shown when search/filters match 0 shortcuts) -->
-                <div id="empty-search-state" class="hidden rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 p-12 text-center my-8">
-                    <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-400">
-                        <i data-lucide="search-x" class="w-7 h-7 text-cyan-500"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">No matching shortcuts found</h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-                        We couldn't find any shortcuts matching your current search query or filter criteria. Try searching for a broader action like "copy", "tab", or "terminal".
+    <!-- VIEW 3: COMPLETE SHORTCUT LIBRARY (Focused Single-Category or Filtered View so there is NO 35-Shelf Scroll Overload) -->
+    <main id="main-library" class="hidden max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1 w-full">
+        
+        <!-- Category Selector Matrix (Clean Pill Grid so users pick 1 category at a time without scrolling through 35 sections) -->
+        <div class="mb-5 bg-white dark:bg-[#0c1220] border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div>
+                    <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i data-lucide="folder-kanban" class="w-4 h-4 text-cyan-500"></i>
+                        <span>Select a Category Shelf</span>
+                        <span id="sidebar-cat-count" class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">35</span>
+                    </h2>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                        Tap any category below to view its shortcuts immediately—no need to scroll down a huge page.
                     </p>
-                    <button id="empty-reset-btn" class="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-semibold text-xs hover:bg-cyan-400 transition">
-                        Reset All Search Filters
+                </div>
+
+                <!-- Dropdown + Show All Toggle -->
+                <div class="flex items-center gap-2">
+                    <div class="relative flex-1 sm:w-60">
+                        <select id="filter-category-select" aria-label="Select Category" class="w-full appearance-none bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 pr-7 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition truncate">
+                            <option value="windows-os">1. Windows 10 and Windows 11</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+                    <button id="show-all-categories-btn" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-900 hover:bg-cyan-500/15 text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 border border-slate-200 dark:border-slate-800 transition shrink-0">
+                        Show All 35
                     </button>
                 </div>
+            </div>
 
-                <!-- Categories Container -->
-                <div id="categories-shelves-container" class="space-y-6">
-                    <!-- Populated dynamically via JavaScript -->
-                </div>
+            <!-- Horizontal Scrollable / Wrapping Category Chips -->
+            <div id="category-Quick-Matrix" class="flex sm:flex-wrap overflow-x-auto no-scrollbar gap-1.5 pb-1">
+                <!-- Populated via JavaScript -->
             </div>
         </div>
+
+        <!-- Empty State (Shown when search/filters match 0 shortcuts) -->
+        <div id="empty-search-state" class="hidden rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 p-8 text-center my-4 bg-white dark:bg-[#0b101d]">
+            <div class="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                <i data-lucide="search-x" class="w-5 h-5 text-cyan-500"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">No matching shortcuts found</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">
+                No shortcuts matched your current filter or search query.
+            </p>
+            <button id="empty-reset-btn" class="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-semibold text-xs hover:bg-cyan-400 transition">
+                Reset All Filters
+            </button>
+        </div>
+
+        <!-- Categories Container -->
+        <div id="categories-shelves-container" class="space-y-4">
+            <!-- Populated dynamically via JavaScript -->
+        </div>
     </main>
+
+    <!-- Recently Interacted Bar (Compact Bottom Strip) -->
+    <section id="recently-viewed-section" class="hidden max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pb-4 w-full">
+        <div class="p-3 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-500"></i> Recent:
+                </span>
+                <div id="recently-viewed-list" class="flex flex-wrap gap-1.5"></div>
+            </div>
+            <button id="clear-recent-btn" class="text-[11px] text-slate-400 hover:text-rose-500 transition">Clear</button>
+        </div>
+    </section>
 
     <!-- INTERACTIVE SHORTCUT PRACTICE QUIZ MODAL -->
     <div id="quiz-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
@@ -527,19 +560,24 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#060911] py-10 mt-16">
+    <!-- Footer with Official Copyright Reserved Notice -->
+    <footer class="border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#060911] py-8 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white">
-                    <i data-lucide="command" class="w-3.5 h-3.5"></i>
+            <div class="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white shadow-sm">
+                        <i data-lucide="command" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <span class="font-bold text-slate-800 dark:text-slate-200">Shortcut Atlas</span>
                 </div>
-                <span class="font-semibold text-slate-800 dark:text-slate-200">Shortcut Atlas</span>
-                <span>— Built as a self-contained developer &amp; productivity reference library.</span>
+                <span class="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+                <span>&copy; <span id="copyright-year">2026</span> Shortcut Atlas. All Rights Reserved.</span>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="#top" class="hover:text-cyan-400 transition">Back to Top ↑</a>
-                <a href="index.html" class="hover:text-cyan-400 transition">Portfolio Home</a>
+            <div class="flex items-center gap-4 font-medium">
+                <button type="button" data-shelf-tab="front" class="shelf-tab-trigger hover:text-cyan-500 transition">Front Shelf</button>
+                <button type="button" data-shelf-tab="library" class="shelf-tab-trigger hover:text-cyan-500 transition">35 Categories</button>
+                <a href="#top" class="hover:text-cyan-500 transition">Back to Top ↑</a>
+                <a href="index.html" class="hover:text-cyan-500 transition">Portfolio Home</a>
             </div>
         </div>
     </footer>
@@ -2561,8 +2599,9 @@
          * 2. STATE MANAGEMENT & LOCAL STORAGE PERSISTENCE
          *************************************************************************/
         const state = {
+            activeTab: "front", // 'front' | 'library' | 'whatsapp' | 'saved'
             searchQuery: "",
-            selectedCategory: "all",
+            selectedCategory: "windows-os", // Default to first category in Library tab so page isn't 35 shelves tall!
             selectedPlatform: "all",
             selectedApp: "all",
             osMode: "all", // 'all', 'windows', 'mac', 'linux'
@@ -2594,10 +2633,10 @@
                     state.recentlyViewed = JSON.parse(savedRecent);
                 }
                 const savedTheme = localStorage.getItem("shortcutAtlas_theme");
-                if (savedTheme === "light") {
-                    document.documentElement.classList.remove("dark");
-                } else {
+                if (savedTheme === "dark") {
                     document.documentElement.classList.add("dark");
+                } else {
+                    document.documentElement.classList.remove("dark");
                 }
                 const savedOsMode = localStorage.getItem("shortcutAtlas_osMode");
                 if (savedOsMode) {
@@ -2721,45 +2760,90 @@
         }
 
         function updateFavoriteBadge() {
-            const badge = document.getElementById("fav-count-badge");
-            const btn = document.getElementById("favorites-toggle-btn");
             const count = state.favorites.size;
-            if (count > 0) {
-                badge.textContent = count;
-                badge.classList.remove("hidden");
+            document.querySelectorAll(".fav-count-badge").forEach(badge => {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.classList.remove("hidden");
+                } else {
+                    badge.classList.add("hidden");
+                }
+            });
+
+            document.querySelectorAll(".fav-filter-trigger").forEach(btn => {
+                if (state.activeTab === "saved") {
+                    btn.classList.add("bg-amber-500/20", "border-amber-500", "text-amber-500");
+                } else {
+                    btn.classList.remove("bg-amber-500/20", "border-amber-500", "text-amber-500");
+                }
+            });
+        }
+
+        function setActiveShelfTab(tabName) {
+            state.activeTab = tabName;
+            if (tabName === "saved") {
+                state.onlyFavorites = true;
             } else {
-                badge.classList.add("hidden");
+                state.onlyFavorites = false;
             }
 
-            if (state.onlyFavorites) {
-                btn.classList.add("bg-amber-500/20", "border-amber-500", "text-amber-500");
-            } else {
-                btn.classList.remove("bg-amber-500/20", "border-amber-500", "text-amber-500");
+            // When switching to library tab, if 'all' was set by a search, keep it or focus first category
+            if (tabName === "library" && state.searchQuery.trim() === "" && state.selectedPlatform === "all" && state.selectedApp === "all" && !state.selectedCategory) {
+                state.selectedCategory = "windows-os";
             }
+
+            updateShelfTabsUI();
+            updateFavoriteBadge();
+            renderAll();
+        }
+
+        function updateShelfTabsUI() {
+            const isSearchingOrFiltering = state.searchQuery.trim() !== "" || state.selectedPlatform !== "all" || state.selectedApp !== "all";
+            const effectiveTab = isSearchingOrFiltering ? "library" : state.activeTab;
+
+            const frontSection = document.getElementById("front-shelf");
+            const waSection = document.getElementById("whatsapp-spotlight");
+            const libSection = document.getElementById("main-library");
+
+            frontSection.classList.toggle("hidden", effectiveTab !== "front");
+            waSection.classList.toggle("hidden", effectiveTab !== "whatsapp");
+            libSection.classList.toggle("hidden", effectiveTab !== "library" && effectiveTab !== "saved");
+
+            document.querySelectorAll(".shelf-tab-trigger").forEach(btn => {
+                const tab = btn.getAttribute("data-shelf-tab");
+                if (!btn.closest(".grid") && !btn.closest("nav")) return; // Skip CTA buttons
+                if (tab === effectiveTab) {
+                    btn.classList.add("bg-cyan-500", "text-slate-950", "shadow-sm");
+                    btn.classList.remove("text-slate-600", "dark:text-slate-300", "hover:bg-slate-200/60");
+                } else {
+                    btn.classList.remove("bg-cyan-500", "text-slate-950", "shadow-sm");
+                    btn.classList.add("text-slate-600", "dark:text-slate-300");
+                }
+            });
         }
 
         /*************************************************************************
-         * 4. CARD RENDERING COMPONENT
+         * 4. CARD RENDERING COMPONENT (Ultra-Compact on Mobile, Spacious on Desktop)
          *************************************************************************/
         function createShortcutCardHTML(shortcut, badgeLabel = "") {
             const isFav = state.favorites.has(shortcut.id);
             const primaryKeys = getDisplayKeys(shortcut);
             const secondaryMac = (state.osMode === "all" && shortcut.macKeys && shortcut.macKeys !== shortcut.keys)
-                ? `<div class="mt-1.5 text-[11px] font-mono text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                     <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400">macOS</span>
+                ? `<div class="mt-1 text-[10px] sm:text-[11px] font-mono text-slate-400 dark:text-slate-500 flex items-center gap-1.5 flex-wrap">
+                     <span class="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400">macOS</span>
                      <span>${escapeHTML(shortcut.macKeys)}</span>
                    </div>`
                 : "";
 
             return `
-                <article class="shortcut-card group relative rounded-2xl bg-white dark:bg-[#0f1624] border border-slate-200/90 dark:border-slate-800/90 hover:border-cyan-500/60 dark:hover:border-cyan-500/60 p-4 flex flex-col justify-between shadow-sm hover:shadow-xl hover:shadow-cyan-500/5" data-shortcut-id="${shortcut.id}">
+                <article class="shortcut-card group relative rounded-xl sm:rounded-2xl bg-white dark:bg-[#0f1624] border border-slate-200/90 dark:border-slate-800/90 hover:border-cyan-500/60 dark:hover:border-cyan-500/60 p-3 sm:p-4 flex flex-col justify-between shadow-sm hover:shadow-xl hover:shadow-cyan-500/5 min-w-0" data-shortcut-id="${shortcut.id}">
                     <div>
                         <!-- Top Row: Key Combination + Action Buttons -->
-                        <div class="flex items-start justify-between gap-2 mb-3">
-                            <div class="flex flex-wrap items-center gap-1">
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex flex-wrap items-center gap-1 min-w-0">
                                 ${renderKeycapsHTML(primaryKeys)}
                             </div>
-                            <div class="flex items-center gap-1 shrink-0">
+                            <div class="flex items-center gap-0.5 shrink-0">
                                 <button 
                                     type="button"
                                     class="fav-btn p-1.5 rounded-lg text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition ${isFav ? 'text-amber-500' : ''}" 
@@ -2767,7 +2851,7 @@
                                     title="${isFav ? 'Remove Bookmark' : 'Bookmark Shortcut'}"
                                     aria-label="Bookmark ${escapeHTML(shortcut.action)}"
                                 >
-                                    <i data-lucide="bookmark" class="w-4 h-4 ${isFav ? 'fill-amber-500' : ''}"></i>
+                                    <i data-lucide="bookmark" class="w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-amber-500' : ''}"></i>
                                 </button>
                                 <button 
                                     type="button"
@@ -2776,30 +2860,30 @@
                                     title="Copy Shortcut Details"
                                     aria-label="Copy ${escapeHTML(shortcut.action)}"
                                 >
-                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                    <i data-lucide="copy" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                                 </button>
                             </div>
                         </div>
                         ${secondaryMac}
 
                         <!-- Action Title & Explanation -->
-                        <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white mt-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition">
+                        <h3 class="font-bold text-xs sm:text-base text-slate-900 dark:text-white mt-1.5 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition leading-snug">
                             ${escapeHTML(shortcut.action)}
                         </h3>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                        <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
                             ${escapeHTML(shortcut.description)}
                         </p>
                     </div>
 
                     <!-- Footer Metadata Badges -->
-                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <span class="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 font-medium">
+                    <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-1.5 text-[10px] sm:text-[11px]">
+                        <div class="flex items-center gap-1 flex-wrap min-w-0">
+                            <span class="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 font-medium truncate max-w-[180px]">
                                 ${escapeHTML(shortcut.app)}
                             </span>
-                            ${badgeLabel ? `<span class="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-mono">${escapeHTML(badgeLabel)}</span>` : ""}
+                            ${badgeLabel ? `<span class="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-mono">${escapeHTML(badgeLabel)}</span>` : ""}
                         </div>
-                        <span class="font-mono text-slate-400 dark:text-slate-500">
+                        <span class="font-mono text-slate-400 dark:text-slate-500 truncate">
                             ${escapeHTML(shortcut.platform)}
                         </span>
                     </div>
@@ -2811,12 +2895,21 @@
          * 5. FILTERING ENGINE
          *************************************************************************/
         function matchesGlobalFilters(shortcut) {
-            if (state.onlyFavorites && !state.favorites.has(shortcut.id)) {
+            if (state.activeTab === "saved" || state.onlyFavorites) {
+                if (!state.favorites.has(shortcut.id)) return false;
+            }
+
+            const hasActiveSearchOrGlobalFilter =
+                state.searchQuery.trim() !== "" ||
+                state.selectedPlatform !== "all" ||
+                state.selectedApp !== "all" ||
+                state.activeTab === "saved";
+
+            // Only restrict by selectedCategory when browsing the Category tab normally (not during global search/bookmark view)
+            if (!hasActiveSearchOrGlobalFilter && state.selectedCategory !== "all" && shortcut.category !== state.selectedCategory) {
                 return false;
             }
-            if (state.selectedCategory !== "all" && shortcut.category !== state.selectedCategory) {
-                return false;
-            }
+
             if (state.selectedPlatform !== "all") {
                 const platLower = shortcut.platform.toLowerCase();
                 const targetLower = state.selectedPlatform.toLowerCase();
@@ -2887,7 +2980,7 @@
                 const item = SHORTCUTS_DATA.find(s => s.id === id);
                 if (!item) return "";
                 return `
-                    <button type="button" data-recent-id="${item.id}" class="recent-pill inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs hover:border-cyan-500 transition">
+                    <button type="button" data-recent-id="${item.id}" class="recent-pill inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] hover:border-cyan-500 transition">
                         <span class="font-mono font-bold text-cyan-600 dark:text-cyan-400">${escapeHTML(getDisplayKeys(item))}</span>
                         <span class="text-slate-700 dark:text-slate-300">${escapeHTML(item.action)}</span>
                     </button>
@@ -2895,36 +2988,40 @@
             }).join("");
         }
 
-        function renderSidebarDirectory(filteredShortcuts) {
-            const sidebarList = document.getElementById("category-sidebar-list");
-            const catQuery = (document.getElementById("sidebar-cat-search")?.value || "").toLowerCase().trim();
+        function renderCategoryPillMatrix() {
+            const matrixEl = document.getElementById("category-Quick-Matrix");
+            if (!matrixEl) return;
 
             const countsByCat = {};
             CATEGORIES_META.forEach(c => countsByCat[c.id] = 0);
-            filteredShortcuts.forEach(s => {
-                if (countsByCat[s.category] !== undefined) {
-                    countsByCat[s.category]++;
-                }
+            SHORTCUTS_DATA.forEach(s => {
+                if (countsByCat[s.category] !== undefined) countsByCat[s.category]++;
             });
 
-            const visibleCategories = CATEGORIES_META.filter(cat => {
-                if (catQuery && !cat.name.toLowerCase().includes(catQuery)) return false;
-                return true;
-            });
-
-            sidebarList.innerHTML = visibleCategories.map(cat => {
+            matrixEl.innerHTML = CATEGORIES_META.map((cat, idx) => {
+                const isSelected = state.selectedCategory === cat.id && state.searchQuery.trim() === "" && state.activeTab !== "saved";
                 const count = countsByCat[cat.id] || 0;
-                const isSelected = state.selectedCategory === cat.id;
                 return `
-                    <a href="#cat-${cat.id}" data-sidebar-cat="${cat.id}" class="sidebar-cat-link flex items-center justify-between px-2.5 py-2 rounded-xl transition ${isSelected ? 'bg-cyan-500/15 text-cyan-500 font-semibold border border-cyan-500/30' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white'}">
-                        <div class="flex items-center gap-2 truncate pr-2">
-                            <i data-lucide="${cat.icon}" class="w-3.5 h-3.5 shrink-0 text-cyan-500"></i>
-                            <span class="truncate">${escapeHTML(cat.name)}</span>
-                        </div>
-                        <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shrink-0">${count}</span>
-                    </a>
+                    <button 
+                        type="button" 
+                        data-matrix-cat="${cat.id}" 
+                        class="matrix-cat-btn shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium border transition ${
+                            isSelected
+                                ? 'bg-cyan-500 text-slate-950 font-bold border-cyan-500 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-900/90 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-cyan-500/50'
+                        }"
+                    >
+                        <i data-lucide="${cat.icon}" class="w-3.5 h-3.5 ${isSelected ? 'text-slate-950' : 'text-cyan-500'}"></i>
+                        <span>${idx + 1}. ${escapeHTML(cat.name)}</span>
+                        <span class="text-[10px] font-mono px-1.5 py-0.2 rounded ${isSelected ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-200/70 dark:bg-slate-800 text-slate-500'}">${count}</span>
+                    </button>
                 `;
             }).join("");
+
+            const catSelect = document.getElementById("filter-category-select");
+            if (catSelect && catSelect.value !== state.selectedCategory) {
+                catSelect.value = state.selectedCategory;
+            }
         }
 
         function renderMainLibrary() {
@@ -2933,18 +3030,19 @@
             const activeFilterBar = document.getElementById("active-filter-bar");
             const filterSummary = document.getElementById("filter-results-summary");
 
+            updateShelfTabsUI();
+            renderCategoryPillMatrix();
+
             const filtered = SHORTCUTS_DATA.filter(matchesGlobalFilters);
-            renderSidebarDirectory(filtered);
 
             const isFiltered = state.searchQuery.trim() !== "" ||
-                state.selectedCategory !== "all" ||
                 state.selectedPlatform !== "all" ||
                 state.selectedApp !== "all" ||
-                state.onlyFavorites;
+                state.activeTab === "saved";
 
             if (isFiltered) {
                 activeFilterBar.classList.remove("hidden");
-                filterSummary.textContent = `Showing ${filtered.length} matching shortcut${filtered.length === 1 ? '' : 's'} ${state.onlyFavorites ? '(Bookmarked Only)' : ''}`;
+                filterSummary.textContent = `Found ${filtered.length} matching shortcut${filtered.length === 1 ? '' : 's'} ${state.activeTab === 'saved' ? 'in Saved Bookmarks' : ''}`;
             } else {
                 activeFilterBar.classList.add("hidden");
             }
@@ -2973,44 +3071,43 @@
                 return `
                     <section id="cat-${cat.id}" class="rounded-2xl bg-white dark:bg-[#0b101d] border border-slate-200 dark:border-slate-800/90 overflow-hidden shadow-sm transition">
                         <!-- Category Shelf Header -->
-                        <div class="p-4 sm:px-6 bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
-                            <button type="button" data-toggle-cat="${cat.id}" class="cat-collapse-btn flex items-center gap-3 text-left group focus:outline-none">
-                                <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-500 group-hover:scale-105 transition">
+                        <div class="p-3 sm:px-5 sm:py-3.5 bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between gap-2">
+                            <button type="button" data-toggle-cat="${cat.id}" class="cat-collapse-btn flex items-center gap-2.5 text-left group focus:outline-none min-w-0 flex-1">
+                                <div class="shrink-0 w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-500">
                                     <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
                                 </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-cyan-500 transition">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-cyan-500 transition truncate">
                                             ${escapeHTML(cat.name)}
                                         </h3>
-                                        <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
-                                            ${catShortcuts.length} ${catShortcuts.length === 1 ? 'shortcut' : 'shortcuts'}
+                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">
+                                            ${catShortcuts.length} shortcuts
                                         </span>
                                     </div>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">${escapeHTML(cat.group)} Shelf</p>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escapeHTML(cat.group)}</p>
                                 </div>
                             </button>
 
-                            <div class="flex items-center gap-2">
-                                <!-- Per-Category Instant Filter -->
+                            <div class="flex items-center gap-1.5 shrink-0">
                                 <div class="relative hidden sm:block">
                                     <input 
                                         type="text" 
                                         data-cat-search-input="${cat.id}"
                                         value="${escapeHTML(state.categoryLocalSearch[cat.id] || '')}"
-                                        placeholder="Filter shelf..." 
-                                        class="cat-local-input w-40 text-xs px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:border-cyan-500"
+                                        placeholder="Filter this shelf..." 
+                                        class="cat-local-input w-36 text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:border-cyan-500"
                                     >
                                 </div>
-                                <button type="button" data-toggle-cat="${cat.id}" class="cat-collapse-btn p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" aria-label="Toggle Category">
+                                <button type="button" data-toggle-cat="${cat.id}" class="cat-collapse-btn p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white transition" aria-label="Toggle Category">
                                     <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Category Cards Grid -->
-                        <div class="${isCollapsed ? 'hidden' : 'p-4 sm:p-6'}">
-                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div class="${isCollapsed ? 'hidden' : 'p-3 sm:p-5'}">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5">
                                 ${displayedShortcuts.map(s => createShortcutCardHTML(s)).join("")}
                             </div>
                         </div>
@@ -3033,22 +3130,26 @@
          * 7. POPULATE FILTER DROPDOWNS & STATS
          *************************************************************************/
         function initializeDropdownsAndStats() {
-            // Update Hero Live Counter
             const totalShortcuts = SHORTCUTS_DATA.length;
             const totalCategories = CATEGORIES_META.length;
             document.getElementById("hero-stats-text").textContent =
-                `Indexing ${totalShortcuts} Verified Shortcuts across ${totalCategories} Categories`;
+                `${totalShortcuts} Verified Shortcuts • ${totalCategories} Categories`;
             document.getElementById("sidebar-cat-count").textContent = totalCategories;
 
-            // Populate Category Select
+            const yearSpan = document.getElementById("copyright-year");
+            if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+
+            // Populate Category Select (with numbered categories + All 35 option)
             const catSelect = document.getElementById("filter-category-select");
-            catSelect.innerHTML = `<option value="all">All ${totalCategories} Categories</option>` +
-                CATEGORIES_META.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join("");
+            catSelect.innerHTML =
+                CATEGORIES_META.map((c, idx) => `<option value="${c.id}">${idx + 1}. ${escapeHTML(c.name)}</option>`).join("") +
+                `<option value="all">View All ${totalCategories} Categories Together</option>`;
+            catSelect.value = state.selectedCategory;
 
             // Populate Application Select
             const uniqueApps = [...new Set(SHORTCUTS_DATA.map(s => s.app))].sort();
             const appSelect = document.getElementById("filter-app-select");
-            appSelect.innerHTML = `<option value="all">All Applications (${uniqueApps.length})</option>` +
+            appSelect.innerHTML = `<option value="all">App: All (${uniqueApps.length})</option>` +
                 uniqueApps.map(app => `<option value="${escapeHTML(app)}">${escapeHTML(app)}</option>`).join("");
         }
 
@@ -3149,15 +3250,18 @@
          *************************************************************************/
         function resetAllFilters() {
             state.searchQuery = "";
-            state.selectedCategory = "all";
+            state.selectedCategory = "windows-os";
             state.selectedPlatform = "all";
             state.selectedApp = "all";
             state.onlyFavorites = false;
+            if (state.activeTab === "saved") {
+                state.activeTab = "front";
+            }
             state.categoryLocalSearch = {};
 
             document.getElementById("global-search-input").value = "";
             document.getElementById("clear-search-btn").classList.add("hidden");
-            document.getElementById("filter-category-select").value = "all";
+            document.getElementById("filter-category-select").value = "windows-os";
             document.getElementById("filter-platform-select").value = "all";
             document.getElementById("filter-app-select").value = "all";
 
@@ -3167,17 +3271,17 @@
 
         function updateThemeIcons() {
             const isDark = document.documentElement.classList.contains("dark");
-            document.getElementById("theme-icon-dark").classList.toggle("hidden", !isDark);
-            document.getElementById("theme-icon-light").classList.toggle("hidden", isDark);
+            document.querySelectorAll(".theme-icon-dark").forEach(el => el.classList.toggle("hidden", !isDark));
+            document.querySelectorAll(".theme-icon-light").forEach(el => el.classList.toggle("hidden", isDark));
         }
 
         function updateOsButtonsUI() {
             document.querySelectorAll(".os-mode-btn").forEach(btn => {
                 const mode = btn.getAttribute("data-os-mode");
                 if (mode === state.osMode) {
-                    btn.className = "os-mode-btn px-2.5 py-1 rounded-lg text-xs bg-cyan-500 text-slate-950 font-semibold shadow-sm transition";
+                    btn.className = "os-mode-btn px-2 py-1 rounded-lg text-[11px] sm:text-xs bg-cyan-500 text-slate-950 font-semibold shadow-sm transition text-center";
                 } else {
-                    btn.className = "os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+                    btn.className = "os-mode-btn px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition text-center";
                 }
             });
         }
@@ -3228,6 +3332,15 @@
             // Dropdown Filters
             document.getElementById("filter-category-select").addEventListener("change", (e) => {
                 state.selectedCategory = e.target.value;
+                state.activeTab = "library";
+                renderMainLibrary();
+                lucide.createIcons();
+            });
+
+            document.getElementById("show-all-categories-btn").addEventListener("click", () => {
+                state.selectedCategory = "all";
+                state.activeTab = "library";
+                document.getElementById("filter-category-select").value = "all";
                 renderMainLibrary();
                 lucide.createIcons();
             });
@@ -3248,13 +3361,42 @@
             document.querySelectorAll(".quick-chip").forEach(chip => {
                 chip.addEventListener("click", () => {
                     const q = chip.getAttribute("data-quick-query");
+                    if (q.toLowerCase() === "whatsapp") {
+                        state.searchQuery = "";
+                        searchInput.value = "";
+                        clearSearchBtn.classList.add("hidden");
+                        setActiveShelfTab("whatsapp");
+                        return;
+                    }
                     state.searchQuery = q;
                     searchInput.value = q;
                     clearSearchBtn.classList.remove("hidden");
                     renderMainLibrary();
                     lucide.createIcons();
-                    document.getElementById("main-library").scrollIntoView({ behavior: "smooth" });
                 });
+            });
+
+            // Shelf Tab Switcher Buttons
+            document.body.addEventListener("click", (e) => {
+                const tabBtn = e.target.closest(".shelf-tab-trigger");
+                if (tabBtn) {
+                    const targetTab = tabBtn.getAttribute("data-shelf-tab");
+                    if (targetTab) {
+                        state.searchQuery = "";
+                        searchInput.value = "";
+                        clearSearchBtn.classList.add("hidden");
+                        setActiveShelfTab(targetTab);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                }
+
+                const matrixCatBtn = e.target.closest(".matrix-cat-btn");
+                if (matrixCatBtn) {
+                    state.selectedCategory = matrixCatBtn.getAttribute("data-matrix-cat");
+                    state.activeTab = "library";
+                    renderMainLibrary();
+                    lucide.createIcons();
+                }
             });
 
             // OS Perspective Switcher
@@ -3273,9 +3415,9 @@
                     state.waFilter = btn.getAttribute("data-wa-tab");
                     document.querySelectorAll(".wa-tab-btn").forEach(b => {
                         if (b.getAttribute("data-wa-tab") === state.waFilter) {
-                            b.className = "wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition";
+                            b.className = "wa-tab-btn px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-emerald-500 text-slate-950 transition text-center";
                         } else {
-                            b.className = "wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition";
+                            b.className = "wa-tab-btn px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition text-center";
                         }
                     });
                     renderWhatsAppSpotlight();
@@ -3283,39 +3425,20 @@
                 });
             });
 
-            // Favorites Filter Toggle
-            document.getElementById("favorites-toggle-btn").addEventListener("click", () => {
-                state.onlyFavorites = !state.onlyFavorites;
-                updateFavoriteBadge();
-                renderMainLibrary();
-                lucide.createIcons();
-                if (state.onlyFavorites) {
-                    document.getElementById("main-library").scrollIntoView({ behavior: "smooth" });
-                }
+            // Favorites Filter Toggle (Both Mobile & Desktop Header Buttons)
+            document.querySelectorAll(".fav-filter-trigger").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    if (state.activeTab === "saved") {
+                        setActiveShelfTab("front");
+                    } else {
+                        setActiveShelfTab("saved");
+                    }
+                });
             });
 
             // Reset Filters Buttons
             document.getElementById("reset-all-filters-btn").addEventListener("click", resetAllFilters);
             document.getElementById("empty-reset-btn").addEventListener("click", resetAllFilters);
-
-            // Expand / Collapse All Categories
-            document.getElementById("expand-all-btn").addEventListener("click", () => {
-                state.collapsedCategories.clear();
-                renderMainLibrary();
-                lucide.createIcons();
-            });
-
-            document.getElementById("collapse-all-btn").addEventListener("click", () => {
-                CATEGORIES_META.forEach(c => state.collapsedCategories.add(c.id));
-                renderMainLibrary();
-                lucide.createIcons();
-            });
-
-            // Sidebar Category Filter Input
-            document.getElementById("sidebar-cat-search").addEventListener("input", () => {
-                renderSidebarDirectory(SHORTCUTS_DATA.filter(matchesGlobalFilters));
-                lucide.createIcons();
-            });
 
             // Clear Recent History
             document.getElementById("clear-recent-btn").addEventListener("click", () => {
@@ -3324,13 +3447,15 @@
                 renderRecentlyViewed();
             });
 
-            // Theme Toggle
-            document.getElementById("theme-toggle-btn").addEventListener("click", () => {
-                const isDark = document.documentElement.classList.toggle("dark");
-                try {
-                    localStorage.setItem("shortcutAtlas_theme", isDark ? "dark" : "light");
-                } catch (e) {}
-                updateThemeIcons();
+            // Theme Toggle (Both Mobile & Desktop Buttons)
+            document.querySelectorAll(".theme-toggle-trigger").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const isDark = document.documentElement.classList.toggle("dark");
+                    try {
+                        localStorage.setItem("shortcutAtlas_theme", isDark ? "dark" : "light");
+                    } catch (e) {}
+                    updateThemeIcons();
+                });
             });
 
             // Event Delegation for Copy, Favorite, Category Collapse, Local Shelf Search
@@ -3417,6 +3542,8 @@
 
             document.getElementById("nav-quiz-btn").addEventListener("click", openQuiz);
             document.getElementById("mobile-quiz-btn").addEventListener("click", openQuiz);
+            const tabletQuizBtn = document.getElementById("tablet-quiz-btn");
+            if (tabletQuizBtn) tabletQuizBtn.addEventListener("click", openQuiz);
             document.getElementById("close-quiz-btn").addEventListener("click", () => {
                 quizModal.classList.add("hidden");
                 quizModal.classList.remove("flex");
