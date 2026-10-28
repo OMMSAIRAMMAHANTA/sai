@@ -26,7 +26,7 @@ body{
   margin:0;font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;
   background:
     linear-gradient(135deg,rgba(5,11,20,.93) 0%,rgba(10,25,47,.86) 100%),
-    url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') center/cover no-repeat fixed;
+    url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') center/cover no-repeat;
   background-color:var(--bg);
 }
 h1,h2,h3,p{margin:0}
@@ -44,8 +44,8 @@ h1,h2,h3,p{margin:0}
 .orb.b{bottom:-15%;right:-10%;width:50vw;height:50vw;background:radial-gradient(circle,rgba(185,0,255,.10),transparent 62%);animation:drift 14s infinite alternate-reverse}
 @keyframes drift{to{transform:scale(1.12) translate(3%,-3%)}}
 #reptileCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:.55}
-.cursor-glow{position:fixed;width:360px;height:360px;border-radius:50%;pointer-events:none;z-index:2;
-  background:radial-gradient(circle,rgba(0,234,255,.10),transparent 65%);transform:translate(-50%,-50%);left:50%;top:50%}
+.cursor-glow{position:fixed;width:300px;height:300px;border-radius:50%;pointer-events:none;z-index:2;
+  background:radial-gradient(circle,rgba(0,234,255,.09),transparent 65%);transform:translate(-50%,-50%);left:50%;top:50%;contain:strict}
 
 /* ---------- Floating controls ---------- */
 .round-btn{position:fixed;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -70,7 +70,7 @@ h1,h2,h3,p{margin:0}
 /* ---------- Layout ---------- */
 .content-wrapper{position:relative;z-index:10}
 .page-section{min-height:100vh;padding:110px 7% 90px;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  animation:focusIn 1s cubic-bezier(.25,1,.5,1) both}
+  animation:focusIn .7s cubic-bezier(.25,1,.5,1) both}
 @keyframes focusIn{from{opacity:0;transform:scale(1.02) translateY(15px);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
 .hero-layout{display:flex;align-items:center;justify-content:space-between;gap:50px;width:100%;max-width:1400px}
 .hero-content{flex:1.15;animation:slideL 1s ease both}
@@ -216,7 +216,7 @@ footer b{color:var(--accent);font-weight:600}
 @keyframes boxGlitch{0%{transform:scale(.9)}20%{transform:translate(-5px,5px) scale(.95)}40%{transform:translate(-5px,-5px) scale(.98)}60%{transform:translate(5px,5px) scale(1.02)}80%{transform:translate(5px,-5px)}100%{transform:none}}
 
 /* ---------- Ambient particles ---------- */
-.ambient-particle{position:fixed;bottom:0;border-radius:50%;background:rgba(0,234,255,.4);box-shadow:0 0 10px rgba(0,234,255,.25);pointer-events:none;z-index:0;animation:floatParticle linear infinite}
+.ambient-particle{position:fixed;bottom:0;border-radius:50%;background:rgba(0,234,255,.4);box-shadow:0 0 6px rgba(0,234,255,.2);pointer-events:none;z-index:0;animation:floatParticle linear infinite;contain:layout style}
 @keyframes floatParticle{0%{transform:translateY(0) scale(.5);opacity:0}20%,80%{opacity:1}100%{transform:translateY(-110vh) scale(1.5);opacity:0}}
 
 /* ---------- Staggered hero entrance ---------- */
@@ -344,6 +344,20 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
   .gc-profile{margin-bottom:.5rem}
   .gc-chips{display:none}
   .close-modal-btn{top:8px;right:8px;width:34px;height:34px}
+}
+
+/* ---------- Performance tuning: keep the visual style, reduce paint cost ---------- */
+@media (max-width: 768px), (hover: none) {
+  body { background-attachment: scroll; }
+  .cursor-glow { display: none; }
+  #reptileCanvas { display: none; }
+  .scanlines { opacity: .18; }
+  .orb { filter: blur(6px); }
+  .stat, .skill-badge, .chip, .glass-card, .full-menu { -webkit-backdrop-filter: none; }
+  .stat, .skill-badge, .chip { backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #reptileCanvas, .cursor-glow { display: none; }
 }
 
 /* ---------- Responsive ---------- */
@@ -656,23 +670,40 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ---------- Avatar 3D tilt + cursor glow ---------- */
+/* ---------- Avatar 3D tilt + cursor glow (throttled to one update/frame) ---------- */
 const wrap=$('avatarWrap'), glow=$('cursorGlow');
-window.addEventListener('mousemove',e=>{
-  glow.style.left=e.clientX+'px'; glow.style.top=e.clientY+'px';
-  const r=wrap.getBoundingClientRect();
-  const dx=(e.clientX-(r.left+r.width/2))/window.innerWidth;
-  const dy=(e.clientY-(r.top+r.height/2))/window.innerHeight;
-  wrap.style.transform=`rotateY(${dx*18}deg) rotateX(${-dy*18}deg)`;
-});
+const canUsePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+let pointerFrame = 0, pointerX = innerWidth / 2, pointerY = innerHeight / 2;
+if (canUsePointer && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  window.addEventListener('mousemove', e => {
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    if (pointerFrame) return;
+    pointerFrame = requestAnimationFrame(() => {
+      pointerFrame = 0;
+      glow.style.left = pointerX + 'px';
+      glow.style.top = pointerY + 'px';
+      const r = wrap.getBoundingClientRect();
+      const dx = (pointerX - (r.left + r.width / 2)) / Math.max(innerWidth, 1);
+      const dy = (pointerY - (r.top + r.height / 2)) / Math.max(innerHeight, 1);
+      wrap.style.transform = `rotateY(${dx * 14}deg) rotateX(${-dy * 14}deg)`;
+    });
+  }, { passive: true });
+  window.addEventListener('mouseleave', () => {
+    wrap.style.transform = '';
+  }, { passive: true });
+}
 
 /* ---------- Floating particles ---------- */
 (function(){
   const box=$('particles');
-  for(let i=0;i<22;i++){
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const touch = matchMedia('(hover: none)').matches;
+  const count = reduced ? 0 : (touch ? 9 : 16);
+  for(let i=0;i<count;i++){
     const p=document.createElement('div'); p.className='ambient-particle';
-    const s=Math.random()*5+2;
-    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}vw;animation-duration:${6+Math.random()*7}s;animation-delay:${Math.random()*6}s`;
+    const s=Math.random()*4+2;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}vw;animation-duration:${8+Math.random()*8}s;animation-delay:${Math.random()*8}s`;
     box.appendChild(p);
   }
 })();
@@ -802,48 +833,85 @@ socialOverlay.addEventListener('mousemove',e=>{
   }
 });
 
-/* ---------- Reptile cursor trail ---------- */
-const rCanvas=$('reptileCanvas'), rCtx=rCanvas.getContext('2d');
-let rW,rH;
-const rMouse={x:innerWidth/2,y:innerHeight/2}, rHead={x:innerWidth/2,y:innerHeight/2};
-const segs=[], SEG=45, DIST=12; let walk=0;
+/* ---------- Reptile cursor trail: adaptive, capped-DPI, pause when hidden ---------- */
+const rCanvas=$('reptileCanvas');
+const rCtx=rCanvas.getContext('2d', { alpha:true, desynchronized:true });
+const trailEnabled = matchMedia('(hover: hover) and (pointer: fine)').matches &&
+                     !matchMedia('(prefers-reduced-motion: reduce)').matches;
+let rW=innerWidth, rH=innerHeight, rDpr=1, trailFrame=0, walk=0;
+const rMouse={x:innerWidth/2,y:innerHeight/2};
+const rHead={x:innerWidth/2,y:innerHeight/2};
+const SEG=30, DIST=14, segs=[];
 for(let i=0;i<SEG;i++) segs.push({x:rHead.x,y:rHead.y,angle:0});
-function rResize(){ rW=rCanvas.width=innerWidth; rH=rCanvas.height=innerHeight; }
-addEventListener('mousemove',e=>{ rMouse.x=e.clientX; rMouse.y=e.clientY; });
-addEventListener('resize',rResize); rResize();
+
+function rResize(){
+  rW=innerWidth; rH=innerHeight;
+  rDpr=Math.min(window.devicePixelRatio || 1, 1.25);
+  rCanvas.width=Math.round(rW*rDpr);
+  rCanvas.height=Math.round(rH*rDpr);
+  rCanvas.style.width=rW+'px';
+  rCanvas.style.height=rH+'px';
+  rCtx.setTransform(rDpr,0,0,rDpr,0,0);
+}
+window.addEventListener('resize', rResize, {passive:true});
+if(trailEnabled){
+  window.addEventListener('mousemove',e=>{rMouse.x=e.clientX;rMouse.y=e.clientY;},{passive:true});
+}
+rResize();
 
 function drawBody(s,i){
-  rCtx.save(); rCtx.translate(s.x,s.y); rCtx.rotate(s.angle);
+  rCtx.save();
+  rCtx.translate(s.x,s.y);
+  rCtx.rotate(s.angle);
   const hue=190+i*2;
-  rCtx.strokeStyle=`hsl(${hue},100%,50%)`; rCtx.lineWidth=1.5;
-  rCtx.shadowBlur=12; rCtx.shadowColor=`hsl(${hue},100%,50%)`;
-  const bW=Math.sin(i/SEG*Math.PI)*22;
-  rCtx.beginPath(); rCtx.moveTo(0,-bW/2); rCtx.lineTo(0,bW/2); rCtx.stroke();
-  if(i===10||i===25){
-    const l=Math.sin(walk)*20, r=Math.sin(walk+Math.PI)*20;
+  rCtx.strokeStyle=`hsl(${hue},100%,50%)`;
+  rCtx.lineWidth=1.4;
+  /* Keep the neon trail, but reserve stronger blur for only the front segments. */
+  rCtx.shadowBlur=i<7?4:0;
+  rCtx.shadowColor=`hsl(${hue},100%,50%)`;
+  const bW=Math.sin(i/SEG*Math.PI)*18;
+  rCtx.beginPath();
+  rCtx.moveTo(0,-bW/2);
+  rCtx.lineTo(0,bW/2);
+  rCtx.stroke();
+  if(i===8||i===20){
+    const l=Math.sin(walk)*16, rr=Math.sin(walk+Math.PI)*16;
     rCtx.beginPath();
-    rCtx.moveTo(0,bW/2); rCtx.lineTo(r,bW/2+15); rCtx.lineTo(r+5,bW/2+18);
-    rCtx.moveTo(0,-bW/2); rCtx.lineTo(l,-bW/2-15); rCtx.lineTo(l+5,-bW/2-18);
+    rCtx.moveTo(0,bW/2); rCtx.lineTo(rr,bW/2+12); rCtx.lineTo(rr+4,bW/2+14);
+    rCtx.moveTo(0,-bW/2); rCtx.lineTo(l,-bW/2-12); rCtx.lineTo(l+4,-bW/2-14);
     rCtx.stroke();
   }
-  rCtx.fillStyle='#fff'; rCtx.shadowBlur=0; rCtx.beginPath(); rCtx.arc(0,0,1.5,0,Math.PI*2); rCtx.fill();
+  rCtx.shadowBlur=0;
+  rCtx.fillStyle='#fff';
+  rCtx.beginPath(); rCtx.arc(0,0,1.3,0,Math.PI*2); rCtx.fill();
   rCtx.restore();
 }
 function loop(){
+  trailFrame=0;
+  if(document.hidden || !trailEnabled) return;
   rCtx.clearRect(0,0,rW,rH);
-  rHead.x+=(rMouse.x-rHead.x)*.12; rHead.y+=(rMouse.y-rHead.y)*.12;
+  rHead.x+=(rMouse.x-rHead.x)*.12;
+  rHead.y+=(rMouse.y-rHead.y)*.12;
   const d=Math.hypot(rMouse.x-segs[0].x,rMouse.y-segs[0].y);
-  if(d>1) walk+=d*.08;
+  if(d>1) walk+=d*.06;
   segs[0].x=rHead.x; segs[0].y=rHead.y;
   for(let i=1;i<SEG;i++){
     const a=segs[i-1], b=segs[i];
     b.angle=Math.atan2(a.y-b.y,a.x-b.x);
-    b.x=a.x-Math.cos(b.angle)*DIST; b.y=a.y-Math.sin(b.angle)*DIST;
+    b.x=a.x-Math.cos(b.angle)*DIST;
+    b.y=a.y-Math.sin(b.angle)*DIST;
     drawBody(b,i);
   }
-  requestAnimationFrame(loop);
+  trailFrame=requestAnimationFrame(loop);
 }
-loop();
+function startTrail(){
+  if(trailEnabled && !document.hidden && !trailFrame) trailFrame=requestAnimationFrame(loop);
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden && trailFrame){cancelAnimationFrame(trailFrame);trailFrame=0;}
+  else startTrail();
+});
+startTrail();
 </script>
 </body>
 </html>
