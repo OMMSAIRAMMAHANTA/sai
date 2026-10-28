@@ -1,227 +1,475 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Omm Sairam Mahanta | Software Platforms</title>
+    <title>Omm Sairam Mahanta | Platforms</title>
     
     <!-- Dependencies -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts Merged -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-
         :root {
             --primary-accent: #00eaff;
             --text-main: #ffffff;
-            --text-muted: #a0a0a0;
-            --glass-bg: rgba(10, 10, 15, 0.45);
-            --card-border: rgba(0, 234, 255, 0.15);
-            --bg-dark: #050b14;
+            --text-muted: rgba(255, 255, 255, 0.62);
+            --bg-dark: #040508;
         }
 
-        body {
-            margin: 0; padding: 0;
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-main);
-            overflow-x: hidden;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             background-color: var(--bg-dark);
-            background: linear-gradient(135deg, rgba(5,11,20,0.92) 0%, rgba(10,25,47,0.85) 100%), url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
-            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
-        h1, h2, h3, p { margin: 0; }
-        .btn, .btn-hero { background-color: transparent; }
-        
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px; z-index: 9998; pointer-events: none; opacity: 0.5;
+        /* Deep Black Background with Subtle Red & Blue Ambient Lighting */
+        .ambient-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 50% 46%, rgba(190, 24, 38, 0.2) 0%, rgba(120, 15, 28, 0.08) 36%, transparent 68%),
+                radial-gradient(circle at 22% 65%, rgba(29, 78, 216, 0.14) 0%, transparent 55%),
+                radial-gradient(circle at 78% 35%, rgba(0, 234, 255, 0.1) 0%, transparent 55%),
+                linear-gradient(180deg, #030407 0%, #070910 50%, #030407 100%);
         }
 
-        #reptileCanvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1; pointer-events: none; opacity: 0.6;
+        .ambient-glow {
+            position: fixed;
+            top: 48%;
+            left: 50%;
+            width: min(560px, 90vw);
+            height: min(380px, 60vh);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--active-glow, rgba(37, 99, 235, 0.26)) 0%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+            transition: background 0.5s ease;
         }
 
-        .bg-glow {
-            position: fixed; top: -15%; left: -10%; width: 55vw; height: 55vw;
-            background: radial-gradient(circle, rgba(0, 234, 255, 0.08) 0%, rgba(0,0,0,0) 65%);
-            border-radius: 50%; z-index: 0; animation: pulse-glow 10s infinite alternate;
-        }
-        .bg-glow-2 {
-            position: fixed; bottom: -10%; right: -10%; width: 50vw; height: 50vw;
-            background: radial-gradient(circle, rgba(0, 234, 255, 0.06) 0%, rgba(0,0,0,0) 60%);
-            border-radius: 50%; z-index: 0; animation: pulse-glow 12s infinite alternate-reverse;
-        }
-        @keyframes pulse-glow {
-            0% { transform: scale(1) translate(0, 0); }
-            100% { transform: scale(1.1) translate(2%, -2%); }
-        }
-
-        .content-wrapper {
-            position: relative; z-index: 10; 
-            min-height: 100vh;
-            display: flex; flex-direction: column; justify-content: center;
+        /* Preserved Navigation & Music Floating Controls */
+        .hamburger-btn,
+        .music-btn {
+            position: fixed;
+            right: 28px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(8, 12, 22, 0.78);
+            border: 1.5px solid var(--primary-accent);
+            color: var(--primary-accent);
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(0, 234, 255, 0.18);
+            transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .hamburger-btn {
-            position: fixed; top: 40px; right: 40px;
-            width: 55px; height: 55px; border-radius: 50%;
-            background: transparent; backdrop-filter: blur(10px);
-            border: 2px solid var(--primary-accent);
-            color: var(--primary-accent); font-size: 20px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 10000;
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .hamburger-btn:hover {
-            transform: scale(1.1) rotate(180deg);
-            background: var(--primary-accent); color: #000;
-            box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+            top: 28px;
+            z-index: 10000;
         }
 
         .music-btn {
-            position: fixed; bottom: 40px; right: 40px;
-            width: 55px; height: 55px; border-radius: 50%;
-            background: transparent; backdrop-filter: blur(10px);
-            border: 2px solid var(--primary-accent);
-            color: var(--primary-accent); font-size: 20px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 9997; 
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            bottom: 28px;
+            z-index: 9997;
         }
+
+        .hamburger-btn:hover,
         .music-btn:hover {
-            transform: scale(1.1);
-            background: var(--primary-accent); color: #000;
-            box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+            transform: scale(1.08);
+            background: var(--primary-accent);
+            color: #000;
+            box-shadow: 0 0 22px rgba(0, 234, 255, 0.5);
         }
 
+        /* Preserved Full Screen Menu */
         .full-menu {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 5, 10, 0.98); backdrop-filter: blur(25px);
-            z-index: 9999; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; gap: 35px;
-            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 5, 10, 0.97);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
         }
-        .full-menu.open { opacity: 1; pointer-events: all; }
+
+        .full-menu.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
         .full-menu a {
-            font-size: 2.5rem; color: transparent; text-decoration: none; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 4px; 
-            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.3);
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            opacity: 0; transform: translateY(30px);
-        }
-        .full-menu a:hover, .full-menu a.active-link {
-            color: var(--primary-accent); -webkit-text-stroke: 1.5px var(--primary-accent);
-            text-shadow: 0 0 20px rgba(0,234,255,0.5);
-            transform: scale(1.05) !important; letter-spacing: 6px;
-        }
-
-        .page-section {
-            display: flex; padding: 100px 5%; min-height: 100vh;
-            box-sizing: border-box; flex-direction: column; justify-content: center; align-items: center;
-            animation: cinematicFocus 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-        @keyframes cinematicFocus {
-            from { opacity: 0; transform: scale(1.02) translateY(15px); filter: blur(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+            font-size: 2.2rem;
+            color: transparent;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.32);
+            opacity: 0;
+            transform: translateY(24px);
+            transition: color 0.3s ease, -webkit-text-stroke 0.3s ease, transform 0.3s ease, letter-spacing 0.3s ease;
         }
 
-        .section-title { font-size: 2.5rem; margin-bottom: 40px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
-        
-        /* Ultra Compact App-Style Grid */
-        .project-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 15px; 
-            width: 100%; 
-            max-width: 1000px; 
-            perspective: 1000px; 
+        .full-menu.open a {
+            opacity: 1;
+            transform: translateY(0);
         }
-        
-        /* Adjusted padding and sizes for App look */
-        .project-card {
-            background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 20px 15px; text-align: center; 
-            transform-style: preserve-3d; transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s;
-            position: relative; display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 220px;
-        }
-        .project-card:hover { border-color: var(--primary-accent); box-shadow: 0 10px 30px rgba(0, 234, 255, 0.2); z-index: 10; }
-        .project-icon { font-size: 2rem; color: var(--primary-accent); margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,234,255,0.4); transform: translateZ(20px); }
-        .project-title { font-size: 1.1rem; margin-bottom: 6px; font-weight: 700; transform: translateZ(15px); }
-        .project-desc { 
-            color: var(--text-muted); font-size: 0.75rem; line-height: 1.4; margin-bottom: 12px; 
-            transform: translateZ(10px); flex-grow: 1; 
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        
-        .btn {
-            padding: 8px 15px; border-radius: 12px; border: none; cursor: pointer;
-            background: linear-gradient(45deg, var(--primary-accent), #0099aa);
-            color: #000; font-weight: 800; font-size: 0.75rem; text-decoration: none; transition: 0.3s;
-            display: inline-block; box-shadow: 0 0 10px rgba(0, 234, 255, 0.3); text-transform: uppercase; letter-spacing: 0.5px;
-            width: 100%; box-sizing: border-box;
-        }
-        .btn:hover { background: #fff; box-shadow: 0 0 15px #fff; transform: translateZ(15px) scale(1.02); }
 
-        footer { text-align: center; padding: 25px; background: transparent; color: #555; font-size: 0.9rem; width: 100%; position: absolute; bottom: 0; left: 0; right: 0; letter-spacing: 1px;}
+        .full-menu a:hover,
+        .full-menu a.active-link {
+            color: var(--primary-accent);
+            -webkit-text-stroke: 1.5px var(--primary-accent);
+            text-shadow: 0 0 18px rgba(0, 234, 255, 0.45);
+            transform: scale(1.04);
+            letter-spacing: 5px;
+        }
 
-        @media (max-width: 600px) {
-            .full-menu a { font-size: 1.6rem; letter-spacing: 2px; }
-            .hamburger-btn { top: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px;}
-            .music-btn { bottom: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px; }
-            .section-title { font-size: 1.8rem; margin-bottom: 30px; }
-            .project-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } /* Strictly 2 columns on mobile */
-            .project-card { padding: 15px 10px; min-height: 190px; }
-            .project-icon { font-size: 1.8rem; }
-            .project-title { font-size: 0.95rem; }
-            .project-desc { font-size: 0.7rem; -webkit-line-clamp: 2; margin-bottom: 8px; }
-            .btn { padding: 8px 10px; font-size: 0.7rem; }
-            .page-section { padding: 80px 4% 60px 4%; }
+        /* Main Showcase Container */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .carousel-viewport {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            overflow-y: visible;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 36px 0;
+            cursor: grab;
+        }
+
+        .carousel-viewport:active {
+            cursor: grabbing;
+        }
+
+        .carousel-viewport::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-track {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            padding: 0 calc(50vw - 115px);
+            margin: 0 auto;
+        }
+
+        /* Poster Card */
+        .platform-poster {
+            position: relative;
+            width: 230px;
+            height: 334px;
+            border-radius: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+            scroll-snap-align: center;
+            text-decoration: none;
+            color: #fff;
+            background: #0c1018;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.72);
+            transform: scale(0.84);
+            opacity: 0.46;
+            filter: brightness(0.72) saturate(0.85);
+            transition: 
+                transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.35s ease,
+                box-shadow 0.42s ease;
+            will-change: transform, opacity;
+        }
+
+        .platform-poster.is-neighbor {
+            transform: scale(0.9);
+            opacity: 0.72;
+            filter: brightness(0.86) saturate(0.95);
+        }
+
+        .platform-poster.is-active {
+            transform: scale(1.06);
+            opacity: 1;
+            filter: brightness(1) saturate(1.05);
+            border-color: rgba(255, 255, 255, 0.24);
+            box-shadow: 0 26px 56px rgba(0, 0, 0, 0.88), 0 0 32px rgba(255, 255, 255, 0.06);
+            z-index: 5;
+        }
+
+        .platform-poster.is-upcoming.is-active {
+            filter: brightness(0.88) saturate(0.7);
+        }
+
+        .poster-media {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .poster-media svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .platform-poster.is-active:hover .poster-media svg {
+            transform: scale(1.04);
+        }
+
+        /* Dark Gradient Overlay for Text Readability */
+        .poster-shade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(4, 6, 12, 0.32) 0%,
+                rgba(4, 6, 12, 0.04) 34%,
+                rgba(4, 6, 12, 0.72) 70%,
+                rgba(3, 5, 10, 0.96) 100%
+            );
+            pointer-events: none;
+        }
+
+        /* Subtle Top Icon Badge */
+        .poster-top {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .platform-emblem {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.74rem;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Bottom Info Overlay */
+        .poster-info {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .poster-title {
+            font-size: 1.22rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+        }
+
+        .poster-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-pill {
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.84);
+            background: rgba(255, 255, 255, 0.12);
+            padding: 3px 9px;
+            border-radius: 999px;
+            letter-spacing: 0.01em;
+        }
+
+        .tag-sub {
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Subtle Indicator Dots */
+        .carousel-dots {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.22);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .dot.active {
+            width: 20px;
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        footer {
+            position: fixed;
+            bottom: 14px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.28);
+            font-size: 0.74rem;
+            letter-spacing: 0.6px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Compact Mobile Optimization */
+        @media (max-width: 640px) {
+            .hamburger-btn {
+                top: 18px;
+                right: 18px;
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+
+            .music-btn {
+                bottom: 18px;
+                right: 18px;
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+
+            .full-menu a {
+                font-size: 1.6rem;
+                letter-spacing: 2px;
+            }
+
+            .carousel-viewport {
+                padding: 24px 0;
+            }
+
+            .carousel-track {
+                gap: 14px;
+                padding: 0 calc(50vw - 92px);
+            }
+
+            .platform-poster {
+                width: 184px;
+                height: 270px;
+                border-radius: 16px;
+                transform: scale(0.86);
+            }
+
+            .platform-poster.is-neighbor {
+                transform: scale(0.91);
+            }
+
+            .platform-poster.is-active {
+                transform: scale(1.03);
+            }
+
+            .poster-title {
+                font-size: 1.06rem;
+                margin-bottom: 6px;
+            }
+
+            .tag-pill,
+            .tag-sub {
+                font-size: 0.63rem;
+            }
+
+            footer {
+                font-size: 0.68rem;
+                bottom: 10px;
+            }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            .carousel-viewport {
+                scroll-behavior: auto;
+            }
+            .platform-poster,
+            .poster-media svg,
+            .ambient-glow,
+            .dot {
+                transition: none !important;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="scanlines"></div>
-    <div class="bg-glow"></div>
-    <div class="bg-glow-2"></div>
+    <!-- AMBIENT LIGHTING -->
+    <div class="ambient-stage"></div>
+    <div class="ambient-glow" id="ambientGlow"></div>
 
     <!-- AUDIO ELEMENT -->
     <audio id="bgMusic" loop>
         <source src="dreamss.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- BACKGROUND ENGINE -->
-    <canvas id="reptileCanvas"></canvas>
-
     <!-- HAMBURGER MENU BUTTON -->
-    <div class="hamburger-btn" onclick="toggleMenu()">
+    <div class="hamburger-btn" onclick="toggleMenu()" aria-label="Toggle Menu">
         <i class="fa-solid fa-bars" id="menu-icon"></i>
     </div>
 
     <!-- MUSIC TOGGLE BUTTON -->
-    <div class="music-btn" onclick="toggleMusic()" title="Play/Pause Background Music">
+    <div class="music-btn" onclick="toggleMusic()" title="Play/Pause Background Music" aria-label="Toggle Music">
         <i class="fa-solid fa-volume-xmark" id="music-icon"></i>
     </div>
 
@@ -233,91 +481,435 @@
         <a href="contact.html">Connect</a>
     </div>
 
-    <div class="content-wrapper">
-        <section id="projects" class="page-section">
-            <h2 class="section-title"><span style="color:var(--primary-accent)">Software Platforms</span></h2>
-            
-            <div class="project-grid">
-                
-                <!-- Active Core Platforms -->
-                <div class="project-card">
-                    <i class="fa-solid fa-graduation-cap project-icon"></i>
-                    <div class="project-title">AstraNiti</div>
-                    <div class="project-desc">A value-based educational platform focused on cultivating civic sense and ethical character in students.</div>
-                    <div><button class="btn btn-hero" onclick="window.location.href='astraniti.html'">Launch App</button></div>
-                </div>
-                
-                <div class="project-card">
-                    <i class="fa-solid fa-file-invoice-dollar project-icon"></i>
-                    <div class="project-title">AstraBill</div>
-                    <div class="project-desc">Professional electricity bill predictor and usage analyzer with dynamic charting.</div>
-                    <div><button class="btn btn-hero" onclick="window.location.href='astrabill.html'">Launch App</button></div>
-                </div>
-                
-                <div class="project-card">
-                    <i class="fab fa-youtube project-icon"></i>
-                    <div class="project-title">Lostt</div>
-                    <div class="project-desc">Content creation and gaming channel featuring custom branding, Minecraft highlights, and interactive media.</div>
-                    <div><button class="btn btn-hero" onclick="window.open('https://www.youtube.com/@Lostt426', '_blank')">Visit Channel</button></div>
-                </div>
+    <!-- PLATFORMS SHOWCASE -->
+    <main class="content-wrapper">
+        <div class="carousel-viewport" id="carouselViewport" aria-label="Platforms Gallery">
+            <div class="carousel-track" id="carouselTrack">
 
-                <!-- New Added Utility Platforms -->
-                <div class="project-card">
-                    <i class="fa-solid fa-book-open project-icon"></i>
-                    <div class="project-title">Student Tools</div>
-                    <div class="project-desc">A dedicated suite of utilities tailored for academic research, daily organization, and productivity.</div>
-                    <div><button class="btn btn-hero" onclick="window.location.href='studentools.html'">Explore</button></div>
-                </div>
+                <!-- 1. AstraNiti -->
+                <a href="astraniti.html" class="platform-poster" data-index="0" data-glow="rgba(37, 99, 235, 0.28)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="AstraNiti Artwork">
+                            <defs>
+                                <radialGradient id="nitiBg" cx="50%" cy="38%" r="72%">
+                                    <stop offset="0%" stop-color="#1e3a8a"/>
+                                    <stop offset="55%" stop-color="#0a1329"/>
+                                    <stop offset="100%" stop-color="#03050a"/>
+                                </radialGradient>
+                                <filter id="nitiGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="7" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#nitiBg)"/>
+                            <!-- Concentric Halo Rings -->
+                            <circle cx="200" cy="235" r="108" fill="none" stroke="rgba(56, 189, 248, 0.14)" stroke-width="1.5" stroke-dasharray="6 8"/>
+                            <circle cx="200" cy="235" r="76" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2"/>
+                            <!-- Glowing Civic Compass Star -->
+                            <g filter="url(#nitiGlow)">
+                                <polygon points="200,135 222,213 300,235 222,257 200,335 178,257 100,235 178,213" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linejoin="round"/>
+                                <circle cx="200" cy="235" r="14" fill="#00eaff"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #2563eb;">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">AstraNiti</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Education</span>
+                            <span class="tag-sub">Civic Ethics</span>
+                        </div>
+                    </div>
+                </a>
 
-                <div class="project-card">
-                    <i class="fa-solid fa-code project-icon"></i>
-                    <div class="project-title">Developer Tools</div>
-                    <div class="project-desc">Advanced utilities for coding, JSON formatting, API testing, and accelerating development workflows.</div>
-                    <div><button class="btn btn-hero" onclick="window.location.href='developertools.html'">Explore</button></div>
-                </div>
+                <!-- 2. AstraBill (Default Active Center Card) -->
+                <a href="astrabill.html" class="platform-poster is-active" data-index="1" data-glow="rgba(6, 182, 212, 0.28)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="AstraBill Artwork">
+                            <defs>
+                                <radialGradient id="billBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#064e3b"/>
+                                    <stop offset="50%" stop-color="#081c24"/>
+                                    <stop offset="100%" stop-color="#03060a"/>
+                                </radialGradient>
+                                <linearGradient id="barGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#00eaff"/>
+                                    <stop offset="100%" stop-color="#10b981"/>
+                                </linearGradient>
+                                <filter id="billGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="6" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#billBg)"/>
+                            <!-- Grid Backdrop -->
+                            <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
+                                <line x1="65" y1="150" x2="335" y2="150"/>
+                                <line x1="65" y1="210" x2="335" y2="210"/>
+                                <line x1="65" y1="270" x2="335" y2="270"/>
+                                <line x1="65" y1="330" x2="335" y2="330"/>
+                            </g>
+                            <!-- Glowing Analytics Bars -->
+                            <g fill="url(#barGrad)" opacity="0.88">
+                                <rect x="92" y="265" width="32" height="85" rx="6"/>
+                                <rect x="148" y="215" width="32" height="135" rx="6"/>
+                                <rect x="204" y="240" width="32" height="110" rx="6"/>
+                                <rect x="260" y="160" width="32" height="190" rx="6" filter="url(#billGlow)"/>
+                            </g>
+                            <!-- Rising Energy Trend Line -->
+                            <polyline points="108,245 164,195 220,218 276,135" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#billGlow)"/>
+                            <circle cx="276" cy="135" r="7" fill="#00eaff" filter="url(#billGlow)"/>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #0891b2;">
+                            <i class="fa-solid fa-bolt"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">AstraBill</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Analytics</span>
+                            <span class="tag-sub">Predictor</span>
+                        </div>
+                    </div>
+                </a>
 
-                <div class="project-card">
-                    <i class="fa-solid fa-file-zipper project-icon"></i>
-                    <div class="project-title">File Tools</div>
-                    <div class="project-desc">Fast, secure in-browser tools for file conversion, compression, and document manipulation safely.</div>
-                    <div><button class="btn btn-hero" onclick="window.location.href='filetools.html'">Explore</button></div>
-                </div>
+                <!-- 3. Lostt -->
+                <a href="https://www.youtube.com/@Lostt426" target="_blank" rel="noopener noreferrer" class="platform-poster" data-index="2" data-glow="rgba(225, 29, 72, 0.3)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Lostt Channel Artwork">
+                            <defs>
+                                <radialGradient id="losttBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#4c0519"/>
+                                    <stop offset="55%" stop-color="#180614"/>
+                                    <stop offset="100%" stop-color="#040408"/>
+                                </radialGradient>
+                                <filter id="redGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="8" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#losttBg)"/>
+                            <!-- Soundwave Rings -->
+                            <circle cx="200" cy="235" r="98" fill="none" stroke="rgba(244, 63, 94, 0.18)" stroke-width="2"/>
+                            <circle cx="200" cy="235" r="70" fill="rgba(244, 63, 94, 0.12)" stroke="#f43f5e" stroke-width="3" filter="url(#redGlow)"/>
+                            <!-- Play Triangle -->
+                            <polygon points="184,202 184,268 238,235" fill="#ffffff" filter="url(#redGlow)"/>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #e11d48;">
+                            <i class="fa-brands fa-youtube"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">Lostt</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Media</span>
+                            <span class="tag-sub">YouTube</span>
+                        </div>
+                    </div>
+                </a>
 
-                <div class="project-card">
-                    <i class="fa-solid fa-shield-halved project-icon"></i>
-                    <div class="project-title">Privacy Tools</div>
-                    <div class="project-desc">Secure encryption, robust password generation, and localized privacy utilities to keep your data safe.</div>
-                    <div><button class="btn btn-hero" onclick="window.location.href='privacytools.html'">Explore</button></div>
-                </div>
+                <!-- 4. Student Tools -->
+                <a href="studentools.html" class="platform-poster" data-index="3" data-glow="rgba(139, 92, 246, 0.28)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Student Tools Artwork">
+                            <defs>
+                                <radialGradient id="stuBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#2e1065"/>
+                                    <stop offset="55%" stop-color="#110926"/>
+                                    <stop offset="100%" stop-color="#04040a"/>
+                                </radialGradient>
+                                <filter id="violetGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="7" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#stuBg)"/>
+                            <!-- Floating Academic Cards -->
+                            <g transform="translate(95, 135)">
+                                <rect x="20" y="0" width="170" height="195" rx="16" fill="#1e1b4b" stroke="rgba(167, 139, 250, 0.35)" stroke-width="2" transform="rotate(6 105 97)"/>
+                                <rect x="0" y="10" width="170" height="195" rx="16" fill="#171236" stroke="#a78bfa" stroke-width="3" filter="url(#violetGlow)"/>
+                                <line x1="32" y1="62" x2="138" y2="62" stroke="#c4b5fd" stroke-width="5" stroke-linecap="round"/>
+                                <line x1="32" y1="96" x2="115" y2="96" stroke="rgba(196, 181, 253, 0.55)" stroke-width="5" stroke-linecap="round"/>
+                                <line x1="32" y1="130" x2="128" y2="130" stroke="rgba(196, 181, 253, 0.55)" stroke-width="5" stroke-linecap="round"/>
+                                <circle cx="132" cy="162" r="12" fill="#a855f7" filter="url(#violetGlow)"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #7c3aed;">
+                            <i class="fa-solid fa-book-open"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">Student Tools</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Academic</span>
+                            <span class="tag-sub">Productivity</span>
+                        </div>
+                    </div>
+                </a>
 
-                <!-- Inactive/Coming Soon Platforms (Moved to Last) -->
-                <div class="project-card" style="opacity: 0.6; filter: grayscale(50%);">
-                    <i class="fa-solid fa-truck-fast project-icon" style="color: #888; text-shadow: none;"></i>
-                    <div class="project-title">AstraGoo</div>
-                    <div class="project-desc">A complete logistics and delivery service platform designed for seamless dispatch and driver routing.</div>
-                    <div><button class="btn btn-hero" style="background: rgba(255,255,255,0.1); color: #888; box-shadow: none; pointer-events: none;">Coming Soon</button></div>
-                </div>
-                
-                <div class="project-card" style="opacity: 0.6; filter: grayscale(50%);">
-                    <i class="fa-solid fa-file-pdf project-icon" style="color: #888; text-shadow: none;"></i>
-                    <div class="project-title">Astra Tools</div>
-                    <div class="project-desc">An online utility suite built to provide fast, secure document formatting and PDF-to-Word conversion.</div>
-                    <div><button class="btn btn-hero" style="background: rgba(255,255,255,0.1); color: #888; box-shadow: none; pointer-events: none;">Initializing...</button></div>
-                </div>
+                <!-- 5. Developer Tools -->
+                <a href="developertools.html" class="platform-poster" data-index="4" data-glow="rgba(14, 165, 233, 0.28)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Developer Tools Artwork">
+                            <defs>
+                                <radialGradient id="devBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#0c4a6e"/>
+                                    <stop offset="55%" stop-color="#071626"/>
+                                    <stop offset="100%" stop-color="#02060c"/>
+                                </radialGradient>
+                                <filter id="cyanGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="6" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#devBg)"/>
+                            <!-- Terminal Window Frame -->
+                            <rect x="64" y="135" width="272" height="195" rx="16" fill="rgba(7, 16, 30, 0.85)" stroke="rgba(56, 189, 248, 0.32)" stroke-width="2"/>
+                            <circle cx="90" cy="160" r="5" fill="#f43f5e"/>
+                            <circle cx="108" cy="160" r="5" fill="#fbbf24"/>
+                            <circle cx="126" cy="160" r="5" fill="#10b981"/>
+                            <!-- Glowing Code Brackets -->
+                            <g stroke="#00eaff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#cyanGlow)">
+                                <polyline points="160,210 128,242 160,274"/>
+                                <polyline points="240,210 272,242 240,274"/>
+                                <line x1="212" y1="202" x2="188" y2="282" stroke="#38bdf8"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #0284c7;">
+                            <i class="fa-solid fa-code"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">Developer Tools</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">DevSuite</span>
+                            <span class="tag-sub">JSON &bull; API</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 6. File Tools -->
+                <a href="filetools.html" class="platform-poster" data-index="5" data-glow="rgba(245, 158, 11, 0.25)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="File Tools Artwork">
+                            <defs>
+                                <radialGradient id="fileBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#451a03"/>
+                                    <stop offset="55%" stop-color="#190d07"/>
+                                    <stop offset="100%" stop-color="#050406"/>
+                                </radialGradient>
+                                <filter id="amberGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="6" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#fileBg)"/>
+                            <!-- Layered Isometric File Stack -->
+                            <g fill="none" stroke-linejoin="round" filter="url(#amberGlow)">
+                                <polygon points="200,150 295,198 200,246 105,198" fill="rgba(245, 158, 11, 0.18)" stroke="#fbbf24" stroke-width="4"/>
+                                <polyline points="105,238 200,286 295,238" stroke="rgba(251, 191, 36, 0.75)" stroke-width="4" stroke-linecap="round"/>
+                                <polyline points="105,278 200,326 295,278" stroke="rgba(251, 191, 36, 0.45)" stroke-width="4" stroke-linecap="round"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #d97706;">
+                            <i class="fa-solid fa-file-zipper"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">File Tools</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Converter</span>
+                            <span class="tag-sub">In-Browser</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 7. Privacy Tools -->
+                <a href="privacytools.html" class="platform-poster" data-index="6" data-glow="rgba(16, 185, 129, 0.26)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Privacy Tools Artwork">
+                            <defs>
+                                <radialGradient id="privBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#064e3b"/>
+                                    <stop offset="55%" stop-color="#061717"/>
+                                    <stop offset="100%" stop-color="#020507"/>
+                                </radialGradient>
+                                <filter id="emeraldGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="7" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#privBg)"/>
+                            <!-- Cyber Shield Outline -->
+                            <path d="M200 130 L282 166 V238 C282 296 200 342 200 342 C200 342 118 296 118 238 V166 Z" 
+                                  fill="rgba(16, 185, 129, 0.12)" 
+                                  stroke="#10b981" 
+                                  stroke-width="5" 
+                                  stroke-linejoin="round"
+                                  filter="url(#emeraldGlow)"/>
+                            <!-- Keyhole Core -->
+                            <circle cx="200" cy="222" r="14" fill="#34d399" filter="url(#emeraldGlow)"/>
+                            <path d="M194 232 L206 232 L210 264 L190 264 Z" fill="#34d399"/>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #059669;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">Privacy Tools</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Security</span>
+                            <span class="tag-sub">Encryption</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 8. AstraGoo (Upcoming) -->
+                <a href="#astragoo" class="platform-poster is-upcoming" data-index="7" data-upcoming="true" data-glow="rgba(100, 116, 139, 0.22)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="AstraGoo Artwork">
+                            <defs>
+                                <radialGradient id="gooBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#1e293b"/>
+                                    <stop offset="55%" stop-color="#0f172a"/>
+                                    <stop offset="100%" stop-color="#030508"/>
+                                </radialGradient>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#gooBg)"/>
+                            <!-- Route Network Nodes -->
+                            <g stroke="rgba(148, 163, 184, 0.38)" stroke-width="3" stroke-dasharray="6 6" fill="none">
+                                <path d="M110 290 Q 190 150 290 190"/>
+                                <path d="M110 290 Q 220 310 290 190"/>
+                            </g>
+                            <circle cx="110" cy="290" r="10" fill="#94a3b8"/>
+                            <circle cx="205" cy="222" r="8" fill="#64748b"/>
+                            <circle cx="290" cy="190" r="12" fill="#e2e8f0"/>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #475569;">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">AstraGoo</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Logistics</span>
+                            <span class="tag-sub">Upcoming</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 9. Astra Tools (Upcoming) -->
+                <a href="#astratools" class="platform-poster is-upcoming" data-index="8" data-upcoming="true" data-glow="rgba(100, 116, 139, 0.22)">
+                    <div class="poster-media">
+                        <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Astra Tools Artwork">
+                            <defs>
+                                <radialGradient id="pdfBg" cx="50%" cy="40%" r="72%">
+                                    <stop offset="0%" stop-color="#27272a"/>
+                                    <stop offset="55%" stop-color="#121217"/>
+                                    <stop offset="100%" stop-color="#040407"/>
+                                </radialGradient>
+                            </defs>
+                            <rect width="400" height="600" fill="url(#pdfBg)"/>
+                            <!-- Document Frame -->
+                            <path d="M135 145 H235 L275 185 V325 H135 Z" fill="rgba(255,255,255,0.05)" stroke="#94a3b8" stroke-width="4" stroke-linejoin="round"/>
+                            <polyline points="235,145 235,185 275,185" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linejoin="round"/>
+                            <line x1="165" y1="225" x2="245" y2="225" stroke="rgba(226, 232, 240, 0.6)" stroke-width="4" stroke-linecap="round"/>
+                            <line x1="165" y1="258" x2="225" y2="258" stroke="rgba(226, 232, 240, 0.4)" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="poster-shade"></div>
+                    <div class="poster-top">
+                        <span class="platform-emblem" style="background: #52525b;">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </span>
+                    </div>
+                    <div class="poster-info">
+                        <h2 class="poster-title">Astra Tools</h2>
+                        <div class="poster-tags">
+                            <span class="tag-pill">Documents</span>
+                            <span class="tag-sub">Upcoming</span>
+                        </div>
+                    </div>
+                </a>
 
             </div>
-            <footer>&copy; 2026 Omm Sairam Mahanta | AstraGoo Network. All Rights Reserved.</footer>
-        </section>
-    </div>
+        </div>
+
+        <!-- Subtle Carousel Indicators -->
+        <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Select Platform">
+            <button class="dot" data-index="0" aria-label="AstraNiti"></button>
+            <button class="dot active" data-index="1" aria-label="AstraBill"></button>
+            <button class="dot" data-index="2" aria-label="Lostt"></button>
+            <button class="dot" data-index="3" aria-label="Student Tools"></button>
+            <button class="dot" data-index="4" aria-label="Developer Tools"></button>
+            <button class="dot" data-index="5" aria-label="File Tools"></button>
+            <button class="dot" data-index="6" aria-label="Privacy Tools"></button>
+            <button class="dot" data-index="7" aria-label="AstraGoo"></button>
+            <button class="dot" data-index="8" aria-label="Astra Tools"></button>
+        </div>
+
+        <footer>&copy; 2026 Omm Sairam Mahanta | AstraGoo Network. All Rights Reserved.</footer>
+    </main>
 
     <!-- JAVASCRIPT -->
     <script>
+        // Preserved Audio Logic
         let isMusicPlaying = sessionStorage.getItem('musicPlaying') === 'true';
         const bgMusic = document.getElementById('bgMusic');
         const musicIcon = document.getElementById('music-icon');
 
-        if(isMusicPlaying) {
-            bgMusic.play().catch(()=> { isMusicPlaying = false; sessionStorage.setItem('musicPlaying', 'false'); });
+        if (isMusicPlaying) {
+            bgMusic.play().catch(() => {
+                isMusicPlaying = false;
+                sessionStorage.setItem('musicPlaying', 'false');
+            });
             musicIcon.classList.replace('fa-volume-xmark', 'fa-volume-high');
         }
 
@@ -334,6 +926,7 @@
             isMusicPlaying = !isMusicPlaying;
         }
 
+        // Preserved Navigation Menu Logic
         function toggleMenu() {
             const menu = document.getElementById('fullMenu');
             const icon = document.getElementById('menu-icon');
@@ -344,70 +937,119 @@
             if (menu.classList.contains('open')) {
                 icon.classList.replace('fa-bars', 'fa-xmark');
                 links.forEach((link, idx) => {
-                    link.style.animation = `slideInLink 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards ${idx * 0.1}s`;
+                    link.style.transitionDelay = `${idx * 0.06}s`;
                 });
             } else {
                 icon.classList.replace('fa-xmark', 'fa-bars');
-                links.forEach(link => { link.style.animation = 'none'; link.style.opacity = '0'; link.style.transform = 'translateY(40px)'; });
+                links.forEach(link => {
+                    link.style.transitionDelay = '0s';
+                });
             }
         }
 
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `
-            @keyframes slideInLink {
-                from { opacity: 0; transform: translateY(40px); filter: blur(5px); }
-                to { opacity: 1; transform: translateY(0); filter: blur(0px); }
-            }
-        `;
-        document.head.appendChild(styleSheet);
+        // Lightweight Carousel Controller
+        const viewport = document.getElementById('carouselViewport');
+        const posters = Array.from(document.querySelectorAll('.platform-poster'));
+        const dots = Array.from(document.querySelectorAll('.dot'));
+        const ambientGlow = document.getElementById('ambientGlow');
+        let activeIndex = 1;
+        let scrollTicking = false;
 
-        // Card 3D Effect
-        document.querySelectorAll('.project-card').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                let rect = card.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                let y = e.clientY - rect.top;
-                let xOffset = (x / rect.width - 0.5) * 30; 
-                let yOffset = (y / rect.height - 0.5) * -30;
-                card.style.transform = `perspective(1000px) rotateX(${yOffset}deg) rotateY(${xOffset}deg) scale3d(1.02, 1.02, 1.02)`;
+        function setActiveCard(index) {
+            if (index < 0 || index >= posters.length) return;
+            activeIndex = index;
+
+            posters.forEach((poster, idx) => {
+                poster.classList.toggle('is-active', idx === activeIndex);
+                poster.classList.toggle('is-neighbor', Math.abs(idx - activeIndex) === 1);
             });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === activeIndex);
+            });
+
+            const glow = posters[activeIndex].getAttribute('data-glow');
+            if (glow) {
+                ambientGlow.style.setProperty('--active-glow', glow);
+            }
+        }
+
+        function centerCard(index, smooth = true) {
+            const card = posters[index];
+            if (!card) return;
+            const targetLeft = card.offsetLeft - (viewport.clientWidth - card.offsetWidth) / 2;
+            viewport.scrollTo({
+                left: targetLeft,
+                behavior: smooth ? 'smooth' : 'auto'
+            });
+            setActiveCard(index);
+        }
+
+        function updateActiveFromScroll() {
+            const viewportCenter = viewport.scrollLeft + viewport.clientWidth / 2;
+            let closestIdx = activeIndex;
+            let minDistance = Infinity;
+
+            posters.forEach((poster, idx) => {
+                const cardCenter = poster.offsetLeft + poster.offsetWidth / 2;
+                const dist = Math.abs(viewportCenter - cardCenter);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestIdx = idx;
+                }
+            });
+
+            if (closestIdx !== activeIndex) {
+                setActiveCard(closestIdx);
+            }
+            scrollTicking = false;
+        }
+
+        viewport.addEventListener('scroll', () => {
+            if (!scrollTicking) {
+                window.requestAnimationFrame(updateActiveFromScroll);
+                scrollTicking = true;
+            }
+        }, { passive: true });
+
+        viewport.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                viewport.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
+
+        posters.forEach((poster, idx) => {
+            poster.addEventListener('click', (e) => {
+                if (idx !== activeIndex) {
+                    e.preventDefault();
+                    centerCard(idx, true);
+                } else if (poster.getAttribute('data-upcoming') === 'true') {
+                    e.preventDefault();
+                }
+            });
+
+            poster.addEventListener('mouseenter', () => {
+                if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                    setActiveCard(idx);
+                }
             });
         });
 
-        // Reptile Canvas
-        const rCanvas = document.getElementById('reptileCanvas');
-        const rCtx = rCanvas.getContext('2d');
-        let rWidth, rHeight, rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 }, rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
-        const rSegments = [], rSegCount = 45, rSegDist = 12; let rWalkCycle = 0;
-        for (let i = 0; i < rSegCount; i++) { rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 }); }
-        function rResize() { rWidth = rCanvas.width = window.innerWidth; rHeight = rCanvas.height = window.innerHeight; }
-        window.addEventListener('mousemove', e => { rMouse.x = e.clientX; rMouse.y = e.clientY; });
-        function drawReptileEngine() {
-            rCtx.clearRect(0, 0, rWidth, rHeight);
-            rHead.x += (rMouse.x - rHead.x) * 0.12; rHead.y += (rMouse.y - rHead.y) * 0.12;
-            let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
-            if (dHead > 1) rWalkCycle += dHead * 0.08;
-            rSegments[0].x = rHead.x; rSegments[0].y = rHead.y;
-            for (let i = 1; i < rSegCount; i++) {
-                let s1 = rSegments[i - 1], s2 = rSegments[i];
-                let dx = s1.x - s2.x, dy = s1.y - s2.y;
-                s2.angle = Math.atan2(dy, dx);
-                s2.x = s1.x - Math.cos(s2.angle) * rSegDist; s2.y = s1.y - Math.sin(s2.angle) * rSegDist;
-                renderReptileBody(s2, i);
+        dots.forEach((dot, idx) => {
+            dot.addEventListener('click', () => centerCard(idx, true));
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && activeIndex < posters.length - 1) {
+                centerCard(activeIndex + 1, true);
+            } else if (e.key === 'ArrowLeft' && activeIndex > 0) {
+                centerCard(activeIndex - 1, true);
             }
-            requestAnimationFrame(drawReptileEngine);
-        }
-        function renderReptileBody(seg, i) {
-            rCtx.save(); rCtx.translate(seg.x, seg.y); rCtx.rotate(seg.angle);
-            let hue = 190 + (i * 2); rCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`; rCtx.lineWidth = 1.5; rCtx.shadowBlur = 12; rCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
-            let bW = Math.sin((i / rSegCount) * Math.PI) * 22;
-            rCtx.beginPath(); rCtx.moveTo(0, -bW / 2); rCtx.lineTo(0, bW / 2); rCtx.stroke();
-            rCtx.fillStyle = "white"; rCtx.shadowBlur = 0; rCtx.beginPath(); rCtx.arc(0, 0, 1.5, 0, Math.PI * 2); rCtx.fill();
-            rCtx.restore();
-        }
-        window.addEventListener('resize', rResize); rResize(); drawReptileEngine();
+        });
+
+        window.addEventListener('load', () => centerCard(1, false));
+        window.addEventListener('resize', () => centerCard(activeIndex, false));
     </script>
 </body>
 </html>
