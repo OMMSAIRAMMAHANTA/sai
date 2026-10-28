@@ -2,286 +2,960 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe Dashboard | Gaming Lab</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Omm Sairam Mahanta | Tic Tac Toe</title>
+    
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        @property --angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
-        :root { --accent:#00eaff; --red:#ff4466; --gold:#ffd54a; --bg:#050b14; }
-        * { box-sizing:border-box; }
-        html { scroll-behavior:smooth; }
-        body {
-            margin:0; min-height:100vh; font-family:'Poppins',sans-serif; color:#fff; overflow-x:hidden;
-            background: linear-gradient(135deg, rgba(5,11,20,.93) 0%, rgba(10,25,47,.88) 100%),
-                        url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center/cover fixed;
-            background-color:var(--bg);
-            transition:opacity .35s ease, transform .35s ease, filter .35s ease;
+        :root {
+            --primary-accent: #00eaff;
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.62);
+            --bg-dark: #040508;
         }
-        body.leaving { opacity:0; transform:scale(1.04); filter:blur(8px); }
 
-        /* ---------- Background FX ---------- */
-        #fx { position:fixed; inset:0; width:100%; height:100%; z-index:-3; pointer-events:none; }
-        .orb { position:fixed; border-radius:50%; filter:blur(90px); z-index:-2; pointer-events:none; opacity:.35; }
-        .orb.a { width:46vw; height:46vw; left:-12vw; top:-14vw; background:#00eaff; animation:drift1 16s ease-in-out infinite alternate; }
-        .orb.b { width:40vw; height:40vw; right:-10vw; bottom:-12vw; background:#ff4466; animation:drift2 19s ease-in-out infinite alternate; opacity:.25; }
-        @keyframes drift1 { to { transform:translate(14vw, 12vw) scale(1.2); } }
-        @keyframes drift2 { to { transform:translate(-12vw, -10vw) scale(1.15); } }
-        .scan { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.35;
-            background:repeating-linear-gradient(to bottom, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.18) 2px 4px); }
-        .cursor-glow { position:fixed; width:420px; height:420px; border-radius:50%; left:0; top:0; z-index:-1; pointer-events:none;
-            background:radial-gradient(circle, rgba(0,234,255,.14), transparent 65%); transform:translate(-50%,-50%); transition:opacity .3s; opacity:0; }
-
-        .wrap { max-width:1120px; margin:0 auto; padding:44px 20px 70px; position:relative; }
-
-        /* ---------- Hero ---------- */
-        .hero { display:flex; flex-direction:column; align-items:center; gap:22px; margin-bottom:38px; }
-        .mini { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; width:122px; padding:8px; border-radius:18px;
-            background:rgba(0,0,0,.45); border:1px solid rgba(0,234,255,.35); box-shadow:0 0 30px rgba(0,234,255,.25), inset 0 0 14px rgba(0,234,255,.08);
-            animation:floaty 4s ease-in-out infinite; }
-        @keyframes floaty { 50% { transform:translateY(-8px) rotate(-1.5deg); } }
-        .mini i { aspect-ratio:1; border-radius:8px; background:rgba(255,255,255,.05); display:flex; align-items:center; justify-content:center;
-            font-style:normal; font-weight:900; font-size:1.35rem; transition:.25s; }
-        .mini i.x { color:var(--accent); text-shadow:0 0 12px var(--accent); animation:stamp .35s cubic-bezier(.2,1.6,.4,1); }
-        .mini i.o { color:var(--red); text-shadow:0 0 12px var(--red); animation:stamp .35s cubic-bezier(.2,1.6,.4,1); }
-        .mini i.win { background:rgba(255,213,74,.22); box-shadow:0 0 16px rgba(255,213,74,.7); animation:stamp .35s cubic-bezier(.2,1.6,.4,1), blink .5s .35s 3; }
-        @keyframes stamp { from { transform:scale(0) rotate(-90deg); opacity:0; } }
-        @keyframes blink { 50% { background:rgba(255,213,74,.5); } }
-
-        h1 { margin:0; text-align:center; font-weight:900; text-transform:uppercase; letter-spacing:6px; line-height:1.1;
-            font-size:clamp(2rem, 6.5vw, 3.6rem);
-            background:linear-gradient(100deg, #00eaff 0%, #ffffff 25%, #ffd54a 50%, #ff4466 75%, #00eaff 100%); background-size:250% 100%;
-            -webkit-background-clip:text; background-clip:text; color:transparent; animation:shimmer 6s linear infinite, titleIn 1s cubic-bezier(.2,.8,.2,1) backwards;
-            filter:drop-shadow(0 0 18px rgba(0,234,255,.35)); }
-        @keyframes shimmer { to { background-position:-250% 0; } }
-        @keyframes titleIn { from { opacity:0; transform:translateY(-24px) scale(.92); letter-spacing:18px; } }
-
-        /* ---------- Buttons ---------- */
-        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:18px; perspective:1200px; }
-        .game-btn {
-            --rx:0deg; --ry:0deg; --lift:0px; --s:1; --mx:50%; --my:50%;
-            position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center;
-            min-height:74px; padding:14px 16px; color:#fff; text-decoration:none; font-weight:700; font-size:.95rem; letter-spacing:.5px;
-            background:rgba(15,15,20,.78); backdrop-filter:blur(6px);
-            border:1px solid rgba(0,234,255,.28); border-radius:18px;
-            box-shadow:0 0 18px rgba(0,234,255,.08), inset 0 0 14px rgba(0,234,255,.04);
-            transform:perspective(800px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift)) scale(var(--s));
-            transition:transform .18s ease-out, border-color .25s, box-shadow .25s, color .25s;
-            animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards; animation-delay:calc(var(--i) * 45ms + 250ms);
-            -webkit-tap-highlight-color:transparent; will-change:transform;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
-        @keyframes rise { from { opacity:0; transform:translateY(34px) scale(.85) rotateX(-25deg); filter:blur(6px); } }
-        .game-btn::before {                         /* cursor spotlight */
-            content:""; position:absolute; inset:0; opacity:0; transition:opacity .25s;
-            background:radial-gradient(180px circle at var(--mx) var(--my), rgba(0,234,255,.38), transparent 70%);
-        }
-        .game-btn::after {                          /* light sweep */
-            content:""; position:absolute; top:0; bottom:0; width:45%; left:-60%; transform:skewX(-20deg);
-            background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
-        }
-        .game-btn span.label { position:relative; z-index:2; transition:transform .25s, text-shadow .25s; }
-        .game-btn:hover, .game-btn:focus-visible {
-            outline:none; --lift:-6px; --s:1.04; border-color:var(--accent);
-            box-shadow:0 14px 34px rgba(0,0,0,.5), 0 0 28px rgba(0,234,255,.45), inset 0 0 18px rgba(0,234,255,.12);
-        }
-        .game-btn:hover::before, .game-btn:focus-visible::before { opacity:1; }
-        .game-btn:hover::after, .game-btn:focus-visible::after { left:130%; transition:left .75s ease; }
-        .game-btn:hover span.label, .game-btn:focus-visible span.label { transform:translateZ(0) scale(1.06); text-shadow:0 0 14px rgba(0,234,255,.9); }
-        .game-btn:active { --s:.97; transition-duration:.08s; }
 
-        /* Featured (Sai's) */
-        .game-btn.featured {
-            grid-column:1 / -1; min-height:92px; font-size:1.3rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold);
-            border:2px solid transparent;
-            background:linear-gradient(#0b0e16,#0b0e16) padding-box,
-                       conic-gradient(from var(--angle), #ffd54a, rgba(255,213,74,0) 25%, #ff4466 50%, rgba(255,213,74,0) 75%, #ffd54a) border-box;
-            animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards, spin 4s linear infinite, pulse 2.6s ease-in-out infinite;
-            animation-delay:.2s, 0s, 0s;
-            box-shadow:0 0 30px rgba(255,213,74,.25), inset 0 0 20px rgba(255,213,74,.08);
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
-        .game-btn.featured::before { background:radial-gradient(260px circle at var(--mx) var(--my), rgba(255,213,74,.35), transparent 70%); }
-        .game-btn.featured:hover, .game-btn.featured:focus-visible { color:#fff; box-shadow:0 16px 40px rgba(0,0,0,.5), 0 0 44px rgba(255,213,74,.7); }
-        .game-btn.featured:hover span.label { text-shadow:0 0 18px rgba(255,213,74,1); }
-        @keyframes spin { to { --angle:360deg; } }
-        @keyframes pulse { 50% { box-shadow:0 0 52px rgba(255,213,74,.5), inset 0 0 26px rgba(255,213,74,.14); } }
 
-        /* Click ripple */
-        .ripple { position:absolute; z-index:1; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; pointer-events:none;
-            background:rgba(255,255,255,.7); animation:ripple .6s ease-out forwards; }
-        @keyframes ripple { to { transform:scale(24); opacity:0; } }
-
-        @media (hover:none) { .game-btn { transform:none !important; } }
-        @media (prefers-reduced-motion:reduce) {
-            *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+        /* Deep Black Background with Subtle Red & Blue Ambient Lighting */
+        .ambient-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 50% 46%, rgba(190, 24, 38, 0.2) 0%, rgba(120, 15, 28, 0.08) 36%, transparent 68%),
+                radial-gradient(circle at 22% 65%, rgba(29, 78, 216, 0.14) 0%, transparent 55%),
+                radial-gradient(circle at 78% 35%, rgba(0, 234, 255, 0.1) 0%, transparent 55%),
+                linear-gradient(180deg, #030407 0%, #070910 50%, #030407 100%);
         }
-        @media (max-width:520px) { .grid { grid-template-columns:1fr 1fr; gap:12px; } .game-btn { font-size:.82rem; min-height:68px; padding:10px; } .game-btn.featured { font-size:1.05rem; letter-spacing:1.5px; } }
-        @media (max-width:360px) { .grid { grid-template-columns:1fr; } }
+
+        .ambient-glow {
+            position: fixed;
+            top: 48%;
+            left: 50%;
+            width: min(560px, 90vw);
+            height: min(380px, 60vh);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--active-glow, rgba(245, 158, 11, 0.28)) 0%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+            transition: background 0.5s ease;
+        }
+
+        /* Floating Back, Navigation & Music Controls */
+        .back-btn,
+        .hamburger-btn,
+        .music-btn {
+            position: fixed;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(8, 12, 22, 0.78);
+            border: 1.5px solid var(--primary-accent);
+            color: var(--primary-accent);
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 18px rgba(0, 234, 255, 0.18);
+            transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .back-btn {
+            top: 28px;
+            left: 28px;
+            z-index: 10000;
+        }
+
+        .hamburger-btn {
+            top: 28px;
+            right: 28px;
+            z-index: 10000;
+        }
+
+        .music-btn {
+            bottom: 28px;
+            right: 28px;
+            z-index: 9997;
+        }
+
+        .back-btn:hover,
+        .hamburger-btn:hover,
+        .music-btn:hover {
+            transform: scale(1.08);
+            background: var(--primary-accent);
+            color: #000;
+            box-shadow: 0 0 22px rgba(0, 234, 255, 0.5);
+        }
+
+        /* Full Screen Menu */
+        .full-menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 5, 10, 0.97);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .full-menu.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .full-menu a {
+            font-size: 2.2rem;
+            color: transparent;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.32);
+            opacity: 0;
+            transform: translateY(24px);
+            transition: color 0.3s ease, -webkit-text-stroke 0.3s ease, transform 0.3s ease, letter-spacing 0.3s ease;
+        }
+
+        .full-menu.open a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .full-menu a:hover,
+        .full-menu a.active-link {
+            color: var(--primary-accent);
+            -webkit-text-stroke: 1.5px var(--primary-accent);
+            text-shadow: 0 0 18px rgba(0, 234, 255, 0.45);
+            transform: scale(1.04);
+            letter-spacing: 5px;
+        }
+
+        /* Main Showcase Container */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .carousel-viewport {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            overflow-y: visible;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 36px 0;
+            cursor: grab;
+        }
+
+        .carousel-viewport:active {
+            cursor: grabbing;
+        }
+
+        .carousel-viewport::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-track {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            padding: 0 calc(50vw - 115px);
+            margin: 0 auto;
+        }
+
+        /* Poster Card */
+        .mode-poster {
+            position: relative;
+            width: 230px;
+            height: 334px;
+            border-radius: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+            scroll-snap-align: center;
+            text-decoration: none;
+            color: #fff;
+            background: #0c1018;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.72);
+            transform: scale(0.84);
+            opacity: 0.46;
+            filter: brightness(0.72) saturate(0.85);
+            transition: 
+                transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.35s ease,
+                box-shadow 0.42s ease;
+            will-change: transform, opacity;
+        }
+
+        .mode-poster.is-neighbor {
+            transform: scale(0.9);
+            opacity: 0.72;
+            filter: brightness(0.86) saturate(0.95);
+        }
+
+        .mode-poster.is-active {
+            transform: scale(1.06);
+            opacity: 1;
+            filter: brightness(1) saturate(1.05);
+            border-color: rgba(255, 255, 255, 0.24);
+            box-shadow: 0 26px 56px rgba(0, 0, 0, 0.88), 0 0 32px rgba(255, 255, 255, 0.06);
+            z-index: 5;
+        }
+
+        .poster-media {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .poster-media svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .mode-poster.is-active:hover .poster-media svg {
+            transform: scale(1.04);
+        }
+
+        /* Dark Gradient Overlay for Text Readability */
+        .poster-shade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(4, 6, 12, 0.32) 0%,
+                rgba(4, 6, 12, 0.04) 34%,
+                rgba(4, 6, 12, 0.72) 70%,
+                rgba(3, 5, 10, 0.96) 100%
+            );
+            pointer-events: none;
+        }
+
+        /* Subtle Top Icon Badge */
+        .poster-top {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .mode-emblem {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.74rem;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Bottom Info Overlay */
+        .poster-info {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .poster-title {
+            font-size: 1.18rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.22;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+        }
+
+        .poster-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-pill {
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.84);
+            background: rgba(255, 255, 255, 0.12);
+            padding: 3px 9px;
+            border-radius: 999px;
+            letter-spacing: 0.01em;
+        }
+
+        .tag-sub {
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Subtle Carousel Progress Bar & Counter */
+        .carousel-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+            z-index: 10;
+        }
+
+        .progress-track {
+            width: 140px;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 10%;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            transition: width 0.25s ease;
+        }
+
+        .counter-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.55);
+            letter-spacing: 0.06em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 14px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.28);
+            font-size: 0.74rem;
+            letter-spacing: 0.6px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Compact Mobile Optimization */
+        @media (max-width: 640px) {
+            .back-btn {
+                top: 18px;
+                left: 18px;
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+
+            .hamburger-btn {
+                top: 18px;
+                right: 18px;
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+
+            .music-btn {
+                bottom: 18px;
+                right: 18px;
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+
+            .full-menu a {
+                font-size: 1.6rem;
+                letter-spacing: 2px;
+            }
+
+            .carousel-viewport {
+                padding: 24px 0;
+            }
+
+            .carousel-track {
+                gap: 14px;
+                padding: 0 calc(50vw - 92px);
+            }
+
+            .mode-poster {
+                width: 184px;
+                height: 270px;
+                border-radius: 16px;
+                transform: scale(0.86);
+            }
+
+            .mode-poster.is-neighbor {
+                transform: scale(0.91);
+            }
+
+            .mode-poster.is-active {
+                transform: scale(1.03);
+            }
+
+            .poster-title {
+                font-size: 1.02rem;
+                margin-bottom: 6px;
+            }
+
+            .tag-pill,
+            .tag-sub {
+                font-size: 0.62rem;
+            }
+
+            footer {
+                font-size: 0.68rem;
+                bottom: 10px;
+            }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            .carousel-viewport {
+                scroll-behavior: auto;
+            }
+            .mode-poster,
+            .poster-media svg,
+            .ambient-glow,
+            .progress-fill {
+                transition: none !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <canvas id="fx"></canvas>
-    <div class="orb a"></div><div class="orb b"></div>
-    <div class="scan"></div>
-    <div class="cursor-glow" id="glow"></div>
 
-    <div class="wrap">
-        <div class="hero">
-            <div class="mini" id="mini"></div>
-            <h1>Tic Tac Toe</h1>
-        </div>
-        <div class="grid" id="grid"></div>
+    <!-- AMBIENT LIGHTING -->
+    <div class="ambient-stage"></div>
+    <div class="ambient-glow" id="ambientGlow"></div>
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="bgMusic" loop>
+        <source src="dreamss.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- BACK TO GAMES BUTTON -->
+    <a href="games.html" class="back-btn" title="Back to Games" aria-label="Back to Games">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
+    <!-- HAMBURGER MENU BUTTON -->
+    <div class="hamburger-btn" onclick="toggleMenu()" aria-label="Toggle Menu">
+        <i class="fa-solid fa-bars" id="menu-icon"></i>
     </div>
 
-<script>
-/* ============ Buttons ============ */
-// [button name, page it opens]. Change the file names to match the pages you create.
-const GAMES = [
-    ["Sai's Tic Tac Toe", "tictactoe.html"],
-    ["Classic Tic-Tac-Toe", "classic-tic-tac-toe.html"],
-    ["4×4 Tic-Tac-Toe", "4x4-tic-tac-toe.html"],
-    ["5×5 Tic-Tac-Toe", "5x5-tic-tac-toe.html"],
-    ["3D Tic-Tac-Toe", "3d-tic-tac-toe.html"],
-    ["Giant Tic-Tac-Toe", "giant-tic-tac-toe.html"],
-    ["Infinite Tic-Tac-Toe", "infinite-tic-tac-toe.html"],
-    ["Vanishing Tic-Tac-Toe", "vanishing-tic-tac-toe.html"],
-    ["Ultimate Tic-Tac-Toe", "ultimate-tic-tac-toe.html"],
-    ["Misère Tic-Tac-Toe", "misere-tic-tac-toe.html"],
-    ["Notakto", "notakto.html"],
-    ["Wild Tic-Tac-Toe", "wild-tic-tac-toe.html"],
-    ["Reverse Tic-Tac-Toe", "reverse-tic-tac-toe.html"],
-    ["Gravity Tic-Tac-Toe", "gravity-tic-tac-toe.html"],
-    ["Quantum Tic-Tac-Toe", "quantum-tic-tac-toe.html"],
-    ["Rotating Tic-Tac-Toe", "rotating-tic-tac-toe.html"],
-    ["Three-Move Tic-Tac-Toe", "three-move-tic-tac-toe.html"],
-    ["Four-Player Tic-Tac-Toe", "four-player-tic-tac-toe.html"],
-    ["Timed Tic-Tac-Toe", "timed-tic-tac-toe.html"],
-    ["Power-Up Tic-Tac-Toe", "power-up-tic-tac-toe.html"],
-    ["Blocked-Cell Tic-Tac-Toe", "blocked-cell-tic-tac-toe.html"],
-    ["Team Tic-Tac-Toe", "team-tic-tac-toe.html"],
-    ["Tournament Tic-Tac-Toe", "tournament-tic-tac-toe.html"],
-    ["AI Tic-Tac-Toe", "ai-tic-tac-toe.html"],
-    ["Online Multiplayer Tic-Tac-Toe", "online-multiplayer-tic-tac-toe.html"],
-    ["Memory Tic-Tac-Toe", "memory-tic-tac-toe.html"]
-];
+    <!-- MUSIC TOGGLE BUTTON -->
+    <div class="music-btn" onclick="toggleMusic()" title="Play/Pause Background Music" aria-label="Toggle Music">
+        <i class="fa-solid fa-volume-xmark" id="music-icon"></i>
+    </div>
 
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const grid = document.getElementById("grid");
+    <!-- FULL SCREEN MENU -->
+    <div class="full-menu" id="fullMenu">
+        <a href="index.html">Biodata</a>
+        <a href="projects.html">Platforms</a>
+        <a href="games.html" class="active-link">Gaming Lab</a>
+        <a href="contact.html">Connect</a>
+    </div>
 
-GAMES.forEach(([name, href], i) => {
-    const a = document.createElement("a");
-    a.className = "game-btn" + (i === 0 ? " featured" : "");
-    a.href = href;
-    a.style.setProperty("--i", i);
-    a.innerHTML = '<span class="label"></span>';
-    a.firstChild.textContent = name;
+    <!-- TIC TAC TOE SHOWCASE -->
+    <main class="content-wrapper">
+        <div class="carousel-viewport" id="carouselViewport" aria-label="Tic Tac Toe Modes">
+            <div class="carousel-track" id="carouselTrack"></div>
+        </div>
 
-    // 3D tilt + spotlight following the cursor
-    a.addEventListener("pointermove", e => {
-        if (e.pointerType === "touch") return;
-        const r = a.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
-        a.style.setProperty("--mx", (px * 100) + "%");
-        a.style.setProperty("--my", (py * 100) + "%");
-        if (!reduceMotion) {
-            a.style.setProperty("--ry", ((px - .5) * 16) + "deg");
-            a.style.setProperty("--rx", ((.5 - py) * 16) + "deg");
+        <!-- Compact Progress Indicator -->
+        <div class="carousel-status" aria-live="polite">
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="counter-label" id="counterLabel">01 / 26</span>
+        </div>
+
+        <footer>&copy; 2026 Omm Sairam Mahanta | AstraGoo Network. All Rights Reserved.</footer>
+    </main>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // Preserved Audio Logic
+        let isMusicPlaying = sessionStorage.getItem('musicPlaying') === 'true';
+        const bgMusic = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('music-icon');
+
+        if (isMusicPlaying) {
+            bgMusic.play().catch(() => {
+                isMusicPlaying = false;
+                sessionStorage.setItem('musicPlaying', 'false');
+            });
+            musicIcon.classList.replace('fa-volume-xmark', 'fa-volume-high');
         }
-    });
-    a.addEventListener("pointerleave", () => { a.style.setProperty("--rx", "0deg"); a.style.setProperty("--ry", "0deg"); });
 
-    // Ripple, then fade out and open the page
-    a.addEventListener("click", e => {
-        if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-        e.preventDefault();
-        const r = a.getBoundingClientRect(), d = document.createElement("span");
-        d.className = "ripple";
-        d.style.left = (e.clientX - r.left || r.width / 2) + "px";
-        d.style.top = (e.clientY - r.top || r.height / 2) + "px";
-        a.appendChild(d);
-        setTimeout(() => document.body.classList.add("leaving"), 180);
-        setTimeout(() => { location.href = href; }, reduceMotion ? 0 : 480);
-    });
-    grid.appendChild(a);
-});
-// If the browser restores this page from the back button, undo the fade-out
-addEventListener("pageshow", () => document.body.classList.remove("leaving"));
-
-/* ============ Self-playing mini board ============ */
-(function () {
-    const mini = document.getElementById("mini");
-    const cells = [];
-    for (let i = 0; i < 9; i++) { const c = document.createElement("i"); mini.appendChild(c); cells.push(c); }
-    const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    // [cell, mark] sequences that finish in a win
-    const SCRIPTS = [
-        [[4,"x"],[0,"o"],[2,"x"],[1,"o"],[6,"x"]],
-        [[0,"x"],[4,"o"],[1,"x"],[8,"o"],[2,"x"]],
-        [[4,"x"],[0,"o"],[8,"x"],[2,"o"],[3,"x"],[1,"o"],[5,"x"]],
-        [[0,"x"],[2,"o"],[1,"x"],[5,"o"],[8,"x"],[4,"o"],[6,"x"],[3,"o"]],
-    ];
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-    async function loop() {
-        let n = 0;
-        while (true) {
-            const script = SCRIPTS[n++ % SCRIPTS.length];
-            cells.forEach(c => { c.className = ""; c.textContent = ""; });
-            await sleep(600);
-            for (const [i, m] of script) { cells[i].className = m; cells[i].textContent = m === "x" ? "X" : "O"; await sleep(520); }
-            const marks = cells.map(c => c.className);
-            const win = LINES.find(l => marks[l[0]] && marks[l[0]] === marks[l[1]] && marks[l[1]] === marks[l[2]]);
-            if (win) win.forEach(i => cells[i].classList.add("win"));
-            await sleep(1900);
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicIcon.classList.replace('fa-volume-high', 'fa-volume-xmark');
+                sessionStorage.setItem('musicPlaying', 'false');
+            } else {
+                bgMusic.play().catch(e => console.log("Audio play blocked by browser:", e));
+                musicIcon.classList.replace('fa-volume-xmark', 'fa-volume-high');
+                sessionStorage.setItem('musicPlaying', 'true');
+            }
+            isMusicPlaying = !isMusicPlaying;
         }
-    }
-    loop();
-})();
 
-/* ============ Floating X / O background ============ */
-(function () {
-    const cv = document.getElementById("fx"), ctx = cv.getContext("2d");
-    const glow = document.getElementById("glow");
-    let W, H, dpr, parts = [], mx = 0, my = 0, tx = 0, ty = 0, running = true;
-
-    function resize() {
-        dpr = Math.min(devicePixelRatio || 1, 2);
-        W = innerWidth; H = innerHeight;
-        cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const count = Math.round(Math.min(46, (W * H) / 30000));
-        parts = Array.from({ length: count }, () => ({
-            x: Math.random() * W, y: Math.random() * H, z: .3 + Math.random() * .9,
-            vy: -(.12 + Math.random() * .35), vx: (Math.random() - .5) * .2,
-            ch: Math.random() < .5 ? "X" : "O", rot: Math.random() * 6.28, vr: (Math.random() - .5) * .01
-        }));
-    }
-    function draw() {
-        if (!running) return;
-        ctx.clearRect(0, 0, W, H);
-        mx += (tx - mx) * .06; my += (ty - my) * .06;
-        for (const p of parts) {
-            p.x += p.vx; p.y += p.vy; p.rot += p.vr;
-            if (p.y < -50) { p.y = H + 50; p.x = Math.random() * W; }
-            if (p.x < -50) p.x = W + 50; if (p.x > W + 50) p.x = -50;
-            const ox = mx * 40 * p.z, oy = my * 40 * p.z, size = 18 + p.z * 42;
-            ctx.save();
-            ctx.translate(p.x + ox, p.y + oy); ctx.rotate(p.rot);
-            ctx.globalAlpha = .06 + p.z * .13;
-            ctx.font = "800 " + size + "px Poppins, sans-serif";
-            ctx.textAlign = "center"; ctx.textBaseline = "middle";
-            ctx.fillStyle = p.ch === "X" ? "#00eaff" : "#ff4466";
-            ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 14;
-            ctx.fillText(p.ch, 0, 0);
-            ctx.restore();
+        // Preserved Navigation Menu Logic
+        function toggleMenu() {
+            const menu = document.getElementById('fullMenu');
+            const icon = document.getElementById('menu-icon');
+            const links = document.querySelectorAll('.full-menu a');
+            
+            menu.classList.toggle('open');
+            
+            if (menu.classList.contains('open')) {
+                icon.classList.replace('fa-bars', 'fa-xmark');
+                links.forEach((link, idx) => {
+                    link.style.transitionDelay = `${idx * 0.06}s`;
+                });
+            } else {
+                icon.classList.replace('fa-xmark', 'fa-bars');
+                links.forEach(link => {
+                    link.style.transitionDelay = '0s';
+                });
+            }
         }
-        if (!reduceMotion) requestAnimationFrame(draw);
-    }
-    addEventListener("pointermove", e => {
-        tx = e.clientX / W - .5; ty = e.clientY / H - .5;
-        glow.style.opacity = 1; glow.style.left = e.clientX + "px"; glow.style.top = e.clientY + "px";
-    });
-    document.addEventListener("mouseleave", () => glow.style.opacity = 0);
-    document.addEventListener("visibilitychange", () => { running = !document.hidden; if (running && !reduceMotion) requestAnimationFrame(draw); });
-    addEventListener("resize", resize);
-    resize(); requestAnimationFrame(draw);
-})();
-</script>
+
+        // All 26 Preserved Tic Tac Toe Game Links & Metadata
+        const GAMES = [
+            { name: "Sai's Tic Tac Toe", href: "tictactoe.html", pill: "Signature", sub: "Featured", icon: "fa-crown", color: "#f59e0b", bg: "#451a03", glow: "rgba(245, 158, 11, 0.3)", art: "featured" },
+            { name: "Classic Tic-Tac-Toe", href: "classic-tic-tac-toe.html", pill: "3×3", sub: "Standard", icon: "fa-hashtag", color: "#00eaff", bg: "#0c4a6e", glow: "rgba(0, 234, 255, 0.28)", art: "grid3" },
+            { name: "4×4 Tic-Tac-Toe", href: "4x4-tic-tac-toe.html", pill: "4×4", sub: "Extended", icon: "fa-border-all", color: "#3b82f6", bg: "#1e3a8a", glow: "rgba(59, 130, 246, 0.28)", art: "grid4" },
+            { name: "5×5 Tic-Tac-Toe", href: "5x5-tic-tac-toe.html", pill: "5×5", sub: "Tactical", icon: "fa-table-cells", color: "#6366f1", bg: "#312e81", glow: "rgba(99, 102, 241, 0.28)", art: "grid5" },
+            { name: "3D Tic-Tac-Toe", href: "3d-tic-tac-toe.html", pill: "Spatial", sub: "Multi-Layer", icon: "fa-cube", color: "#a855f7", bg: "#3b0764", glow: "rgba(168, 85, 247, 0.28)", art: "cube" },
+            { name: "Giant Tic-Tac-Toe", href: "giant-tic-tac-toe.html", pill: "Macro", sub: "Large Board", icon: "fa-expand", color: "#ec4899", bg: "#500724", glow: "rgba(236, 72, 153, 0.28)", art: "grid5" },
+            { name: "Infinite Tic-Tac-Toe", href: "infinite-tic-tac-toe.html", pill: "Endless", sub: "No Draws", icon: "fa-infinity", color: "#06b6d4", bg: "#083344", glow: "rgba(6, 182, 212, 0.28)", art: "infinity" },
+            { name: "Vanishing Tic-Tac-Toe", href: "vanishing-tic-tac-toe.html", pill: "Decay", sub: "Fading Marks", icon: "fa-eye-slash", color: "#14b8a6", bg: "#042f2e", glow: "rgba(20, 184, 166, 0.28)", art: "vanish" },
+            { name: "Ultimate Tic-Tac-Toe", href: "ultimate-tic-tac-toe.html", pill: "9 Boards", sub: "Nested", icon: "fa-table-cells-large", color: "#f43f5e", bg: "#4c0519", glow: "rgba(244, 63, 94, 0.3)", art: "ultimate" },
+            { name: "Misère Tic-Tac-Toe", href: "misere-tic-tac-toe.html", pill: "Inverse", sub: "Avoid 3", icon: "fa-skull", color: "#ef4444", bg: "#450a0a", glow: "rgba(239, 68, 68, 0.28)", art: "inverse" },
+            { name: "Notakto", href: "notakto.html", pill: "All X", sub: "Impartial", icon: "fa-xmark", color: "#eab308", bg: "#422006", glow: "rgba(234, 179, 8, 0.26)", art: "onlyX" },
+            { name: "Wild Tic-Tac-Toe", href: "wild-tic-tac-toe.html", pill: "Freestyle", sub: "Pick X or O", icon: "fa-shuffle", color: "#10b981", bg: "#064e3b", glow: "rgba(16, 185, 129, 0.28)", art: "wild" },
+            { name: "Reverse Tic-Tac-Toe", href: "reverse-tic-tac-toe.html", pill: "Mirrored", sub: "Flipped Logic", icon: "fa-rotate-left", color: "#8b5cf6", bg: "#2e1065", glow: "rgba(139, 92, 246, 0.28)", art: "inverse" },
+            { name: "Gravity Tic-Tac-Toe", href: "gravity-tic-tac-toe.html", pill: "Physics", sub: "Falling Pieces", icon: "fa-arrow-down-wide-short", color: "#0ea5e9", bg: "#082f49", glow: "rgba(14, 165, 233, 0.28)", art: "gravity" },
+            { name: "Quantum Tic-Tac-Toe", href: "quantum-tic-tac-toe.html", pill: "Quantum", sub: "Superposition", icon: "fa-atom", color: "#22d3ee", bg: "#083344", glow: "rgba(34, 211, 238, 0.28)", art: "quantum" },
+            { name: "Rotating Tic-Tac-Toe", href: "rotating-tic-tac-toe.html", pill: "Dynamic", sub: "Shifting Grid", icon: "fa-arrows-spin", color: "#f97316", bg: "#431407", glow: "rgba(249, 115, 22, 0.28)", art: "rotate" },
+            { name: "Three-Move Tic-Tac-Toe", href: "three-move-tic-tac-toe.html", pill: "3 Pieces", sub: "Slide Phase", icon: "fa-sliders", color: "#38bdf8", bg: "#0c4a6e", glow: "rgba(56, 189, 248, 0.28)", art: "vanish" },
+            { name: "Four-Player Tic-Tac-Toe", href: "four-player-tic-tac-toe.html", pill: "4 Players", sub: "Party Mode", icon: "fa-users", color: "#e11d48", bg: "#4c0519", glow: "rgba(225, 29, 72, 0.28)", art: "fourP" },
+            { name: "Timed Tic-Tac-Toe", href: "timed-tic-tac-toe.html", pill: "Blitz", sub: "Speed Clock", icon: "fa-stopwatch", color: "#fbbf24", bg: "#451a03", glow: "rgba(251, 191, 36, 0.28)", art: "clock" },
+            { name: "Power-Up Tic-Tac-Toe", href: "power-up-tic-tac-toe.html", pill: "Abilities", sub: "Special Moves", icon: "fa-bolt", color: "#a855f7", bg: "#3b0764", glow: "rgba(168, 85, 247, 0.28)", art: "power" },
+            { name: "Blocked-Cell Tic-Tac-Toe", href: "blocked-cell-tic-tac-toe.html", pill: "Hazards", sub: "Locked Tiles", icon: "fa-ban", color: "#64748b", bg: "#1e293b", glow: "rgba(100, 116, 139, 0.28)", art: "blocked" },
+            { name: "Team Tic-Tac-Toe", href: "team-tic-tac-toe.html", pill: "Co-Op", sub: "Squad Play", icon: "fa-handshake-angle", color: "#10b981", bg: "#064e3b", glow: "rgba(16, 185, 129, 0.28)", art: "fourP" },
+            { name: "Tournament Tic-Tac-Toe", href: "tournament-tic-tac-toe.html", pill: "Bracket", sub: "Championship", icon: "fa-trophy", color: "#f59e0b", bg: "#451a03", glow: "rgba(245, 158, 11, 0.28)", art: "featured" },
+            { name: "AI Tic-Tac-Toe", href: "ai-tic-tac-toe.html", pill: "Neural", sub: "Minimax Engine", icon: "fa-microchip", color: "#00eaff", bg: "#083344", glow: "rgba(0, 234, 255, 0.3)", art: "ai" },
+            { name: "Online Multiplayer Tic-Tac-Toe", href: "online-multiplayer-tic-tac-toe.html", pill: "Online", sub: "Live Match", icon: "fa-globe", color: "#3b82f6", bg: "#1e3a8a", glow: "rgba(59, 130, 246, 0.28)", art: "online" },
+            { name: "Memory Tic-Tac-Toe", href: "memory-tic-tac-toe.html", pill: "Blindfold", sub: "Hidden Marks", icon: "fa-brain", color: "#ec4899", bg: "#500724", glow: "rgba(236, 72, 153, 0.28)", art: "memory" }
+        ];
+
+        // Custom SVG Artwork Generator for Each Mode
+        function buildPosterSVG(game, idx) {
+            const c = game.color;
+            const bg = game.bg;
+            let motif = "";
+
+            switch (game.art) {
+                case "featured":
+                    motif = `
+                        <circle cx="200" cy="230" r="96" fill="none" stroke="${c}" stroke-width="2" stroke-opacity="0.28" stroke-dasharray="6 8"/>
+                        <g stroke="rgba(255,255,255,0.22)" stroke-width="3" stroke-linecap="round">
+                            <line x1="162" y1="138" x2="162" y2="322"/><line x1="238" y1="138" x2="238" y2="322"/>
+                            <line x1="108" y1="192" x2="292" y2="192"/><line x1="108" y1="268" x2="292" y2="268"/>
+                        </g>
+                        <g stroke="${c}" stroke-width="8" stroke-linecap="round" filter="url(#glow${idx})">
+                            <line x1="184" y1="214" x2="216" y2="246"/><line x1="216" y1="214" x2="184" y2="246"/>
+                            <line x1="120" y1="150" x2="148" y2="178"/><line x1="148" y1="150" x2="120" y2="178"/>
+                            <line x1="252" y1="282" x2="280" y2="310"/><line x1="280" y1="282" x2="252" y2="310"/>
+                        </g>
+                        <circle cx="266" cy="164" r="16" fill="none" stroke="#ff4466" stroke-width="6"/>
+                        <circle cx="134" cy="296" r="16" fill="none" stroke="#ff4466" stroke-width="6"/>
+                        <line x1="112" y1="142" x2="288" y2="318" stroke="#ffffff" stroke-width="4" stroke-linecap="round" filter="url(#glow${idx})"/>
+                    `;
+                    break;
+                case "grid4":
+                    motif = `
+                        <g stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round">
+                            <line x1="145" y1="130" x2="145" y2="330"/><line x1="200" y1="130" x2="200" y2="330"/><line x1="255" y1="130" x2="255" y2="330"/>
+                            <line x1="95" y1="180" x2="305" y2="180"/><line x1="95" y1="230" x2="305" y2="230"/><line x1="95" y1="280" x2="305" y2="280"/>
+                        </g>
+                        <g stroke="${c}" stroke-width="6" stroke-linecap="round" filter="url(#glow${idx})">
+                            <line x1="110" y1="145" x2="132" y2="167"/><line x1="132" y1="145" x2="110" y2="167"/>
+                            <line x1="162" y1="194" x2="184" y2="216"/><line x1="184" y1="194" x2="162" y2="216"/>
+                            <line x1="216" y1="244" x2="238" y2="266"/><line x1="238" y1="244" x2="216" y2="266"/>
+                            <line x1="270" y1="294" x2="292" y2="316"/><line x1="292" y1="294" x2="270" y2="316"/>
+                        </g>
+                        <circle cx="227" cy="155" r="12" fill="none" stroke="#ff4466" stroke-width="5"/>
+                        <circle cx="172" cy="255" r="12" fill="none" stroke="#ff4466" stroke-width="5"/>
+                    `;
+                    break;
+                case "grid5":
+                    motif = `
+                        <g stroke="rgba(255,255,255,0.18)" stroke-width="2">
+                            <line x1="136" y1="130" x2="136" y2="330"/><line x1="178" y1="130" x2="178" y2="330"/><line x1="222" y1="130" x2="222" y2="330"/><line x1="264" y1="130" x2="264" y2="330"/>
+                            <line x1="95" y1="170" x2="305" y2="170"/><line x1="95" y1="210" x2="305" y2="210"/><line x1="95" y1="250" x2="305" y2="250"/><line x1="95" y1="290" x2="305" y2="290"/>
+                        </g>
+                        <circle cx="200" cy="230" r="12" fill="none" stroke="${c}" stroke-width="5" filter="url(#glow${idx})"/>
+                        <circle cx="157" cy="190" r="12" fill="none" stroke="${c}" stroke-width="5" filter="url(#glow${idx})"/>
+                        <circle cx="243" cy="270" r="12" fill="none" stroke="${c}" stroke-width="5" filter="url(#glow${idx})"/>
+                        <line x1="108" y1="142" x2="292" y2="318" stroke="${c}" stroke-width="3.5" stroke-linecap="round" filter="url(#glow${idx})"/>
+                    `;
+                    break;
+                case "cube":
+                    motif = `
+                        <g fill="rgba(255,255,255,0.03)" stroke="${c}" stroke-width="3" stroke-linejoin="round" filter="url(#glow${idx})">
+                            <polygon points="200,130 295,168 200,206 105,168"/>
+                            <polygon points="200,192 295,230 200,268 105,230" stroke-opacity="0.7"/>
+                            <polygon points="200,254 295,292 200,330 105,292" stroke-opacity="0.45"/>
+                        </g>
+                        <circle cx="200" cy="168" r="7" fill="#fff"/>
+                        <circle cx="200" cy="230" r="7" fill="${c}"/>
+                        <circle cx="200" cy="292" r="7" fill="#ff4466"/>
+                    `;
+                    break;
+                case "infinity":
+                    motif = `
+                        <path d="M145,230 C110,230 110,180 145,180 C175,180 225,280 255,280 C290,280 290,230 255,230 C225,230 175,180 145,180" 
+                              fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round" filter="url(#glow${idx})"/>
+                        <circle cx="145" cy="205" r="8" fill="#ffffff"/>
+                        <circle cx="255" cy="255" r="8" fill="#ff4466"/>
+                    `;
+                    break;
+                case "vanish":
+                    motif = `
+                        <g stroke="rgba(255,255,255,0.18)" stroke-width="2.5" stroke-dasharray="6 6">
+                            <line x1="164" y1="138" x2="164" y2="322"/><line x1="236" y1="138" x2="236" y2="322"/>
+                            <line x1="108" y1="194" x2="292" y2="194"/><line x1="108" y1="266" x2="292" y2="266"/>
+                        </g>
+                        <g stroke="${c}" stroke-width="8" stroke-linecap="round" filter="url(#glow${idx})">
+                            <line x1="184" y1="214" x2="216" y2="246"/><line x1="216" y1="214" x2="184" y2="246"/>
+                        </g>
+                        <circle cx="136" cy="164" r="16" fill="none" stroke="${c}" stroke-width="6" stroke-opacity="0.45"/>
+                        <circle cx="264" cy="296" r="16" fill="none" stroke="${c}" stroke-width="5" stroke-opacity="0.2" stroke-dasharray="5 5"/>
+                    `;
+                    break;
+                case "ultimate":
+                    motif = `
+                        <g stroke="${c}" stroke-width="3.5" stroke-linecap="round" filter="url(#glow${idx})">
+                            <line x1="162" y1="132" x2="162" y2="328"/><line x1="238" y1="132" x2="238" y2="328"/>
+                            <line x1="102" y1="192" x2="298" y2="192"/><line x1="102" y1="268" x2="298" y2="268"/>
+                        </g>
+                        <g stroke="rgba(255,255,255,0.35)" stroke-width="1.5">
+                            <line x1="190" y1="202" x2="190" y2="258"/><line x1="210" y1="202" x2="210" y2="258"/>
+                            <line x1="172" y1="220" x2="228" y2="220"/><line x1="172" y1="240" x2="228" y2="240"/>
+                        </g>
+                    `;
+                    break;
+                case "onlyX":
+                    motif = `
+                        <g stroke="${c}" stroke-width="8" stroke-linecap="round" filter="url(#glow${idx})">
+                            <line x1="122" y1="162" x2="154" y2="194"/><line x1="154" y1="162" x2="122" y2="194"/>
+                            <line x1="184" y1="214" x2="216" y2="246"/><line x1="216" y1="214" x2="184" y2="246"/>
+                            <line x1="246" y1="266" x2="278" y2="298"/><line x1="278" y1="266" x2="246" y2="298"/>
+                        </g>
+                    `;
+                    break;
+                case "gravity":
+                    motif = `
+                        <g stroke="rgba(255,255,255,0.2)" stroke-width="3" stroke-linecap="round">
+                            <line x1="140" y1="140" x2="140" y2="320"/><line x1="200" y1="140" x2="200" y2="320"/><line x1="260" y1="140" x2="260" y2="320"/>
+                            <line x1="105" y1="320" x2="295" y2="320"/>
+                        </g>
+                        <circle cx="170" cy="292" r="18" fill="none" stroke="${c}" stroke-width="6" filter="url(#glow${idx})"/>
+                        <circle cx="230" cy="292" r="18" fill="none" stroke="#ff4466" stroke-width="6"/>
+                        <circle cx="170" cy="195" r="18" fill="none" stroke="${c}" stroke-width="6" filter="url(#glow${idx})"/>
+                        <line x1="170" y1="145" x2="170" y2="168" stroke="#ffffff" stroke-width="3" stroke-dasharray="4 4"/>
+                    `;
+                    break;
+                case "quantum":
+                    motif = `
+                        <g fill="none" stroke="${c}" stroke-width="3" filter="url(#glow${idx})">
+                            <ellipse cx="200" cy="230" rx="95" ry="38" transform="rotate(30 200 230)"/>
+                            <ellipse cx="200" cy="230" rx="95" ry="38" transform="rotate(-30 200 230)"/>
+                            <ellipse cx="200" cy="230" rx="95" ry="38" transform="rotate(90 200 230)" stroke-opacity="0.5"/>
+                        </g>
+                        <circle cx="200" cy="230" r="12" fill="#ffffff" filter="url(#glow${idx})"/>
+                    `;
+                    break;
+                case "rotate":
+                    motif = `
+                        <circle cx="200" cy="230" r="82" fill="none" stroke="${c}" stroke-width="5" stroke-dasharray="160 40" stroke-linecap="round" filter="url(#glow${idx})"/>
+                        <g stroke="#ffffff" stroke-width="6" stroke-linecap="round">
+                            <line x1="184" y1="214" x2="216" y2="246"/><line x1="216" y1="214" x2="184" y2="246"/>
+                        </g>
+                    `;
+                    break;
+                case "fourP":
+                    motif = `
+                        <circle cx="155" cy="185" r="22" fill="none" stroke="#00eaff" stroke-width="6" filter="url(#glow${idx})"/>
+                        <circle cx="245" cy="185" r="22" fill="none" stroke="#ff4466" stroke-width="6"/>
+                        <polygon points="155,252 177,292 133,292" fill="none" stroke="#fbbf24" stroke-width="6" stroke-linejoin="round"/>
+                        <rect x="225" y="252" width="40" height="40" rx="6" fill="none" stroke="#10b981" stroke-width="6"/>
+                    `;
+                    break;
+                case "clock":
+                    motif = `
+                        <circle cx="200" cy="230" r="78" fill="none" stroke="${c}" stroke-width="5" filter="url(#glow${idx})"/>
+                        <polyline points="200,182 200,230 236,248" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    `;
+                    break;
+                case "power":
+                    motif = `
+                        <polygon points="215,135 142,238 198,238 182,325 258,218 202,218" fill="rgba(168, 85, 247, 0.2)" stroke="${c}" stroke-width="5" stroke-linejoin="round" filter="url(#glow${idx})"/>
+                    `;
+                    break;
+                case "blocked":
+                    motif = `
+                        <rect x="135" y="165" width="130" height="130" rx="18" fill="rgba(255,255,255,0.04)" stroke="${c}" stroke-width="4"/>
+                        <circle cx="200" cy="230" r="38" fill="none" stroke="#ef4444" stroke-width="6" filter="url(#glow${idx})"/>
+                        <line x1="174" y1="204" x2="226" y2="256" stroke="#ef4444" stroke-width="6" stroke-linecap="round"/>
+                    `;
+                    break;
+                case "ai":
+                    motif = `
+                        <rect x="148" y="178" width="104" height="104" rx="16" fill="rgba(0, 234, 255, 0.1)" stroke="${c}" stroke-width="4" filter="url(#glow${idx})"/>
+                        <g stroke="${c}" stroke-width="3" stroke-linecap="round">
+                            <line x1="175" y1="145" x2="175" y2="178"/><line x1="200" y1="145" x2="200" y2="178"/><line x1="225" y1="145" x2="225" y2="178"/>
+                            <line x1="175" y1="282" x2="175" y2="315"/><line x1="200" y1="282" x2="200" y2="315"/><line x1="225" y1="282" x2="225" y2="315"/>
+                            <line x1="115" y1="205" x2="148" y2="205"/><line x1="115" y1="230" x2="148" y2="230"/><line x1="115" y1="255" x2="148" y2="255"/>
+                            <line x1="252" y1="205" x2="285" y2="205"/><line x1="252" y1="230" x2="285" y2="230"/><line x1="252" y1="255" x2="285" y2="255"/>
+                        </g>
+                        <circle cx="200" cy="230" r="18" fill="none" stroke="#ffffff" stroke-width="5"/>
+                    `;
+                    break;
+                case "online":
+                    motif = `
+                        <circle cx="200" cy="230" r="78" fill="none" stroke="${c}" stroke-width="4" filter="url(#glow${idx})"/>
+                        <ellipse cx="200" cy="230" rx="38" ry="78" fill="none" stroke="${c}" stroke-width="2.5"/>
+                        <line x1="122" y1="230" x2="278" y2="230" stroke="${c}" stroke-width="2.5"/>
+                    `;
+                    break;
+                case "memory":
+                    motif = `
+                        <rect x="115" y="160" width="76" height="96" rx="10" fill="rgba(255,255,255,0.06)" stroke="${c}" stroke-width="3.5" filter="url(#glow${idx})"/>
+                        <rect x="209" y="195" width="76" height="96" rx="10" fill="rgba(255,255,255,0.06)" stroke="#ffffff" stroke-width="3.5"/>
+                        <text x="153" y="220" text-anchor="middle" fill="${c}" font-size="34" font-weight="700" font-family="sans-serif">?</text>
+                        <text x="247" y="255" text-anchor="middle" fill="#ffffff" font-size="34" font-weight="700" font-family="sans-serif">X</text>
+                    `;
+                    break;
+                default:
+                    motif = `
+                        <g stroke="rgba(255,255,255,0.22)" stroke-width="3" stroke-linecap="round">
+                            <line x1="164" y1="138" x2="164" y2="322"/><line x1="236" y1="138" x2="236" y2="322"/>
+                            <line x1="108" y1="194" x2="292" y2="194"/><line x1="108" y1="266" x2="292" y2="266"/>
+                        </g>
+                        <g stroke="${c}" stroke-width="8" stroke-linecap="round" filter="url(#glow${idx})">
+                            <line x1="184" y1="214" x2="216" y2="246"/><line x1="216" y1="214" x2="184" y2="246"/>
+                        </g>
+                        <circle cx="264" cy="164" r="16" fill="none" stroke="#ff4466" stroke-width="6"/>
+                        <circle cx="136" cy="296" r="16" fill="none" stroke="${c}" stroke-width="6"/>
+                    `;
+            }
+
+            return `
+                <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${game.name}">
+                    <defs>
+                        <radialGradient id="bg${idx}" cx="50%" cy="38%" r="72%">
+                            <stop offset="0%" stop-color="${bg}"/>
+                            <stop offset="58%" stop-color="#070c18"/>
+                            <stop offset="100%" stop-color="#03050a"/>
+                        </radialGradient>
+                        <filter id="glow${idx}" x="-25%" y="-25%" width="150%" height="150%">
+                            <feGaussianBlur stdDeviation="6" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <rect width="400" height="600" fill="url(#bg${idx})"/>
+                    ${motif}
+                </svg>
+            `;
+        }
+
+        // Render Carousel Cards
+        const track = document.getElementById('carouselTrack');
+        GAMES.forEach((game, idx) => {
+            const card = document.createElement('a');
+            card.href = game.href;
+            card.className = 'mode-poster' + (idx === 0 ? ' is-active' : '');
+            card.setAttribute('data-index', idx);
+            card.setAttribute('data-glow', game.glow);
+            card.innerHTML = `
+                <div class="poster-media">
+                    ${buildPosterSVG(game, idx)}
+                </div>
+                <div class="poster-shade"></div>
+                <div class="poster-top">
+                    <span class="mode-emblem" style="background: ${game.color}; color: #04060c;">
+                        <i class="fa-solid ${game.icon}"></i>
+                    </span>
+                </div>
+                <div class="poster-info">
+                    <h2 class="poster-title">${game.name}</h2>
+                    <div class="poster-tags">
+                        <span class="tag-pill">${game.pill}</span>
+                        <span class="tag-sub">${game.sub}</span>
+                    </div>
+                </div>
+            `;
+            track.appendChild(card);
+        });
+
+        // Lightweight Carousel Controller
+        const viewport = document.getElementById('carouselViewport');
+        const posters = Array.from(document.querySelectorAll('.mode-poster'));
+        const ambientGlow = document.getElementById('ambientGlow');
+        const progressFill = document.getElementById('progressFill');
+        const counterLabel = document.getElementById('counterLabel');
+        let activeIndex = 0;
+        let scrollTicking = false;
+
+        function setActiveCard(index) {
+            if (index < 0 || index >= posters.length) return;
+            activeIndex = index;
+
+            posters.forEach((poster, idx) => {
+                poster.classList.toggle('is-active', idx === activeIndex);
+                poster.classList.toggle('is-neighbor', Math.abs(idx - activeIndex) === 1);
+            });
+
+            const glow = posters[activeIndex].getAttribute('data-glow');
+            if (glow) {
+                ambientGlow.style.setProperty('--active-glow', glow);
+            }
+
+            const pct = ((activeIndex + 1) / posters.length) * 100;
+            progressFill.style.width = `${pct}%`;
+            counterLabel.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${posters.length}`;
+        }
+
+        function centerCard(index, smooth = true) {
+            const card = posters[index];
+            if (!card) return;
+            const targetLeft = card.offsetLeft - (viewport.clientWidth - card.offsetWidth) / 2;
+            viewport.scrollTo({
+                left: targetLeft,
+                behavior: smooth ? 'smooth' : 'auto'
+            });
+            setActiveCard(index);
+        }
+
+        function updateActiveFromScroll() {
+            const viewportCenter = viewport.scrollLeft + viewport.clientWidth / 2;
+            let closestIdx = activeIndex;
+            let minDistance = Infinity;
+
+            posters.forEach((poster, idx) => {
+                const cardCenter = poster.offsetLeft + poster.offsetWidth / 2;
+                const dist = Math.abs(viewportCenter - cardCenter);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestIdx = idx;
+                }
+            });
+
+            if (closestIdx !== activeIndex) {
+                setActiveCard(closestIdx);
+            }
+            scrollTicking = false;
+        }
+
+        viewport.addEventListener('scroll', () => {
+            if (!scrollTicking) {
+                window.requestAnimationFrame(updateActiveFromScroll);
+                scrollTicking = true;
+            }
+        }, { passive: true });
+
+        viewport.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                viewport.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
+
+        posters.forEach((poster, idx) => {
+            poster.addEventListener('click', (e) => {
+                if (idx !== activeIndex) {
+                    e.preventDefault();
+                    centerCard(idx, true);
+                }
+            });
+
+            poster.addEventListener('mouseenter', () => {
+                if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                    setActiveCard(idx);
+                }
+            });
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && activeIndex < posters.length - 1) {
+                centerCard(activeIndex + 1, true);
+            } else if (e.key === 'ArrowLeft' && activeIndex > 0) {
+                centerCard(activeIndex - 1, true);
+            }
+        });
+
+        window.addEventListener('load', () => centerCard(0, false));
+        window.addEventListener('resize', () => centerCard(activeIndex, false));
+    </script>
 </body>
 </html>
