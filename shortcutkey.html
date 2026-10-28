@@ -1,0 +1,3438 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shortcut Atlas — Every shortcut. Every tool. One library.</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#06b6d4',
+                            violet: '#8b5cf6',
+                            dark: '#090d16',
+                            card: '#111827',
+                            border: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Theme & Keycap Styling */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --kbd-bg: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+            --kbd-border: #cbd5e1;
+            --kbd-shadow: #94a3b8;
+            --kbd-text: #1e293b;
+        }
+
+        html.dark {
+            --bg-primary: #070a12;
+            --bg-secondary: #0f1624;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --kbd-bg: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            --kbd-border: #334155;
+            --kbd-shadow: #020617;
+            --kbd-text: #38bdf8;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Realistic 3D Mechanical Keycap Styling */
+        kbd.keycap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.85rem;
+            padding: 0.2rem 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--kbd-text);
+            background: var(--kbd-bg);
+            border: 1px solid var(--kbd-border);
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 0 1px var(--kbd-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: all 0.12s ease;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .shortcut-card:hover kbd.keycap {
+            transform: translateY(-1px);
+            border-color: #06b6d4;
+            box-shadow: 0 3px 0 1px var(--kbd-shadow), 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Subtle Grid Background */
+        .bg-grid-pattern {
+            background-size: 36px 36px;
+            background-image: 
+                linear-gradient(to right, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+
+        /* Smooth Card Glow */
+        .shortcut-card {
+            transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+        .shortcut-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-[#070a12]/85 border-b border-slate-200 dark:border-slate-800/80 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <!-- Brand & Portfolio Back Link -->
+            <div class="flex items-center gap-3">
+                <a href="index.html" title="Return to Portfolio" class="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 border border-slate-200 dark:border-slate-700/70 transition">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Portfolio</span>
+                </a>
+                <a href="#top" class="flex items-center gap-2.5 group focus:outline-none">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
+                        <i data-lucide="command" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-violet-600 dark:from-white dark:via-cyan-300 dark:to-violet-400">Shortcut Atlas</span>
+                        <span class="hidden md:inline-block ml-2 text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">v2.5 Reference</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+                <a href="#front-shelf" class="hover:text-cyan-500 dark:hover:text-cyan-400 transition flex items-center gap-1.5">
+                    <i data-lucide="flame" class="w-4 h-4 text-amber-500"></i> Front Shelf
+                </a>
+                <a href="#whatsapp-spotlight" class="hover:text-emerald-500 dark:hover:text-emerald-400 transition flex items-center gap-1.5">
+                    <i data-lucide="message-circle" class="w-4 h-4 text-emerald-500"></i> WhatsApp Hub
+                </a>
+                <a href="#main-library" class="hover:text-cyan-500 dark:hover:text-cyan-400 transition flex items-center gap-1.5">
+                    <i data-lucide="library" class="w-4 h-4 text-cyan-500"></i> Full Library
+                </a>
+                <button id="nav-quiz-btn" class="hover:text-violet-500 dark:hover:text-violet-400 transition flex items-center gap-1.5">
+                    <i data-lucide="award" class="w-4 h-4 text-violet-500"></i> Practice Quiz
+                </button>
+            </nav>
+
+            <!-- Action Controls: OS Switcher, Favorites, Theme -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Global OS Display Perspective Switcher -->
+                <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800" role="group" aria-label="Operating System Key View">
+                    <button data-os-mode="all" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium transition bg-cyan-500 text-slate-950 font-semibold shadow-sm" title="Show All OS Keys">All</button>
+                    <button data-os-mode="windows" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" title="Prioritize Windows Keys">Win</button>
+                    <button data-os-mode="mac" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" title="Prioritize macOS Keys">Mac</button>
+                    <button data-os-mode="linux" class="os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" title="Prioritize Linux Keys">Linux</button>
+                </div>
+
+                <!-- Favorites Filter Toggle -->
+                <button id="favorites-toggle-btn" class="relative p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-amber-500/50 hover:text-amber-500 transition" title="View Saved Bookmarks">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    <span id="fav-count-badge" class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-slate-950 font-mono text-[10px] font-bold flex items-center justify-center">0</span>
+                </button>
+
+                <!-- Quiz Modal Button (Mobile visible) -->
+                <button id="mobile-quiz-btn" class="lg:hidden p-2 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-500 hover:bg-violet-500/20 transition" title="Shortcut Quiz">
+                    <i data-lucide="award" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Theme Switcher -->
+                <button id="theme-toggle-btn" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-500/50 hover:text-cyan-400 transition" title="Toggle Dark/Light Theme" aria-label="Toggle Theme">
+                    <i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i>
+                    <i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="top" class="relative pt-12 pb-14 md:pt-16 md:pb-20 border-b border-slate-200 dark:border-slate-800/80 bg-grid-pattern overflow-hidden">
+        <!-- Ambient Background Glows -->
+        <div class="pointer-events-none absolute -top-24 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div class="pointer-events-none absolute top-10 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl"></div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <!-- Live Statistics Pill -->
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 text-xs font-mono text-slate-600 dark:text-slate-300 mb-6 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span id="hero-stats-text">Indexing 160+ Verified Shortcuts across 35 Categories</span>
+            </div>
+
+            <!-- Title & Subtitle -->
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-violet-600 dark:from-white dark:via-cyan-300 dark:to-violet-400">
+                    Shortcut Atlas
+                </span>
+            </h1>
+            <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8 font-normal">
+                Every shortcut. Every tool. One library. Built like a real reference library—essential daily keys on the front shelf, and deep, organized catalogs below.
+            </p>
+
+            <!-- Master Search Bar -->
+            <div class="max-w-3xl mx-auto mb-6">
+                <div class="relative group">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-2xl blur opacity-25 group-focus-within:opacity-60 transition duration-300"></div>
+                    <div class="relative flex items-center bg-white dark:bg-[#0d1322] border border-slate-300 dark:border-slate-700/80 rounded-2xl shadow-xl overflow-hidden">
+                        <div class="pl-4 pr-2 text-slate-400 flex items-center">
+                            <i data-lucide="search" class="w-5 h-5 text-cyan-500"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="global-search-input"
+                            placeholder="Search by key (Ctrl+Shift+T), action (screenshot, copy), app (WhatsApp, VS Code, Excel)..."
+                            class="w-full py-4 px-2 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none text-sm sm:text-base"
+                            autocomplete="off"
+                        >
+                        <button id="clear-search-btn" class="hidden px-3 py-1.5 mr-2 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition">
+                            Clear
+                        </button>
+                        <div class="hidden sm:flex items-center gap-1 pr-4 text-xs text-slate-400 font-mono">
+                            <kbd class="keycap">/</kbd>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Filter Controls Row -->
+            <div class="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3 mb-7">
+                <!-- Category Select -->
+                <div class="relative">
+                    <select id="filter-category-select" aria-label="Filter by Category" class="w-full appearance-none bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-8 text-xs sm:text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition">
+                        <option value="all">All 35 Categories</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+
+                <!-- Platform Select -->
+                <div class="relative">
+                    <select id="filter-platform-select" aria-label="Filter by Platform" class="w-full appearance-none bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-8 text-xs sm:text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition">
+                        <option value="all">All Platforms (Win / Mac / Linux / Web)</option>
+                        <option value="Windows">Windows</option>
+                        <option value="macOS">macOS</option>
+                        <option value="Linux">Linux / Ubuntu</option>
+                        <option value="Web">Web / Cross-Platform</option>
+                    </select>
+                    <i data-lucide="monitor" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+
+                <!-- Application Select -->
+                <div class="relative">
+                    <select id="filter-app-select" aria-label="Filter by Application" class="w-full appearance-none bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-8 text-xs sm:text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:border-cyan-500 transition">
+                        <option value="all">All Applications</option>
+                    </select>
+                    <i data-lucide="layers" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <!-- Quick Search & Category Pills -->
+            <div class="flex flex-wrap items-center justify-center gap-2 text-xs">
+                <span class="text-slate-400 dark:text-slate-500 font-medium mr-1">Quick Jump:</span>
+                <button data-quick-query="WhatsApp" class="quick-chip px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-medium transition flex items-center gap-1">
+                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp
+                </button>
+                <button data-quick-query="VS Code" class="quick-chip px-3 py-1.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-medium transition">
+                    VS Code
+                </button>
+                <button data-quick-query="Windows" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Windows 11
+                </button>
+                <button data-quick-query="macOS" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    macOS
+                </button>
+                <button data-quick-query="Screenshot" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Screenshots
+                </button>
+                <button data-quick-query="Terminal" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Terminal & Bash
+                </button>
+                <button data-quick-query="Excel" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Excel
+                </button>
+                <button data-quick-query="Git" class="quick-chip px-3 py-1.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    Git & GitHub
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Active Filter Status Bar (Hidden when no filters active) -->
+    <div id="active-filter-bar" class="hidden bg-cyan-500/10 border-b border-cyan-500/20 py-3 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-sm">
+                <i data-lucide="filter" class="w-4 h-4 text-cyan-500"></i>
+                <span id="filter-results-summary" class="font-medium text-slate-800 dark:text-slate-200">Showing filtered results</span>
+            </div>
+            <button id="reset-all-filters-btn" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset All Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Recently Viewed / Copied Shelf (Appears dynamically as user interacts) -->
+    <section id="recently-viewed-section" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div class="p-4 rounded-2xl bg-slate-100/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-500"></i> Recently Interacted Shortcuts
+                </div>
+                <button id="clear-recent-btn" class="text-xs text-slate-400 hover:text-rose-400 transition">Clear History</button>
+            </div>
+            <div id="recently-viewed-list" class="flex flex-wrap gap-2"></div>
+        </div>
+    </section>
+
+    <!-- SECTION B: THE FRONT SHELF (Most-Used Essential Shortcuts) -->
+    <section id="front-shelf" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-b border-slate-200 dark:border-slate-800/80">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+                <div class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-amber-500 mb-2">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Front Shelf Collection
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    Most-Used Daily Shortcuts
+                </h2>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                    The essential foundation: high-frequency commands displayed on the front shelf for instant access.
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="#main-library" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-cyan-600 dark:hover:bg-cyan-500 text-white dark:hover:text-slate-950 text-xs sm:text-sm font-semibold transition shadow-sm">
+                    <span>Explore Full 35-Category Library</span>
+                    <i data-lucide="arrow-down-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Front Shelf Cards Grid -->
+        <div id="front-shelf-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <!-- Populated via JavaScript -->
+        </div>
+    </section>
+
+    <!-- DEDICATED WHATSAPP DESKTOP & WEB SPOTLIGHT -->
+    <section id="whatsapp-spotlight" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-b border-slate-200 dark:border-slate-800/80">
+        <div class="rounded-3xl bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-slate-950 border border-emerald-500/30 p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div class="pointer-events-none absolute -right-16 -bottom-16 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
+            
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold mb-3">
+                        <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Dedicated Productivity Wing
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white">
+                        WhatsApp Desktop &amp; WhatsApp Web Shortcuts
+                    </h2>
+                    <p class="text-sm text-slate-300 mt-1 max-w-2xl">
+                        Verified keyboard combinations for supercharging messaging without touching your mouse. Notice how <span class="text-emerald-400 font-semibold">WhatsApp Web</span> uses <code class="font-mono text-xs bg-slate-800 px-1.5 py-0.5 rounded">Ctrl + Alt</code> modifiers to prevent conflicts with standard browser shortcuts, whereas the <span class="text-cyan-400 font-semibold">Native Desktop App</span> uses direct <code class="font-mono text-xs bg-slate-800 px-1.5 py-0.5 rounded">Ctrl</code> or <code class="font-mono text-xs bg-slate-800 px-1.5 py-0.5 rounded">Cmd</code> bindings.
+                    </p>
+                </div>
+
+                <!-- Sub-filter for WhatsApp Variant -->
+                <div class="flex items-center self-start lg:self-center bg-slate-900/90 p-1 rounded-xl border border-slate-700/80">
+                    <button data-wa-tab="all" class="wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition">All WhatsApp</button>
+                    <button data-wa-tab="desktop" class="wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">Desktop App</button>
+                    <button data-wa-tab="web" class="wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">WhatsApp Web</button>
+                </div>
+            </div>
+
+            <div id="whatsapp-spotlight-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Populated via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION C: COMPLETE SHORTCUT LIBRARY (35 Organized Categories) -->
+    <main id="main-library" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Left Sidebar: Library Directory / Index -->
+            <aside class="lg:w-72 shrink-0">
+                <div class="sticky top-20 bg-white dark:bg-[#0c1220] border border-slate-200 dark:border-slate-800/90 rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-bold text-sm flex items-center gap-2 text-slate-900 dark:text-white">
+                            <i data-lucide="folder-tree" class="w-4 h-4 text-cyan-500"></i>
+                            Category Index
+                        </h3>
+                        <span id="sidebar-cat-count" class="text-xs font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">35</span>
+                    </div>
+
+                    <!-- Quick Filter Inside Sidebar -->
+                    <div class="relative mb-3">
+                        <input 
+                            type="text" 
+                            id="sidebar-cat-search" 
+                            placeholder="Filter categories..." 
+                            class="w-full text-xs px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+                        >
+                    </div>
+
+                    <!-- Scrollable Category List -->
+                    <div id="category-sidebar-list" class="space-y-1 max-h-[55vh] overflow-y-auto pr-1 text-xs">
+                        <!-- Populated via JavaScript -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Area: Expandable / Searchable Category Shelves -->
+            <div class="flex-1 min-w-0">
+                <!-- Library Shelf Controls Header -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>Complete Reference Stacks</span>
+                        </h2>
+                        <p id="library-status-subtitle" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                            Organized into 35 specialized sections. Expand any shelf or search inside a category.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="expand-all-btn" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5">
+                            <i data-lucide="chevrons-down" class="w-3.5 h-3.5 text-cyan-500"></i> Expand All
+                        </button>
+                        <button id="collapse-all-btn" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5">
+                            <i data-lucide="chevrons-up" class="w-3.5 h-3.5 text-violet-500"></i> Collapse All
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty State (Shown when search/filters match 0 shortcuts) -->
+                <div id="empty-search-state" class="hidden rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 p-12 text-center my-8">
+                    <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-400">
+                        <i data-lucide="search-x" class="w-7 h-7 text-cyan-500"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">No matching shortcuts found</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
+                        We couldn't find any shortcuts matching your current search query or filter criteria. Try searching for a broader action like "copy", "tab", or "terminal".
+                    </p>
+                    <button id="empty-reset-btn" class="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-semibold text-xs hover:bg-cyan-400 transition">
+                        Reset All Search Filters
+                    </button>
+                </div>
+
+                <!-- Categories Container -->
+                <div id="categories-shelves-container" class="space-y-6">
+                    <!-- Populated dynamically via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- INTERACTIVE SHORTCUT PRACTICE QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-white dark:bg-[#0f1624] border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative animate-fadeIn">
+            <button id="close-quiz-btn" class="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition" aria-label="Close Quiz">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <div class="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-violet-500 mb-2">
+                <i data-lucide="award" class="w-4 h-4"></i> Muscle Memory Trainer
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Shortcut Atlas Quiz</h3>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6">
+                Test your recall across Windows, macOS, VS Code, Browsers, and WhatsApp.
+            </p>
+
+            <!-- Score & Progress Bar -->
+            <div class="flex items-center justify-between text-xs font-mono mb-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800">
+                <div>Score: <span id="quiz-score" class="text-cyan-500 font-bold">0</span></div>
+                <div>Streak: <span id="quiz-streak" class="text-amber-500 font-bold">0 🔥</span></div>
+                <div>Question: <span id="quiz-q-number" class="text-violet-400 font-bold">1 / 10</span></div>
+            </div>
+
+            <!-- Question Box -->
+            <div id="quiz-question-container" class="mb-6">
+                <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-900 dark:to-[#090d16] border border-slate-200 dark:border-slate-800 mb-4">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span id="quiz-app-badge" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">Application</span>
+                        <span id="quiz-platform-badge" class="text-[11px] font-mono text-slate-400">Platform</span>
+                    </div>
+                    <h4 id="quiz-prompt-action" class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-1">Action Name</h4>
+                    <p id="quiz-prompt-desc" class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Description of the shortcut action goes here.</p>
+                </div>
+
+                <!-- 4 Multiple Choice Options -->
+                <div id="quiz-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Feedback Banner -->
+            <div id="quiz-feedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-medium mb-4 flex items-center justify-between">
+                <span id="quiz-feedback-text"></span>
+                <button id="quiz-next-btn" class="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-semibold text-xs">Next Question →</button>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-400">
+                <button id="quiz-restart-btn" class="hover:text-cyan-400 transition flex items-center gap-1">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Restart Quiz
+                </button>
+                <span>Select the matching key combination</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#060911] py-10 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white">
+                    <i data-lucide="command" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="font-semibold text-slate-800 dark:text-slate-200">Shortcut Atlas</span>
+                <span>— Built as a self-contained developer &amp; productivity reference library.</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#top" class="hover:text-cyan-400 transition">Back to Top ↑</a>
+                <a href="index.html" class="hover:text-cyan-400 transition">Portfolio Home</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Data & Logic -->
+    <script>
+        /*************************************************************************
+         * 1. STRUCTURED CATEGORIES & VERIFIED SHORTCUT DATABASE
+         * Every required category (35 total) with accurate, cross-checked keys.
+         *************************************************************************/
+        const CATEGORIES_META = [
+            { id: "windows-os", name: "Windows 10 and Windows 11", icon: "monitor", group: "Operating Systems" },
+            { id: "macos", name: "macOS", icon: "command", group: "Operating Systems" },
+            { id: "linux-ubuntu", name: "Linux and Ubuntu", icon: "terminal", group: "Operating Systems" },
+            { id: "chrome", name: "Google Chrome", icon: "globe", group: "Web Browsers" },
+            { id: "edge", name: "Microsoft Edge", icon: "compass", group: "Web Browsers" },
+            { id: "firefox", name: "Mozilla Firefox", icon: "flame", group: "Web Browsers" },
+            { id: "whatsapp", name: "WhatsApp Desktop and WhatsApp Web", icon: "message-circle", group: "Communication" },
+            { id: "vscode", name: "Visual Studio Code", icon: "code-2", group: "Development" },
+            { id: "terminal-cmd-ps", name: "Terminal, CMD and PowerShell", icon: "square-terminal", group: "Development" },
+            { id: "linux-bash", name: "Linux Terminal and Bash", icon: "terminal-square", group: "Development" },
+            { id: "git-github", name: "Git and GitHub", icon: "git-branch", group: "Development" },
+            { id: "ms-word", name: "Microsoft Word", icon: "file-text", group: "Office & Docs" },
+            { id: "ms-excel", name: "Microsoft Excel", icon: "table", group: "Office & Docs" },
+            { id: "ms-powerpoint", name: "Microsoft PowerPoint", icon: "presentation", group: "Office & Docs" },
+            { id: "google-workspace", name: "Google Docs, Sheets and Slides", icon: "file-spreadsheet", group: "Office & Docs" },
+            { id: "file-explorer", name: "File Explorer and file management", icon: "folder-open", group: "System & Workflow" },
+            { id: "screenshots", name: "Screenshot and screen recording", icon: "camera", group: "System & Workflow" },
+            { id: "text-editing", name: "Text editing and navigation", icon: "text-cursor-input", group: "System & Workflow" },
+            { id: "coding-general", name: "Coding and programming", icon: "braces", group: "Development" },
+            { id: "web-dev", name: "Web development", icon: "layout", group: "Development" },
+            { id: "vscode-devtools", name: "VS Code extensions and developer tools", icon: "puzzle", group: "Development" },
+            { id: "photoshop", name: "Photoshop and image editing", icon: "image", group: "Creative & Media" },
+            { id: "canva", name: "Canva and graphic design", icon: "palette", group: "Creative & Media" },
+            { id: "video-editing", name: "Video editing", icon: "film", group: "Creative & Media" },
+            { id: "audio-editing", name: "Audio editing", icon: "headphones", group: "Creative & Media" },
+            { id: "messaging-apps", name: "Communication and messaging apps", icon: "messages-square", group: "Communication" },
+            { id: "zoom-meetings", name: "Zoom and online meetings", icon: "video", group: "Communication" },
+            { id: "accessibility", name: "Accessibility shortcuts", icon: "accessibility", group: "System & Workflow" },
+            { id: "window-management", name: "Window management and multitasking", icon: "app-window", group: "System & Workflow" },
+            { id: "productivity", name: "Productivity and workflow shortcuts", icon: "zap", group: "System & Workflow" },
+            { id: "jupyter", name: "Jupyter Notebook", icon: "book-open", group: "Data & Python" },
+            { id: "python-dev", name: "Python development", icon: "file-code", group: "Data & Python" },
+            { id: "database-sql", name: "Database tools and SQL editors", icon: "database", group: "Data & Python" },
+            { id: "remote-vm", name: "Remote desktop and virtualization", icon: "server", group: "System & Workflow" },
+            { id: "popular-utils", name: "Popular applications and utilities", icon: "wrench", group: "System & Workflow" }
+        ];
+
+        const SHORTCUTS_DATA = [
+            // =========================================================================
+            // FRONT SHELF (Featured Most-Used Shortcuts) + Assigned to Primary Category
+            // =========================================================================
+            {
+                id: "fs-copy",
+                keys: "Ctrl + C",
+                macKeys: "Cmd + C",
+                action: "Copy",
+                description: "Copies the currently selected text, file, or object to the system clipboard.",
+                app: "Universal",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                featured: true,
+                tags: ["clipboard", "essential", "duplicate"]
+            },
+            {
+                id: "fs-paste",
+                keys: "Ctrl + V",
+                macKeys: "Cmd + V",
+                action: "Paste",
+                description: "Inserts the most recently copied or cut clipboard contents at the cursor position.",
+                app: "Universal",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                featured: true,
+                tags: ["clipboard", "essential", "insert"]
+            },
+            {
+                id: "fs-cut",
+                keys: "Ctrl + X",
+                macKeys: "Cmd + X",
+                action: "Cut",
+                description: "Removes the selected text or item and places it on the clipboard to be moved.",
+                app: "Universal",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                featured: true,
+                tags: ["clipboard", "move", "essential"]
+            },
+            {
+                id: "fs-undo",
+                keys: "Ctrl + Z",
+                macKeys: "Cmd + Z",
+                action: "Undo",
+                description: "Reverses the last action performed in editors, browsers, and file managers.",
+                app: "Universal",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                featured: true,
+                tags: ["history", "revert", "essential"]
+            },
+            {
+                id: "fs-redo",
+                keys: "Ctrl + Y / Ctrl + Shift + Z",
+                macKeys: "Cmd + Shift + Z",
+                action: "Redo",
+                description: "Restores an action that was previously undone. Many creative and modern apps prefer Ctrl+Shift+Z.",
+                app: "Universal (App-dependent)",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                featured: true,
+                tags: ["history", "restore", "essential"]
+            },
+            {
+                id: "fs-select-all",
+                keys: "Ctrl + A",
+                macKeys: "Cmd + A",
+                action: "Select All",
+                description: "Highlights all text in the active document, input field, or all files in a folder.",
+                app: "Universal",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                featured: true,
+                tags: ["selection", "highlight", "essential"]
+            },
+            {
+                id: "fs-save",
+                keys: "Ctrl + S",
+                macKeys: "Cmd + S",
+                action: "Save",
+                description: "Saves the active document, code file, or webpage locally.",
+                app: "Universal",
+                platform: "Windows / macOS / Linux",
+                category: "productivity",
+                featured: true,
+                tags: ["file", "store", "essential"]
+            },
+            {
+                id: "fs-find",
+                keys: "Ctrl + F",
+                macKeys: "Cmd + F",
+                action: "Find in Page or Document",
+                description: "Opens the search bar to locate specific words or phrases in the current view.",
+                app: "Universal",
+                platform: "Windows / macOS / Linux",
+                category: "productivity",
+                featured: true,
+                tags: ["search", "locate", "essential"]
+            },
+            {
+                id: "fs-alttab",
+                keys: "Alt + Tab",
+                macKeys: "Cmd + Tab",
+                action: "Switch Active Applications",
+                description: "Quickly cycles between open windows and running applications.",
+                app: "System OS",
+                platform: "Windows / macOS / Linux",
+                category: "window-management",
+                featured: true,
+                tags: ["multitasking", "switch", "window"]
+            },
+            {
+                id: "fs-wine",
+                keys: "Win + E",
+                macKeys: "Cmd + Option + Space",
+                action: "Open File Explorer",
+                description: "Immediately launches a new File Explorer window on Windows (or Finder Search on macOS).",
+                app: "File Explorer",
+                platform: "Windows",
+                category: "file-explorer",
+                featured: true,
+                tags: ["files", "folders", "system"]
+            },
+            {
+                id: "fs-winr",
+                keys: "Win + R",
+                macKeys: "Cmd + Space",
+                action: "Open Run Dialog",
+                description: "Opens the Windows Run command box to quickly launch executables, cmd, regedit, or services.",
+                app: "Windows OS",
+                platform: "Windows",
+                category: "windows-os",
+                featured: true,
+                tags: ["run", "launch", "command"]
+            },
+            {
+                id: "fs-taskmgr",
+                keys: "Ctrl + Shift + Esc",
+                macKeys: "Cmd + Option + Esc",
+                action: "Open Task Manager Directly",
+                description: "Launches Windows Task Manager immediately without going through the Ctrl+Alt+Del screen.",
+                app: "Windows OS",
+                platform: "Windows",
+                category: "windows-os",
+                featured: true,
+                tags: ["processes", "performance", "force quit"]
+            },
+            {
+                id: "fs-addressbar",
+                keys: "Ctrl + L",
+                macKeys: "Cmd + L",
+                action: "Focus Browser Address Bar",
+                description: "Highlights the URL bar in Chrome, Edge, Firefox, or File Explorer for instant typing.",
+                app: "Web Browsers",
+                platform: "Windows / macOS / Linux",
+                category: "chrome",
+                featured: true,
+                tags: ["url", "omnibox", "browser"]
+            },
+            {
+                id: "fs-reopentab",
+                keys: "Ctrl + Shift + T",
+                macKeys: "Cmd + Shift + T",
+                action: "Reopen Last Closed Tab",
+                description: "Restores the most recently closed browser tab (or window) in chronological order.",
+                app: "Chrome / Edge / Firefox",
+                platform: "Windows / macOS / Linux",
+                category: "chrome",
+                featured: true,
+                tags: ["browser", "restore", "tabs"]
+            },
+
+            // =========================================================================
+            // WHATSAPP DESKTOP & WHATSAPP WEB (Verified & Platform-Distinguished)
+            // =========================================================================
+            {
+                id: "wa-search-desktop",
+                keys: "Ctrl + F",
+                macKeys: "Cmd + F",
+                action: "Search All Chats & Messages (Desktop)",
+                description: "Focuses the global search box in the native WhatsApp Desktop app to find contacts or messages.",
+                app: "WhatsApp Desktop",
+                platform: "Windows / macOS",
+                category: "whatsapp",
+                waType: "desktop",
+                tags: ["whatsapp", "search", "find", "chats"]
+            },
+            {
+                id: "wa-search-web",
+                keys: "Ctrl + Alt + /",
+                macKeys: "Cmd + Ctrl + /",
+                action: "Search Chats (WhatsApp Web)",
+                description: "Activates the chat list search bar in WhatsApp Web without triggering the browser's built-in page search.",
+                app: "WhatsApp Web",
+                platform: "Web",
+                category: "whatsapp",
+                waType: "web",
+                tags: ["whatsapp", "web", "search"]
+            },
+            {
+                id: "wa-search-in-chat-desktop",
+                keys: "Ctrl + Shift + F",
+                macKeys: "Cmd + Shift + F",
+                action: "Search Within Current Conversation",
+                description: "Opens the in-chat message search bar to find specific keywords inside the currently open chat.",
+                app: "WhatsApp Desktop & Web",
+                platform: "Windows / macOS / Web",
+                category: "whatsapp",
+                waType: "both",
+                tags: ["whatsapp", "conversation", "find"]
+            },
+            {
+                id: "wa-new-chat-desktop",
+                keys: "Ctrl + N",
+                macKeys: "Cmd + N",
+                action: "Start a New Chat (Desktop)",
+                description: "Opens the contact selector to start a new conversation in WhatsApp Desktop.",
+                app: "WhatsApp Desktop",
+                platform: "Windows / macOS",
+                category: "whatsapp",
+                waType: "desktop",
+                tags: ["whatsapp", "new chat", "compose"]
+            },
+            {
+                id: "wa-new-chat-web",
+                keys: "Ctrl + Alt + N",
+                macKeys: "Cmd + Ctrl + N",
+                action: "Start a New Chat (WhatsApp Web)",
+                description: "Starts a new chat in WhatsApp Web (uses Ctrl+Alt+N so the browser does not open a new browser window).",
+                app: "WhatsApp Web",
+                platform: "Web",
+                category: "whatsapp",
+                waType: "web",
+                tags: ["whatsapp", "web", "new chat"]
+            },
+            {
+                id: "wa-next-chat-desktop",
+                keys: "Ctrl + Tab",
+                macKeys: "Ctrl + Tab",
+                action: "Next Chat (Desktop)",
+                description: "Moves selection down to the next conversation in your chat list on WhatsApp Desktop. (Ctrl+Shift+] also works).",
+                app: "WhatsApp Desktop",
+                platform: "Windows / macOS",
+                category: "whatsapp",
+                waType: "desktop",
+                tags: ["whatsapp", "navigate", "next"]
+            },
+            {
+                id: "wa-next-chat-web",
+                keys: "Ctrl + Alt + Tab",
+                macKeys: "Cmd + Ctrl + Tab",
+                action: "Next Chat (WhatsApp Web)",
+                description: "Cycles downward to the next conversation in WhatsApp Web without switching browser tabs.",
+                app: "WhatsApp Web",
+                platform: "Web",
+                category: "whatsapp",
+                waType: "web",
+                tags: ["whatsapp", "web", "navigate"]
+            },
+            {
+                id: "wa-prev-chat-web",
+                keys: "Ctrl + Alt + Shift + Tab",
+                macKeys: "Cmd + Ctrl + Shift + Tab",
+                action: "Previous Chat (WhatsApp Web)",
+                description: "Cycles upward to the previous conversation in WhatsApp Web (use Ctrl+Shift+Tab on Desktop).",
+                app: "WhatsApp Web & Desktop",
+                platform: "Web / Windows / macOS",
+                category: "whatsapp",
+                waType: "both",
+                tags: ["whatsapp", "previous", "navigate"]
+            },
+            {
+                id: "wa-archive-desktop",
+                keys: "Ctrl + E",
+                macKeys: "Cmd + E",
+                action: "Archive Conversation (Desktop)",
+                description: "Archives the currently active chat in WhatsApp Desktop.",
+                app: "WhatsApp Desktop",
+                platform: "Windows / macOS",
+                category: "whatsapp",
+                waType: "desktop",
+                tags: ["whatsapp", "archive", "hide"]
+            },
+            {
+                id: "wa-archive-web",
+                keys: "Ctrl + Alt + Shift + E",
+                macKeys: "Cmd + Ctrl + Shift + E",
+                action: "Archive Conversation (WhatsApp Web)",
+                description: "Moves the currently open chat to Archived Chats on WhatsApp Web.",
+                app: "WhatsApp Web",
+                platform: "Web",
+                category: "whatsapp",
+                waType: "web",
+                tags: ["whatsapp", "web", "archive"]
+            },
+            {
+                id: "wa-mute-chat",
+                keys: "Ctrl + Shift + M",
+                macKeys: "Cmd + Shift + M",
+                action: "Mute Conversation (Desktop) / Ctrl+Alt+Shift+M (Web)",
+                description: "Opens the mute duration dialog for the active chat. On WhatsApp Web, add Alt (Ctrl+Alt+Shift+M).",
+                app: "WhatsApp Desktop & Web",
+                platform: "Windows / macOS / Web",
+                category: "whatsapp",
+                waType: "both",
+                tags: ["whatsapp", "mute", "notifications"]
+            },
+            {
+                id: "wa-mark-unread",
+                keys: "Ctrl + Shift + U",
+                macKeys: "Cmd + Shift + U",
+                action: "Mark Chat as Unread (Desktop) / Ctrl+Alt+Shift+U (Web)",
+                description: "Toggles the unread status indicator on the selected conversation.",
+                app: "WhatsApp Desktop & Web",
+                platform: "Windows / macOS / Web",
+                category: "whatsapp",
+                waType: "both",
+                tags: ["whatsapp", "unread", "mark"]
+            },
+            {
+                id: "wa-emoji-quick",
+                keys: ": + keyword",
+                macKeys: ": + keyword",
+                action: "Inline Emoji Autocomplete",
+                description: "Type a colon followed by at least two letters (e.g., :smile or :fire) in the message input to open the inline emoji selector.",
+                app: "WhatsApp Desktop & Web",
+                platform: "Windows / macOS / Web",
+                category: "whatsapp",
+                waType: "both",
+                tags: ["whatsapp", "emoji", "picker"]
+            },
+            {
+                id: "wa-emoji-panel",
+                keys: "Ctrl + Shift + E",
+                macKeys: "Cmd + Shift + E",
+                action: "Focus Emoji Panel (Desktop) / Win + . (OS Picker)",
+                description: "Opens the emoji panel in WhatsApp Desktop, or use Win + . (Windows) / Ctrl + Cmd + Space (macOS) anywhere.",
+                app: "WhatsApp Desktop",
+                platform: "Windows / macOS",
+                category: "whatsapp",
+                waType: "desktop",
+                tags: ["whatsapp", "emoji", "panel"]
+            },
+            {
+                id: "wa-format-bold",
+                keys: "Ctrl + B  or  *text*",
+                macKeys: "Cmd + B  or  *text*",
+                action: "Bold Message Text",
+                description: "Formats highlighted message text as bold, or wrap words in asterisks (*bold*).",
+                app: "WhatsApp Desktop & Web",
+                platform: "Windows / macOS / Web",
+                category: "whatsapp",
+                waType: "both",
+                tags: ["whatsapp", "formatting", "bold", "italic"]
+            },
+            {
+                id: "wa-newline",
+                keys: "Shift + Enter",
+                macKeys: "Shift + Return",
+                action: "Insert New Line Without Sending",
+                description: "Creates a line break inside the message composition box instead of sending the message immediately.",
+                app: "WhatsApp Desktop & Web",
+                platform: "Windows / macOS / Web",
+                category: "whatsapp",
+                waType: "both",
+                tags: ["whatsapp", "newline", "message"]
+            },
+
+            // =========================================================================
+            // 1. WINDOWS 10 AND WINDOWS 11
+            // =========================================================================
+            {
+                id: "win-lock",
+                keys: "Win + L",
+                action: "Lock PC Instantly",
+                description: "Locks your Windows account and returns to the lock screen immediately.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "windows-os",
+                tags: ["security", "lock", "system"]
+            },
+            {
+                id: "win-power-menu",
+                keys: "Win + X",
+                action: "Open Quick Link (Power User) Menu",
+                description: "Opens the hidden system menu containing Terminal, Device Manager, Disk Management, and Settings.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "windows-os",
+                tags: ["admin", "power user", "menu"]
+            },
+            {
+                id: "win-settings",
+                keys: "Win + I",
+                action: "Open Windows Settings",
+                description: "Launches the modern Windows Settings panel directly.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "windows-os",
+                tags: ["settings", "configuration"]
+            },
+            {
+                id: "win-clipboard-history",
+                keys: "Win + V",
+                action: "Open Clipboard History",
+                description: "Displays a list of recently copied text snippets and images so you can paste older items.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "windows-os",
+                tags: ["clipboard", "history", "paste"]
+            },
+            {
+                id: "win-emoji",
+                keys: "Win + .",
+                action: "Open System Emoji, GIF & Symbol Picker",
+                description: "Brings up the floating Windows emoji, kaomoji, and special character selector in any input field.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "windows-os",
+                tags: ["emoji", "symbols", "input"]
+            },
+            {
+                id: "win-show-desktop",
+                keys: "Win + D",
+                action: "Show or Hide Desktop",
+                description: "Minimizes all open windows to reveal the desktop; press again to restore them.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "windows-os",
+                tags: ["desktop", "minimize"]
+            },
+
+            // =========================================================================
+            // 2. macOS
+            // =========================================================================
+            {
+                id: "mac-spotlight",
+                keys: "Cmd + Space",
+                macKeys: "Cmd + Space",
+                action: "Open Spotlight Search",
+                description: "Launches macOS Spotlight to find apps, files, calculations, and system actions.",
+                app: "macOS",
+                platform: "macOS",
+                category: "macos",
+                tags: ["spotlight", "search", "launcher"]
+            },
+            {
+                id: "mac-force-quit",
+                keys: "Cmd + Option + Esc",
+                macKeys: "Cmd + Option + Esc",
+                action: "Force Quit Applications",
+                description: "Opens the macOS Force Quit window to terminate unresponsive applications.",
+                app: "macOS",
+                platform: "macOS",
+                category: "macos",
+                tags: ["force quit", "hang", "kill"]
+            },
+            {
+                id: "mac-lock",
+                keys: "Ctrl + Cmd + Q",
+                macKeys: "Ctrl + Cmd + Q",
+                action: "Lock Mac Screen Immediately",
+                description: "Instantly locks your macOS session requiring Touch ID or password.",
+                app: "macOS",
+                platform: "macOS",
+                category: "macos",
+                tags: ["security", "lock", "mac"]
+            },
+            {
+                id: "mac-app-prefs",
+                keys: "Cmd + ,",
+                macKeys: "Cmd + ,",
+                action: "Open Active Application Settings",
+                description: "Universal macOS shortcut to open Preferences/Settings for whichever app is currently focused.",
+                app: "macOS Apps",
+                platform: "macOS",
+                category: "macos",
+                tags: ["preferences", "settings"]
+            },
+            {
+                id: "mac-cycle-windows",
+                keys: "Cmd + `",
+                macKeys: "Cmd + `",
+                action: "Switch Between Windows of Same App",
+                description: "Cycles through open windows belonging exclusively to the currently active application.",
+                app: "macOS",
+                platform: "macOS",
+                category: "macos",
+                tags: ["windows", "cycle", "multitask"]
+            },
+
+            // =========================================================================
+            // 3. LINUX AND UBUNTU
+            // =========================================================================
+            {
+                id: "linux-open-term",
+                keys: "Ctrl + Alt + T",
+                action: "Launch System Terminal",
+                description: "Default shortcut in Ubuntu, Mint, and most GNOME/KDE distros to open a new terminal window.",
+                app: "Ubuntu / Linux",
+                platform: "Linux",
+                category: "linux-ubuntu",
+                tags: ["terminal", "shell", "ubuntu"]
+            },
+            {
+                id: "linux-activities",
+                keys: "Super",
+                action: "Open Activities Overview & App Launcher",
+                description: "Press the Super (Windows) key on GNOME/Ubuntu to view open workspaces and search installed apps.",
+                app: "Ubuntu GNOME",
+                platform: "Linux",
+                category: "linux-ubuntu",
+                tags: ["gnome", "overview", "launcher"]
+            },
+            {
+                id: "linux-run-cmd",
+                keys: "Alt + F2",
+                action: "Run Quick Console Command",
+                description: "Opens a quick command dialog to execute a command or restart GNOME shell.",
+                app: "Linux Desktop",
+                platform: "Linux",
+                category: "linux-ubuntu",
+                tags: ["run", "execute", "gnome"]
+            },
+            {
+                id: "linux-tty",
+                keys: "Ctrl + Alt + F3",
+                action: "Switch to Virtual Console (TTY)",
+                description: "Switches from the graphical desktop environment to a full-screen text TTY session (F1/F2/F7 returns to GUI).",
+                app: "Linux Kernel",
+                platform: "Linux",
+                category: "linux-ubuntu",
+                tags: ["tty", "recovery", "console"]
+            },
+
+            // =========================================================================
+            // 4. GOOGLE CHROME
+            // =========================================================================
+            {
+                id: "chrome-incognito",
+                keys: "Ctrl + Shift + N",
+                macKeys: "Cmd + Shift + N",
+                action: "Open New Incognito Window",
+                description: "Launches a private browsing session that does not store local history or cookies.",
+                app: "Google Chrome",
+                platform: "Windows / macOS / Linux",
+                category: "chrome",
+                tags: ["private", "incognito", "browser"]
+            },
+            {
+                id: "chrome-clear-cache",
+                keys: "Ctrl + Shift + Delete",
+                macKeys: "Cmd + Shift + Delete",
+                action: "Clear Browsing Data Dialog",
+                description: "Directly opens the dialog to clear cache, cookies, and browsing history.",
+                app: "Google Chrome",
+                platform: "Windows / macOS / Linux",
+                category: "chrome",
+                tags: ["cache", "cookies", "history"]
+            },
+            {
+                id: "chrome-tab-search",
+                keys: "Ctrl + Shift + A",
+                macKeys: "Cmd + Shift + A",
+                action: "Search Across All Open & Recent Tabs",
+                description: "Opens Chrome's quick tab search popup to jump to any open tab even across multiple windows.",
+                app: "Google Chrome",
+                platform: "Windows / macOS / Linux",
+                category: "chrome",
+                tags: ["tabs", "search", "find"]
+            },
+            {
+                id: "chrome-downloads",
+                keys: "Ctrl + J",
+                macKeys: "Cmd + Option + L",
+                action: "Open Downloads Page",
+                description: "Opens the browser's download manager in a new tab.",
+                app: "Google Chrome",
+                platform: "Windows / macOS / Linux",
+                category: "chrome",
+                tags: ["downloads", "files"]
+            },
+
+            // =========================================================================
+            // 5. MICROSOFT EDGE
+            // =========================================================================
+            {
+                id: "edge-split-screen",
+                keys: "Ctrl + Shift + 2",
+                macKeys: "Cmd + Shift + 2",
+                action: "Toggle Split Screen View",
+                description: "Splits the active Microsoft Edge tab into two side-by-side browsing panes.",
+                app: "Microsoft Edge",
+                platform: "Windows / macOS",
+                category: "edge",
+                tags: ["split screen", "multitask", "edge"]
+            },
+            {
+                id: "edge-read-aloud",
+                keys: "Ctrl + Shift + U",
+                macKeys: "Cmd + Shift + U",
+                action: "Start or Stop Read Aloud",
+                description: "Uses Edge's natural neural voices to read the current webpage or PDF aloud.",
+                app: "Microsoft Edge",
+                platform: "Windows / macOS",
+                category: "edge",
+                tags: ["tts", "read aloud", "audio"]
+            },
+            {
+                id: "edge-collections",
+                keys: "Ctrl + Shift + Y",
+                macKeys: "Cmd + Shift + Y",
+                action: "Open Edge Collections",
+                description: "Opens the Collections sidebar to organize saved web research, links, and notes.",
+                app: "Microsoft Edge",
+                platform: "Windows / macOS",
+                category: "edge",
+                tags: ["collections", "bookmarks", "research"]
+            },
+            {
+                id: "edge-vertical-tabs",
+                keys: "Ctrl + Shift + ,",
+                macKeys: "Cmd + Shift + ,",
+                action: "Toggle Vertical Tabs Sidebar",
+                description: "Switches tab layout between traditional horizontal top bar and the vertical left sidebar.",
+                app: "Microsoft Edge",
+                platform: "Windows / macOS",
+                category: "edge",
+                tags: ["vertical tabs", "layout"]
+            },
+
+            // =========================================================================
+            // 6. MOZILLA FIREFOX
+            // =========================================================================
+            {
+                id: "ff-private-win",
+                keys: "Ctrl + Shift + P",
+                macKeys: "Cmd + Shift + P",
+                action: "Open New Private Window",
+                description: "Opens a Firefox Private Browsing window with Enhanced Tracking Protection.",
+                app: "Mozilla Firefox",
+                platform: "Windows / macOS / Linux",
+                category: "firefox",
+                tags: ["private", "firefox", "security"]
+            },
+            {
+                id: "ff-reader-view",
+                keys: "F9",
+                macKeys: "Cmd + Option + R",
+                action: "Toggle Reader View",
+                description: "Strips away ads, sidebars, and clutter from articles for clean distraction-free reading. (Ctrl+Alt+R on Linux).",
+                app: "Mozilla Firefox",
+                platform: "Windows / macOS / Linux",
+                category: "firefox",
+                tags: ["reader", "article", "clean"]
+            },
+            {
+                id: "ff-quick-find-links",
+                keys: "'",
+                macKeys: "'",
+                action: "Quick Find Links Only",
+                description: "Press single-quote when not focused in an input box to search only hyperlink text on the page.",
+                app: "Mozilla Firefox",
+                platform: "Windows / macOS / Linux",
+                category: "firefox",
+                tags: ["links", "search", "navigation"]
+            },
+            {
+                id: "ff-screenshot",
+                keys: "Ctrl + Shift + S",
+                macKeys: "Cmd + Shift + S",
+                action: "Take Webpage Screenshot",
+                description: "Activates Firefox's native tool to capture a visible area, DOM node, or full scrolling page.",
+                app: "Mozilla Firefox",
+                platform: "Windows / macOS / Linux",
+                category: "firefox",
+                tags: ["screenshot", "capture", "full page"]
+            },
+
+            // =========================================================================
+            // 8. VISUAL STUDIO CODE
+            // =========================================================================
+            {
+                id: "vsc-cmd-palette",
+                keys: "Ctrl + Shift + P",
+                macKeys: "Cmd + Shift + P",
+                action: "Show Command Palette",
+                description: "Opens the master command search bar to run any editor action, extension, or configuration.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode",
+                tags: ["command palette", "vscode", "master"]
+            },
+            {
+                id: "vsc-quick-open",
+                keys: "Ctrl + P",
+                macKeys: "Cmd + P",
+                action: "Quick Open File by Name",
+                description: "Fuzzy-searches across all files in your workspace to open any file in milliseconds.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode",
+                tags: ["file", "open", "fuzzy"]
+            },
+            {
+                id: "vsc-multi-cursor",
+                keys: "Ctrl + D",
+                macKeys: "Cmd + D",
+                action: "Add Next Occurrence to Multi-Cursor",
+                description: "Selects the word at the cursor and adds the next matching occurrence for simultaneous editing.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode",
+                tags: ["multi-cursor", "refactor", "edit"]
+            },
+            {
+                id: "vsc-toggle-terminal",
+                keys: "Ctrl + `",
+                macKeys: "Ctrl + `",
+                action: "Toggle Integrated Terminal",
+                description: "Shows or hides the built-in terminal panel at the bottom of the workspace.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode",
+                tags: ["terminal", "console", "panel"]
+            },
+            {
+                id: "vsc-move-line",
+                keys: "Alt + Up / Down",
+                macKeys: "Option + Up / Down",
+                action: "Move Line Up or Down",
+                description: "Moves the current line or selected block of code up or down without cutting and pasting.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode",
+                tags: ["lines", "move", "reorder"]
+            },
+            {
+                id: "vsc-dup-line",
+                keys: "Shift + Alt + Down",
+                macKeys: "Shift + Option + Down",
+                action: "Copy Line Up or Down",
+                description: "Duplicates the active line or selection immediately below (or above with Up arrow).",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode",
+                tags: ["duplicate", "clone", "line"]
+            },
+
+            // =========================================================================
+            // 9. TERMINAL, CMD AND POWERSHELL
+            // =========================================================================
+            {
+                id: "term-interrupt",
+                keys: "Ctrl + C",
+                macKeys: "Ctrl + C",
+                action: "Abort / Interrupt Running Command",
+                description: "Sends SIGINT to stop the currently executing script, server, or CLI command.",
+                app: "Windows Terminal / PowerShell / CMD",
+                platform: "Windows / macOS / Linux",
+                category: "terminal-cmd-ps",
+                tags: ["cancel", "sigint", "stop"]
+            },
+            {
+                id: "term-wt-split",
+                keys: "Alt + Shift + D",
+                action: "Duplicate & Split Pane (Windows Terminal)",
+                description: "Splits the active Windows Terminal tab into a side-by-side pane using the active profile.",
+                app: "Windows Terminal",
+                platform: "Windows",
+                category: "terminal-cmd-ps",
+                tags: ["split", "pane", "windows terminal"]
+            },
+            {
+                id: "term-clear-line",
+                keys: "Esc",
+                action: "Clear Current Command Input (CMD/PowerShell)",
+                description: "Instantly erases the entire command you are currently typing on the prompt line.",
+                app: "CMD / PowerShell",
+                platform: "Windows",
+                category: "terminal-cmd-ps",
+                tags: ["clear", "erase", "input"]
+            },
+            {
+                id: "term-ps-history",
+                keys: "Ctrl + R",
+                action: "Reverse Search Command History",
+                description: "Searches backward through your previously executed PowerShell commands interactively.",
+                app: "PowerShell / Windows Terminal",
+                platform: "Windows",
+                category: "terminal-cmd-ps",
+                tags: ["history", "search", "psreadline"]
+            },
+
+            // =========================================================================
+            // 10. LINUX TERMINAL AND BASH
+            // =========================================================================
+            {
+                id: "bash-clear",
+                keys: "Ctrl + L",
+                macKeys: "Ctrl + L",
+                action: "Clear Terminal Screen",
+                description: "Clears the terminal viewport cleanly, identical to running the `clear` command, while keeping what you're typing.",
+                app: "Bash / Zsh",
+                platform: "Linux / macOS",
+                category: "linux-bash",
+                tags: ["clear", "bash", "zsh"]
+            },
+            {
+                id: "bash-rev-search",
+                keys: "Ctrl + R",
+                macKeys: "Ctrl + R",
+                action: "Reverse Incremental History Search",
+                description: "Type any substring of a past command to search your `.bash_history` or `.zsh_history`.",
+                app: "Bash / Zsh",
+                platform: "Linux / macOS",
+                category: "linux-bash",
+                tags: ["history", "search", "command"]
+            },
+            {
+                id: "bash-cut-before",
+                keys: "Ctrl + U",
+                macKeys: "Ctrl + U",
+                action: "Cut Line Before Cursor",
+                description: "Deletes everything from the cursor back to the beginning of the command line into the readline buffer (yank with Ctrl+Y).",
+                app: "Bash / Zsh",
+                platform: "Linux / macOS",
+                category: "linux-bash",
+                tags: ["delete", "readline", "cut"]
+            },
+            {
+                id: "bash-line-edges",
+                keys: "Ctrl + A  /  Ctrl + E",
+                macKeys: "Ctrl + A  /  Ctrl + E",
+                action: "Jump to Start (Ctrl+A) or End (Ctrl+E) of Line",
+                description: "Moves the terminal cursor immediately to the beginning or end of the current command.",
+                app: "Bash / Zsh",
+                platform: "Linux / macOS",
+                category: "linux-bash",
+                tags: ["cursor", "navigation", "home", "end"]
+            },
+            {
+                id: "bash-last-arg",
+                keys: "Alt + .",
+                macKeys: "Esc then .",
+                action: "Insert Last Argument of Previous Command",
+                description: "Automatically pastes the final argument (such as a long file path) from the last executed command.",
+                app: "Bash / Zsh",
+                platform: "Linux / macOS",
+                category: "linux-bash",
+                tags: ["argument", "path", "repeat"]
+            },
+
+            // =========================================================================
+            // 11. GIT AND GITHUB
+            // =========================================================================
+            {
+                id: "gh-web-editor",
+                keys: ".",
+                macKeys: ".",
+                action: "Open Repository in GitHub.dev Web VS Code",
+                description: "Press the period key while viewing any GitHub repository or pull request to launch a browser-based VS Code editor.",
+                app: "GitHub Web",
+                platform: "Web",
+                category: "git-github",
+                tags: ["github.dev", "editor", "repo"]
+            },
+            {
+                id: "gh-cmd-palette",
+                keys: "Ctrl + K",
+                macKeys: "Cmd + K",
+                action: "Open GitHub Command Palette",
+                description: "Opens GitHub's global navigation palette to jump to repos, issues, PRs, or run quick actions.",
+                app: "GitHub Web",
+                platform: "Web",
+                category: "git-github",
+                tags: ["command palette", "navigation"]
+            },
+            {
+                id: "gh-file-finder",
+                keys: "T",
+                macKeys: "T",
+                action: "Activate Repository File Finder",
+                description: "Press T on any GitHub repository page to fuzzy-search files across the entire project tree.",
+                app: "GitHub Web",
+                platform: "Web",
+                category: "git-github",
+                tags: ["files", "search", "tree"]
+            },
+            {
+                id: "gh-blame",
+                keys: "B",
+                macKeys: "B",
+                action: "Open Git Blame View for File",
+                description: "When viewing a source file on GitHub, press B to inspect line-by-line commit history.",
+                app: "GitHub Web",
+                platform: "Web",
+                category: "git-github",
+                tags: ["git blame", "history", "commits"]
+            },
+
+            // =========================================================================
+            // 12. MICROSOFT WORD
+            // =========================================================================
+            {
+                id: "word-copy-format",
+                keys: "Ctrl + Shift + C  /  V",
+                macKeys: "Cmd + Shift + C  /  V",
+                action: "Copy & Paste Text Formatting Only",
+                description: "Copies the font style, size, and color of selected text (Ctrl+Shift+C) and applies it elsewhere (Ctrl+Shift+V).",
+                app: "Microsoft Word",
+                platform: "Windows / macOS",
+                category: "ms-word",
+                tags: ["format painter", "styles", "word"]
+            },
+            {
+                id: "word-page-break",
+                keys: "Ctrl + Enter",
+                macKeys: "Cmd + Return",
+                action: "Insert Hard Page Break",
+                description: "Immediately starts a new page at the current cursor position.",
+                app: "Microsoft Word",
+                platform: "Windows / macOS",
+                category: "ms-word",
+                tags: ["page break", "layout"]
+            },
+            {
+                id: "word-clear-format",
+                keys: "Ctrl + Space",
+                macKeys: "Ctrl + Space",
+                action: "Clear All Character Formatting",
+                description: "Resets selected text back to the underlying paragraph style's default font and styling.",
+                app: "Microsoft Word",
+                platform: "Windows / macOS",
+                category: "ms-word",
+                tags: ["reset", "plain text", "formatting"]
+            },
+
+            // =========================================================================
+            // 13. MICROSOFT EXCEL
+            // =========================================================================
+            {
+                id: "excel-autosum",
+                keys: "Alt + =",
+                macKeys: "Cmd + Shift + T",
+                action: "Insert AutoSum Formula",
+                description: "Automatically inserts `=SUM()` referencing the contiguous adjacent row or column of numbers.",
+                app: "Microsoft Excel",
+                platform: "Windows / macOS",
+                category: "ms-excel",
+                tags: ["sum", "formula", "spreadsheet"]
+            },
+            {
+                id: "excel-flash-fill",
+                keys: "Ctrl + E",
+                macKeys: "Ctrl + E",
+                action: "Trigger Flash Fill",
+                description: "Detects patterns in adjacent columns (like splitting first/last names) and fills the rest of the column automatically.",
+                app: "Microsoft Excel",
+                platform: "Windows / macOS",
+                category: "ms-excel",
+                tags: ["flash fill", "automation", "data"]
+            },
+            {
+                id: "excel-create-table",
+                keys: "Ctrl + T",
+                macKeys: "Cmd + T",
+                action: "Convert Range to Structured Table",
+                description: "Turns the current data range into an official Excel Table with sorting, filtering, and banded rows.",
+                app: "Microsoft Excel",
+                platform: "Windows / macOS",
+                category: "ms-excel",
+                tags: ["table", "range", "filter"]
+            },
+            {
+                id: "excel-insert-date",
+                keys: "Ctrl + ;",
+                macKeys: "Ctrl + ;",
+                action: "Insert Static Current Date",
+                description: "Enters today's date as a static value into the active cell (use Ctrl+Shift+; for current time).",
+                app: "Microsoft Excel",
+                platform: "Windows / macOS",
+                category: "ms-excel",
+                tags: ["date", "timestamp", "cell"]
+            },
+            {
+                id: "excel-abs-ref",
+                keys: "F4",
+                macKeys: "Cmd + T",
+                action: "Cycle Absolute / Relative Cell Reference ($A$1)",
+                description: "When editing a formula, toggles the selected cell reference between A1, $A$1, A$1, and $A1.",
+                app: "Microsoft Excel",
+                platform: "Windows / macOS",
+                category: "ms-excel",
+                tags: ["lock cell", "formula", "dollar"]
+            },
+
+            // =========================================================================
+            // 14. MICROSOFT POWERPOINT
+            // =========================================================================
+            {
+                id: "ppt-start-current",
+                keys: "Shift + F5",
+                macKeys: "Cmd + Shift + Return",
+                action: "Start Slide Show from Current Slide",
+                description: "Launches full-screen presentation mode starting on whichever slide you are currently editing (F5 starts from Slide 1).",
+                app: "Microsoft PowerPoint",
+                platform: "Windows / macOS",
+                category: "ms-powerpoint",
+                tags: ["present", "slideshow", "current"]
+            },
+            {
+                id: "ppt-duplicate",
+                keys: "Ctrl + D",
+                macKeys: "Cmd + D",
+                action: "Duplicate Selected Object or Slide",
+                description: "Clones the selected shape, text box, or entire slide thumbnail in one step.",
+                app: "Microsoft PowerPoint",
+                platform: "Windows / macOS",
+                category: "ms-powerpoint",
+                tags: ["duplicate", "slide", "shape"]
+            },
+            {
+                id: "ppt-black-screen",
+                keys: "B",
+                macKeys: "B",
+                action: "Toggle Black Screen During Presentation",
+                description: "Press B during an active slideshow to pause and black out the projector screen (press W for a white screen).",
+                app: "Microsoft PowerPoint",
+                platform: "Windows / macOS",
+                category: "ms-powerpoint",
+                tags: ["presenter", "blackout", "pause"]
+            },
+            {
+                id: "ppt-group",
+                keys: "Ctrl + G",
+                macKeys: "Cmd + Option + G",
+                action: "Group Selected Objects",
+                description: "Combines multiple selected shapes or images into a single movable group (Ctrl+Shift+G to ungroup).",
+                app: "Microsoft PowerPoint",
+                platform: "Windows / macOS",
+                category: "ms-powerpoint",
+                tags: ["group", "shapes", "align"]
+            },
+
+            // =========================================================================
+            // 15. GOOGLE DOCS, SHEETS AND SLIDES
+            // =========================================================================
+            {
+                id: "gdocs-paste-plain",
+                keys: "Ctrl + Shift + V",
+                macKeys: "Cmd + Shift + V",
+                action: "Paste Without Formatting",
+                description: "Pastes clipboard text matching the destination document's font and style, stripping external colors and sizes.",
+                app: "Google Docs / Sheets / Slides",
+                platform: "Web",
+                category: "google-workspace",
+                tags: ["paste", "plain text", "unformatted"]
+            },
+            {
+                id: "gdocs-word-count",
+                keys: "Ctrl + Shift + C",
+                macKeys: "Cmd + Shift + C",
+                action: "Display Document Word Count",
+                description: "Shows the word, character, and page count modal in Google Docs.",
+                app: "Google Docs",
+                platform: "Web",
+                category: "google-workspace",
+                tags: ["word count", "stats", "writing"]
+            },
+            {
+                id: "gdocs-comment",
+                keys: "Ctrl + Alt + M",
+                macKeys: "Cmd + Option + M",
+                action: "Insert Comment on Selection",
+                description: "Adds a collaborative comment thread anchored to the highlighted text or cell.",
+                app: "Google Docs / Sheets / Slides",
+                platform: "Web",
+                category: "google-workspace",
+                tags: ["comment", "review", "collaborate"]
+            },
+            {
+                id: "gdocs-tool-finder",
+                keys: "Alt + /",
+                macKeys: "Option + /",
+                action: "Search the Menus (Action Finder)",
+                description: "Opens a quick command palette inside Docs, Sheets, or Slides to run any menu item by typing its name.",
+                app: "Google Workspace",
+                platform: "Web",
+                category: "google-workspace",
+                tags: ["menu search", "command", "help"]
+            },
+
+            // =========================================================================
+            // 16. FILE EXPLORER AND FILE MANAGEMENT
+            // =========================================================================
+            {
+                id: "fe-new-folder",
+                keys: "Ctrl + Shift + N",
+                macKeys: "Cmd + Shift + N",
+                action: "Create New Folder",
+                description: "Instantly creates a new folder in the current directory and highlights its name for typing.",
+                app: "File Explorer / Finder",
+                platform: "Windows / macOS / Linux",
+                category: "file-explorer",
+                tags: ["mkdir", "folder", "directory"]
+            },
+            {
+                id: "fe-rename",
+                keys: "F2",
+                macKeys: "Return",
+                action: "Rename Selected File or Folder",
+                description: "Makes the filename editable inline. Press Tab while renaming to jump and rename the next file.",
+                app: "File Explorer / Linux",
+                platform: "Windows / Linux",
+                category: "file-explorer",
+                tags: ["rename", "file", "edit"]
+            },
+            {
+                id: "fe-perm-delete",
+                keys: "Shift + Delete",
+                macKeys: "Cmd + Option + Delete",
+                action: "Permanently Delete (Bypass Recycle Bin)",
+                description: "Deletes the selected files immediately without moving them to the Recycle Bin or Trash.",
+                app: "File Explorer / Finder",
+                platform: "Windows / macOS / Linux",
+                category: "file-explorer",
+                tags: ["delete", "permanent", "remove"]
+            },
+            {
+                id: "fe-properties",
+                keys: "Alt + Enter",
+                macKeys: "Cmd + I",
+                action: "Open File/Folder Properties (Get Info)",
+                description: "Displays file size, permissions, creation date, and disk usage for the selected item.",
+                app: "File Explorer / Finder",
+                platform: "Windows / macOS / Linux",
+                category: "file-explorer",
+                tags: ["properties", "info", "size"]
+            },
+
+            // =========================================================================
+            // 17. SCREENSHOT AND SCREEN RECORDING
+            // =========================================================================
+            {
+                id: "ss-win-snip",
+                keys: "Win + Shift + S",
+                action: "Open Windows Snipping Tool Overlay",
+                description: "Dims the screen to capture a rectangular region, freeform shape, single window, or full screen to clipboard.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "screenshots",
+                tags: ["snip", "capture", "region"]
+            },
+            {
+                id: "ss-mac-region",
+                keys: "Cmd + Shift + 4",
+                macKeys: "Cmd + Shift + 4",
+                action: "Capture Selected Area or Window (macOS)",
+                description: "Drag crosshairs to capture an area; press Spacebar after pressing Cmd+Shift+4 to capture a clean window with shadow.",
+                app: "macOS",
+                platform: "macOS",
+                category: "screenshots",
+                tags: ["screenshot", "mac", "window"]
+            },
+            {
+                id: "ss-mac-toolbar",
+                keys: "Cmd + Shift + 5",
+                macKeys: "Cmd + Shift + 5",
+                action: "Open macOS Screenshot & Screen Recording Toolbar",
+                description: "Launches the unified macOS capture panel for screen recording and timed captures.",
+                app: "macOS",
+                platform: "macOS",
+                category: "screenshots",
+                tags: ["screen record", "video", "mac"]
+            },
+            {
+                id: "ss-win-record",
+                keys: "Win + Alt + R",
+                action: "Start/Stop Screen Recording (Xbox Game Bar)",
+                description: "Immediately begins recording video of the active application window in Windows 10/11.",
+                app: "Windows Game Bar",
+                platform: "Windows",
+                category: "screenshots",
+                tags: ["record", "video", "capture"]
+            },
+
+            // =========================================================================
+            // 18. TEXT EDITING AND NAVIGATION
+            // =========================================================================
+            {
+                id: "txt-word-jump",
+                keys: "Ctrl + Left / Right",
+                macKeys: "Option + Left / Right",
+                action: "Jump Cursor Word by Word",
+                description: "Moves the text caret across whole words instead of single characters.",
+                app: "Universal Text Input",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                tags: ["cursor", "words", "move"]
+            },
+            {
+                id: "txt-delete-word",
+                keys: "Ctrl + Backspace",
+                macKeys: "Option + Delete",
+                action: "Delete Entire Previous Word",
+                description: "Deletes the whole word to the left of the cursor in a single keystroke.",
+                app: "Universal Text Input",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                tags: ["delete", "word", "fast"]
+            },
+            {
+                id: "txt-select-word",
+                keys: "Ctrl + Shift + Left / Right",
+                macKeys: "Option + Shift + Left / Right",
+                action: "Select Text Word by Word",
+                description: "Extends the current text highlight across entire words.",
+                app: "Universal Text Input",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                tags: ["select", "highlight", "words"]
+            },
+            {
+                id: "txt-doc-edges",
+                keys: "Ctrl + Home  /  End",
+                macKeys: "Cmd + Up  /  Down",
+                action: "Jump to Very Beginning or End of Document",
+                description: "Places the cursor at the first character or final line of the entire document.",
+                app: "Universal Text Input",
+                platform: "Windows / macOS / Linux",
+                category: "text-editing",
+                tags: ["top", "bottom", "document"]
+            },
+
+            // =========================================================================
+            // 19. CODING AND PROGRAMMING
+            // =========================================================================
+            {
+                id: "code-comment",
+                keys: "Ctrl + /",
+                macKeys: "Cmd + /",
+                action: "Toggle Line Comment",
+                description: "Comments or uncomments the current line or selected block using the language's syntax.",
+                app: "VS Code / JetBrains / Sublime",
+                platform: "Windows / macOS / Linux",
+                category: "coding-general",
+                tags: ["comment", "code", "toggle"]
+            },
+            {
+                id: "code-goto-def",
+                keys: "F12",
+                macKeys: "F12",
+                action: "Go to Symbol Definition",
+                description: "Jumps directly to the file and line where a function, class, or variable is declared.",
+                app: "VS Code / Visual Studio",
+                platform: "Windows / macOS / Linux",
+                category: "coding-general",
+                tags: ["definition", "navigate", "symbol"]
+            },
+            {
+                id: "code-rename-symbol",
+                keys: "F2",
+                macKeys: "F2",
+                action: "Rename Symbol Across Project",
+                description: "Safely refactors a variable, function, or class name across all referencing files.",
+                app: "VS Code / IDEs",
+                platform: "Windows / macOS / Linux",
+                category: "coding-general",
+                tags: ["refactor", "rename", "variable"]
+            },
+            {
+                id: "code-format-doc",
+                keys: "Shift + Alt + F",
+                macKeys: "Shift + Option + F",
+                action: "Format Entire Code Document",
+                description: "Runs the configured code formatter (Prettier, Black, clang-format) to fix indentation and style.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "coding-general",
+                tags: ["prettier", "format", "indent"]
+            },
+
+            // =========================================================================
+            // 20. WEB DEVELOPMENT
+            // =========================================================================
+            {
+                id: "web-devtools",
+                keys: "Ctrl + Shift + I  (or F12)",
+                macKeys: "Cmd + Option + I",
+                action: "Open Browser Developer Tools",
+                description: "Opens the DevTools panel for DOM inspection, network monitoring, and performance profiling.",
+                app: "Chrome / Edge / Firefox",
+                platform: "Windows / macOS / Linux",
+                category: "web-dev",
+                tags: ["devtools", "inspect", "debug"]
+            },
+            {
+                id: "web-inspect-el",
+                keys: "Ctrl + Shift + C",
+                macKeys: "Cmd + Shift + C",
+                action: "Inspect DOM Element on Page",
+                description: "Activates the element picker crosshair to hover and inspect any HTML element's styles and box model.",
+                app: "Chrome / Edge / Firefox",
+                platform: "Windows / macOS / Linux",
+                category: "web-dev",
+                tags: ["dom", "css", "element picker"]
+            },
+            {
+                id: "web-hard-reload",
+                keys: "Ctrl + Shift + R",
+                macKeys: "Cmd + Shift + R",
+                action: "Hard Reload (Bypass Browser Cache)",
+                description: "Forces the browser to re-download all CSS, JS, and asset files fresh from the server.",
+                app: "Web Browsers",
+                platform: "Windows / macOS / Linux",
+                category: "web-dev",
+                tags: ["cache", "refresh", "reload"]
+            },
+            {
+                id: "web-device-mode",
+                keys: "Ctrl + Shift + M",
+                macKeys: "Cmd + Shift + M",
+                action: "Toggle Responsive Device Toolbar ( inside DevTools )",
+                description: "Switches viewport into responsive mobile/tablet simulation mode when DevTools is focused.",
+                app: "Chrome / Edge / Firefox DevTools",
+                platform: "Windows / macOS / Linux",
+                category: "web-dev",
+                tags: ["responsive", "mobile", "viewport"]
+            },
+
+            // =========================================================================
+            // 21. VS CODE EXTENSIONS AND DEVELOPER TOOLS
+            // =========================================================================
+            {
+                id: "vsc-ext-panel",
+                keys: "Ctrl + Shift + X",
+                macKeys: "Cmd + Shift + X",
+                action: "Open Extensions Marketplace View",
+                description: "Focuses the VS Code Extensions sidebar to browse, install, or manage extensions.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode-devtools",
+                tags: ["extensions", "marketplace", "plugins"]
+            },
+            {
+                id: "vsc-source-ctrl",
+                keys: "Ctrl + Shift + G",
+                macKeys: "Ctrl + Shift + G",
+                action: "Open Git Source Control View",
+                description: "Opens the integrated Git staging, diffing, and commit panel in VS Code.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode-devtools",
+                tags: ["git", "stage", "commit"]
+            },
+            {
+                id: "vsc-problems",
+                keys: "Ctrl + Shift + M",
+                macKeys: "Cmd + Shift + M",
+                action: "Toggle Problems (Errors & Warnings) Panel",
+                description: "Displays all TypeScript, ESLint, compiler, and linter diagnostics across the workspace.",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode-devtools",
+                tags: ["errors", "linter", "diagnostics"]
+            },
+            {
+                id: "vsc-zen-mode",
+                keys: "Ctrl + K  then  Z",
+                macKeys: "Cmd + K  then  Z",
+                action: "Toggle Distraction-Free Zen Mode",
+                description: "Hides all sidebars, status bars, and panels so you can focus strictly on code (press Esc twice to exit).",
+                app: "VS Code",
+                platform: "Windows / macOS / Linux",
+                category: "vscode-devtools",
+                tags: ["zen", "focus", "fullscreen"]
+            },
+
+            // =========================================================================
+            // 22. PHOTOSHOP AND IMAGE EDITING
+            // =========================================================================
+            {
+                id: "ps-free-transform",
+                keys: "Ctrl + T",
+                macKeys: "Cmd + T",
+                action: "Free Transform Layer",
+                description: "Activates scaling, rotation, and skew handles on the selected layer.",
+                app: "Adobe Photoshop",
+                platform: "Windows / macOS",
+                category: "photoshop",
+                tags: ["scale", "rotate", "transform"]
+            },
+            {
+                id: "ps-dup-layer",
+                keys: "Ctrl + J",
+                macKeys: "Cmd + J",
+                action: "Duplicate Layer or Selection to New Layer",
+                description: "Copies the active layer (or marquee selection) onto a brand-new layer directly above.",
+                app: "Adobe Photoshop",
+                platform: "Windows / macOS",
+                category: "photoshop",
+                tags: ["layer", "duplicate", "copy"]
+            },
+            {
+                id: "ps-deselect",
+                keys: "Ctrl + D",
+                macKeys: "Cmd + D",
+                action: "Deselect Active Marquee Selection",
+                description: "Clears the marching ants selection outline across the canvas.",
+                app: "Adobe Photoshop",
+                platform: "Windows / macOS",
+                category: "photoshop",
+                tags: ["deselect", "marquee", "selection"]
+            },
+            {
+                id: "ps-brush-size",
+                keys: "[  or  ]",
+                macKeys: "[  or  ]",
+                action: "Decrease or Increase Brush Size",
+                description: "Adjusts brush, eraser, or stamp radius on the fly. Hold Shift + [ or ] to adjust brush hardness.",
+                app: "Adobe Photoshop",
+                platform: "Windows / macOS",
+                category: "photoshop",
+                tags: ["brush", "size", "hardness"]
+            },
+
+            // =========================================================================
+            // 23. CANVA AND GRAPHIC DESIGN
+            // =========================================================================
+            {
+                id: "canva-text",
+                keys: "T",
+                macKeys: "T",
+                action: "Insert New Text Box on Canvas",
+                description: "Press T while editing a Canva design to drop a new editable text paragraph onto the artboard.",
+                app: "Canva",
+                platform: "Web / Desktop",
+                category: "canva",
+                tags: ["text", "typography", "canva"]
+            },
+            {
+                id: "canva-rect-line",
+                keys: "R  (or L)",
+                macKeys: "R  (or L)",
+                action: "Insert Rectangle (R), Line (L), or Circle (C)",
+                description: "Single-key shape shortcuts in Canva to rapidly block out layouts and dividers.",
+                app: "Canva",
+                platform: "Web / Desktop",
+                category: "canva",
+                tags: ["shapes", "rectangle", "circle"]
+            },
+            {
+                id: "canva-quick-actions",
+                keys: "Ctrl + E  (or /)",
+                macKeys: "Cmd + E  (or /)",
+                action: "Open Canva Magic Quick Actions",
+                description: "Opens the floating assistant to search elements, photos, fonts, and effects.",
+                app: "Canva",
+                platform: "Web / Desktop",
+                category: "canva",
+                tags: ["magic", "search", "elements"]
+            },
+            {
+                id: "canva-layer-order",
+                keys: "Ctrl + [  or  ]",
+                macKeys: "Cmd + [  or  ]",
+                action: "Send Backward or Bring Forward One Layer",
+                description: "Changes z-index stacking order of the selected design element.",
+                app: "Canva / Figma",
+                platform: "Web / Desktop",
+                category: "canva",
+                tags: ["layers", "arrange", "z-index"]
+            },
+
+            // =========================================================================
+            // 24. VIDEO EDITING
+            // =========================================================================
+            {
+                id: "vid-jkl",
+                keys: "J  /  K  /  L",
+                macKeys: "J  /  K  /  L",
+                action: "Shuttle Reverse (J), Pause (K), Fast-Forward (L)",
+                description: "Industry-standard transport keys across Premiere Pro, DaVinci Resolve, and Final Cut Pro. Press J or L multiple times to increase speed.",
+                app: "Premiere / Resolve / Final Cut",
+                platform: "Windows / macOS",
+                category: "video-editing",
+                tags: ["playback", "scrub", "timeline"]
+            },
+            {
+                id: "vid-in-out",
+                keys: "I  and  O",
+                macKeys: "I  and  O",
+                action: "Mark In Point (I) and Out Point (O)",
+                description: "Sets the start and end boundaries for a clip or timeline range before inserting or exporting.",
+                app: "Premiere / Resolve / Final Cut",
+                platform: "Windows / macOS",
+                category: "video-editing",
+                tags: ["mark in", "mark out", "trim"]
+            },
+            {
+                id: "vid-blade-cut",
+                keys: "Ctrl + K  (or Ctrl + B)",
+                macKeys: "Cmd + K  (or Cmd + B)",
+                action: "Split Clip at Playhead",
+                description: "Slices the selected video/audio clip at the current playhead position (Ctrl+K in Premiere, Ctrl+B in Resolve/CapCut).",
+                app: "Premiere Pro / DaVinci Resolve",
+                platform: "Windows / macOS",
+                category: "video-editing",
+                tags: ["cut", "razor", "split"]
+            },
+
+            // =========================================================================
+            // 25. AUDIO EDITING
+            // =========================================================================
+            {
+                id: "audio-split",
+                keys: "Ctrl + I  (or S)",
+                macKeys: "Cmd + I  (or S)",
+                action: "Split Audio Clip at Playhead",
+                description: "Splits an audio track region in Audacity (Ctrl+I) or Reaper (S) for independent editing.",
+                app: "Audacity / Reaper",
+                platform: "Windows / macOS / Linux",
+                category: "audio-editing",
+                tags: ["split", "waveform", "clip"]
+            },
+            {
+                id: "audio-record",
+                keys: "R  (or Ctrl + R)",
+                macKeys: "R  (or Cmd + R)",
+                action: "Start Audio Track Recording",
+                description: "Begins recording from the armed microphone input onto the timeline.",
+                app: "Audacity / Logic / Reaper",
+                platform: "Windows / macOS / Linux",
+                category: "audio-editing",
+                tags: ["record", "microphone", "daw"]
+            },
+            {
+                id: "audio-loop",
+                keys: "Shift + Space",
+                macKeys: "Shift + Space",
+                action: "Loop Playback of Selected Region",
+                description: "Continuously loops audio playback over the highlighted waveform selection in Audacity.",
+                app: "Audacity",
+                platform: "Windows / macOS / Linux",
+                category: "audio-editing",
+                tags: ["loop", "playback", "audacity"]
+            },
+
+            // =========================================================================
+            // 26. COMMUNICATION AND MESSAGING APPS
+            // =========================================================================
+            {
+                id: "msg-switcher",
+                keys: "Ctrl + K",
+                macKeys: "Cmd + K",
+                action: "Open Quick Channel / Conversation Switcher",
+                description: "Universal jump bar in Slack, Discord, Microsoft Teams, and Telegram Desktop to switch to any person or channel.",
+                app: "Slack / Discord / Teams / Telegram",
+                platform: "Windows / macOS / Linux",
+                category: "messaging-apps",
+                tags: ["quick switcher", "slack", "discord", "teams"]
+            },
+            {
+                id: "msg-edit-last",
+                keys: "Up Arrow",
+                macKeys: "Up Arrow",
+                action: "Edit Your Most Recent Sent Message",
+                description: "When the message box is empty, press Up Arrow to immediately edit the last message you sent.",
+                app: "Slack / Discord / Teams / Telegram",
+                platform: "Windows / macOS / Linux",
+                category: "messaging-apps",
+                tags: ["edit", "typo", "message"]
+            },
+            {
+                id: "msg-discord-mute",
+                keys: "Ctrl + Shift + M",
+                macKeys: "Cmd + Shift + M",
+                action: "Toggle Microphone Mute in Voice Channel",
+                description: "Mutes or unmutes your mic in Discord or Microsoft Teams calls.",
+                app: "Discord / Microsoft Teams",
+                platform: "Windows / macOS",
+                category: "messaging-apps",
+                tags: ["mute", "voice", "mic"]
+            },
+
+            // =========================================================================
+            // 27. ZOOM AND ONLINE MEETINGS
+            // =========================================================================
+            {
+                id: "zoom-mute-audio",
+                keys: "Alt + A",
+                macKeys: "Cmd + Shift + A",
+                action: "Mute or Unmute Microphone (Zoom)",
+                description: "Toggles your microphone audio state during a Zoom meeting (Ctrl+D in Google Meet).",
+                app: "Zoom",
+                platform: "Windows / macOS / Linux",
+                category: "zoom-meetings",
+                tags: ["mute", "mic", "zoom"]
+            },
+            {
+                id: "zoom-toggle-video",
+                keys: "Alt + V",
+                macKeys: "Cmd + Shift + V",
+                action: "Start or Stop Webcam Video (Zoom)",
+                description: "Turns your camera feed on or off during a Zoom call (Ctrl+E in Google Meet).",
+                app: "Zoom",
+                platform: "Windows / macOS / Linux",
+                category: "zoom-meetings",
+                tags: ["camera", "video", "webcam"]
+            },
+            {
+                id: "zoom-share-screen",
+                keys: "Alt + S",
+                macKeys: "Cmd + Shift + S",
+                action: "Launch or Stop Screen Sharing",
+                description: "Opens the screen selection dialog to share your display in Zoom.",
+                app: "Zoom",
+                platform: "Windows / macOS",
+                category: "zoom-meetings",
+                tags: ["screen share", "present"]
+            },
+            {
+                id: "zoom-raise-hand",
+                keys: "Alt + Y",
+                macKeys: "Option + Y",
+                action: "Raise or Lower Hand",
+                description: "Toggles the virtual raised hand indicator in Zoom participant lists.",
+                app: "Zoom",
+                platform: "Windows / macOS",
+                category: "zoom-meetings",
+                tags: ["hand", "question", "meeting"]
+            },
+
+            // =========================================================================
+            // 28. ACCESSIBILITY SHORTCUTS
+            // =========================================================================
+            {
+                id: "a11y-magnifier",
+                keys: "Win + Plus (+)",
+                macKeys: "Cmd + Option + =",
+                action: "Zoom In with System Screen Magnifier",
+                description: "Activates the OS screen magnifier to enlarge any area of the display (Win + Esc closes Magnifier).",
+                app: "Windows / macOS",
+                platform: "Windows / macOS",
+                category: "accessibility",
+                tags: ["magnifier", "zoom", "vision"]
+            },
+            {
+                id: "a11y-narrator",
+                keys: "Win + Ctrl + Enter",
+                macKeys: "Cmd + F5",
+                action: "Toggle Screen Reader (Narrator / VoiceOver)",
+                description: "Starts or stops Windows Narrator (or macOS VoiceOver with Cmd+F5).",
+                app: "Windows / macOS",
+                platform: "Windows / macOS",
+                category: "accessibility",
+                tags: ["screen reader", "narrator", "voiceover"]
+            },
+            {
+                id: "a11y-voice-typing",
+                keys: "Win + H",
+                action: "Open Windows Voice Typing (Speech-to-Text)",
+                description: "Starts system-wide voice dictation with automatic punctuation in any text box.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "accessibility",
+                tags: ["dictation", "speech", "voice"]
+            },
+            {
+                id: "a11y-high-contrast",
+                keys: "Left Alt + Left Shift + PrtScn",
+                action: "Toggle High Contrast Theme",
+                description: "Switches Windows into high-contrast color mode for enhanced text legibility.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "accessibility",
+                tags: ["contrast", "visibility", "theme"]
+            },
+
+            // =========================================================================
+            // 29. WINDOW MANAGEMENT AND MULTITASKING
+            // =========================================================================
+            {
+                id: "wm-snap",
+                keys: "Win + Left / Right",
+                action: "Snap Active Window to Left or Right Half",
+                description: "Docks the current window to 50% of the screen width; follow with Up/Down to snap into corners.",
+                app: "Windows / Ubuntu",
+                platform: "Windows / Linux",
+                category: "window-management",
+                tags: ["snap", "tile", "split"]
+            },
+            {
+                id: "wm-snap-layouts",
+                keys: "Win + Z",
+                action: "Open Windows 11 Snap Layouts Flyout",
+                description: "Opens the multi-window grid layout selector at the top right of the active window.",
+                app: "Windows 11",
+                platform: "Windows",
+                category: "window-management",
+                tags: ["snap layouts", "grid", "windows 11"]
+            },
+            {
+                id: "wm-new-vdesktop",
+                keys: "Win + Ctrl + D",
+                macKeys: "Ctrl + Up (Mission Control)",
+                action: "Create New Virtual Desktop",
+                description: "Creates a fresh virtual workspace to separate work apps from personal windows.",
+                app: "Windows 10/11",
+                platform: "Windows",
+                category: "window-management",
+                tags: ["virtual desktop", "workspace"]
+            },
+            {
+                id: "wm-switch-vdesktop",
+                keys: "Win + Ctrl + Left / Right",
+                macKeys: "Ctrl + Left / Right",
+                action: "Switch Between Virtual Desktops",
+                description: "Slides horizontally between your open virtual desktop workspaces.",
+                app: "Windows / macOS",
+                platform: "Windows / macOS",
+                category: "window-management",
+                tags: ["workspaces", "switch", "desktop"]
+            },
+
+            // =========================================================================
+            // 30. PRODUCTIVITY AND WORKFLOW SHORTCUTS
+            // =========================================================================
+            {
+                id: "prod-insert-link",
+                keys: "Ctrl + K",
+                macKeys: "Cmd + K",
+                action: "Insert or Edit Hyperlink",
+                description: "Universal shortcut across Word, Google Docs, Notion, Gmail, Markdown editors, and Slack to turn selected text into a link.",
+                app: "Docs / Notion / Email / Slack",
+                platform: "Windows / macOS / Web",
+                category: "productivity",
+                tags: ["hyperlink", "url", "link"]
+            },
+            {
+                id: "prod-find-replace",
+                keys: "Ctrl + H",
+                macKeys: "Cmd + Option + F",
+                action: "Find and Replace Text",
+                description: "Opens the batch search-and-replace dialog in editors, spreadsheets, and word processors.",
+                app: "Universal Editors",
+                platform: "Windows / macOS / Linux",
+                category: "productivity",
+                tags: ["replace", "batch", "edit"]
+            },
+            {
+                id: "prod-zoom-reset",
+                keys: "Ctrl + 0",
+                macKeys: "Cmd + 0",
+                action: "Reset Zoom Level to 100%",
+                description: "Restores default 100% scaling after zooming in (Ctrl + Plus) or out (Ctrl + Minus).",
+                app: "Browsers / Editors / Design Tools",
+                platform: "Windows / macOS / Linux",
+                category: "productivity",
+                tags: ["zoom", "scale", "reset"]
+            },
+
+            // =========================================================================
+            // 31. JUPYTER NOTEBOOK
+            // =========================================================================
+            {
+                id: "jup-run-advance",
+                keys: "Shift + Enter",
+                macKeys: "Shift + Return",
+                action: "Run Current Cell and Select Below",
+                description: "Executes the active Python/Markdown cell and moves focus to the next cell (creates one if at bottom).",
+                app: "Jupyter Notebook / JupyterLab",
+                platform: "Web / Cross-Platform",
+                category: "jupyter",
+                tags: ["execute", "cell", "notebook"]
+            },
+            {
+                id: "jup-run-stay",
+                keys: "Ctrl + Enter",
+                macKeys: "Cmd + Return",
+                action: "Run Selected Cell in Place",
+                description: "Executes the current cell and keeps focus on the same cell.",
+                app: "Jupyter Notebook / JupyterLab",
+                platform: "Web / Cross-Platform",
+                category: "jupyter",
+                tags: ["run", "cell", "stay"]
+            },
+            {
+                id: "jup-insert-ab",
+                keys: "Esc  then  A  (or B)",
+                macKeys: "Esc  then  A  (or B)",
+                action: "Insert New Cell Above (A) or Below (B)",
+                description: "In Command Mode (press Esc first), press A to insert a cell above or B to insert below.",
+                app: "Jupyter Notebook / JupyterLab",
+                platform: "Web / Cross-Platform",
+                category: "jupyter",
+                tags: ["insert", "cell", "command mode"]
+            },
+            {
+                id: "jup-cell-type",
+                keys: "Esc  then  M  (or Y)",
+                macKeys: "Esc  then  M  (or Y)",
+                action: "Convert Cell to Markdown (M) or Code (Y)",
+                description: "Switches the active cell between formatted Markdown documentation and executable code.",
+                app: "Jupyter Notebook / JupyterLab",
+                platform: "Web / Cross-Platform",
+                category: "jupyter",
+                tags: ["markdown", "code", "convert"]
+            },
+            {
+                id: "jup-delete-cell",
+                keys: "Esc  then  D , D",
+                macKeys: "Esc  then  D , D",
+                action: "Delete Selected Notebook Cell",
+                description: "Press D twice rapidly while in Command Mode to delete the highlighted cell.",
+                app: "Jupyter Notebook / JupyterLab",
+                platform: "Web / Cross-Platform",
+                category: "jupyter",
+                tags: ["delete", "remove", "cell"]
+            },
+
+            // =========================================================================
+            // 32. PYTHON DEVELOPMENT
+            // =========================================================================
+            {
+                id: "py-quick-fix",
+                keys: "Alt + Enter  (or Ctrl + .)",
+                macKeys: "Option + Return  (or Cmd + .)",
+                action: "Auto-Import Module & Show Quick Fixes",
+                description: "Automatically adds missing Python `import` statements and resolves PEP8 warnings in PyCharm or VS Code.",
+                app: "PyCharm / VS Code Python",
+                platform: "Windows / macOS / Linux",
+                category: "python-dev",
+                tags: ["import", "quick fix", "pycharm"]
+            },
+            {
+                id: "py-search-everywhere",
+                keys: "Shift , Shift",
+                macKeys: "Shift , Shift",
+                action: "Search Everywhere (Classes, Files, Actions)",
+                description: "Double-tap Shift in PyCharm (or any JetBrains IDE) to search across all Python symbols, files, and settings.",
+                app: "PyCharm / JetBrains",
+                platform: "Windows / macOS / Linux",
+                category: "python-dev",
+                tags: ["search", "pycharm", "symbols"]
+            },
+            {
+                id: "py-repl-exit",
+                keys: "Ctrl + D  (or Ctrl + Z then Enter)",
+                macKeys: "Ctrl + D",
+                action: "Exit Interactive Python REPL Session",
+                description: "Sends EOF to cleanly exit the `python` or `ipython` interactive shell (Ctrl+Z then Enter on Windows CMD).",
+                app: "Python REPL / IPython",
+                platform: "Linux / macOS / Windows",
+                category: "python-dev",
+                tags: ["repl", "exit", "eof"]
+            },
+
+            // =========================================================================
+            // 33. DATABASE TOOLS AND SQL EDITORS
+            // =========================================================================
+            {
+                id: "sql-exec-query",
+                keys: "Ctrl + Enter  (or F5)",
+                macKeys: "Cmd + Return",
+                action: "Execute Current SQL Statement",
+                description: "Runs the SQL statement under the cursor in DBeaver, DataGrip, pgAdmin, or MySQL Workbench (F5 in SSMS).",
+                app: "DBeaver / DataGrip / SSMS",
+                platform: "Windows / macOS / Linux",
+                category: "database-sql",
+                tags: ["execute", "query", "sql"]
+            },
+            {
+                id: "sql-exec-script",
+                keys: "Alt + X",
+                macKeys: "Option + X",
+                action: "Execute Entire SQL Script",
+                description: "Runs all SQL queries sequentially in the active editor script in DBeaver.",
+                app: "DBeaver",
+                platform: "Windows / macOS / Linux",
+                category: "database-sql",
+                tags: ["script", "batch", "dbeaver"]
+            },
+            {
+                id: "sql-format",
+                keys: "Ctrl + Shift + F",
+                macKeys: "Cmd + Shift + F",
+                action: "Format & Upper-Case SQL Query",
+                description: "Auto-indents complex JOINs, subqueries, and SELECT clauses for readability.",
+                app: "DBeaver / MySQL Workbench",
+                platform: "Windows / macOS / Linux",
+                category: "database-sql",
+                tags: ["format", "prettify", "sql"]
+            },
+
+            // =========================================================================
+            // 34. REMOTE DESKTOP AND VIRTUALIZATION
+            // =========================================================================
+            {
+                id: "rdp-ctrl-alt-del",
+                keys: "Ctrl + Alt + End",
+                action: "Send Ctrl+Alt+Del Inside Remote Desktop (RDP)",
+                description: "Sends the security interrupt to the remote Windows server/PC instead of triggering it on your local host machine.",
+                app: "Microsoft Remote Desktop (mstsc)",
+                platform: "Windows",
+                category: "remote-vm",
+                tags: ["rdp", "remote", "security"]
+            },
+            {
+                id: "rdp-fullscreen",
+                keys: "Ctrl + Alt + Break",
+                action: "Toggle Remote Desktop Full Screen Mode",
+                description: "Switches the active RDP session between windowed mode and full-screen mode.",
+                app: "Microsoft Remote Desktop",
+                platform: "Windows",
+                category: "remote-vm",
+                tags: ["fullscreen", "rdp", "window"]
+            },
+            {
+                id: "vm-release-mouse",
+                keys: "Right Ctrl  (or Ctrl + Alt)",
+                action: "Release Mouse & Keyboard Focus from VM",
+                description: "Uncaptures the cursor from VirtualBox (Right Ctrl Host Key) or VMware Workstation (Ctrl+Alt) back to host OS.",
+                app: "VirtualBox / VMware",
+                platform: "Windows / Linux",
+                category: "remote-vm",
+                tags: ["virtualbox", "vmware", "host key"]
+            },
+
+            // =========================================================================
+            // 35. POPULAR APPLICATIONS AND UTILITIES
+            // =========================================================================
+            {
+                id: "util-powertoys-run",
+                keys: "Alt + Space",
+                macKeys: "Cmd + Space",
+                action: "Launch PowerToys Run / Raycast Launcher",
+                description: "Opens Microsoft PowerToys Run on Windows (or Raycast/Alfred on macOS) for instant app launching and unit conversion.",
+                app: "PowerToys / Raycast",
+                platform: "Windows / macOS",
+                category: "popular-utils",
+                tags: ["launcher", "powertoys", "raycast"]
+            },
+            {
+                id: "util-vlc-fullscreen",
+                keys: "F",
+                macKeys: "Cmd + F",
+                action: "Toggle VLC Fullscreen Video Playback",
+                description: "Switches VLC Media Player in and out of fullscreen mode (use [ and ] to adjust playback speed).",
+                app: "VLC Media Player",
+                platform: "Windows / macOS / Linux",
+                category: "popular-utils",
+                tags: ["vlc", "media", "video"]
+            },
+            {
+                id: "util-notion-slash",
+                keys: "/",
+                macKeys: "/",
+                action: "Open Block Command Menu (Notion / Obsidian)",
+                description: "Type forward-slash in Notion, Confluence, or modern note apps to insert headings, tables, code blocks, or callouts.",
+                app: "Notion / Modern Docs",
+                platform: "Web / Desktop",
+                category: "popular-utils",
+                tags: ["notion", "slash command", "blocks"]
+            }
+        ];
+
+        /*************************************************************************
+         * 2. STATE MANAGEMENT & LOCAL STORAGE PERSISTENCE
+         *************************************************************************/
+        const state = {
+            searchQuery: "",
+            selectedCategory: "all",
+            selectedPlatform: "all",
+            selectedApp: "all",
+            osMode: "all", // 'all', 'windows', 'mac', 'linux'
+            onlyFavorites: false,
+            waFilter: "all", // 'all', 'desktop', 'web'
+            favorites: new Set(),
+            recentlyViewed: [],
+            collapsedCategories: new Set(),
+            categoryLocalSearch: {},
+            quiz: {
+                score: 0,
+                streak: 0,
+                questionIndex: 0,
+                totalQuestions: 10,
+                currentQuestion: null,
+                answered: false
+            }
+        };
+
+        // Safe LocalStorage Helpers
+        function loadPersistedState() {
+            try {
+                const savedFavs = localStorage.getItem("shortcutAtlas_favorites");
+                if (savedFavs) {
+                    state.favorites = new Set(JSON.parse(savedFavs));
+                }
+                const savedRecent = localStorage.getItem("shortcutAtlas_recent");
+                if (savedRecent) {
+                    state.recentlyViewed = JSON.parse(savedRecent);
+                }
+                const savedTheme = localStorage.getItem("shortcutAtlas_theme");
+                if (savedTheme === "light") {
+                    document.documentElement.classList.remove("dark");
+                } else {
+                    document.documentElement.classList.add("dark");
+                }
+                const savedOsMode = localStorage.getItem("shortcutAtlas_osMode");
+                if (savedOsMode) {
+                    state.osMode = savedOsMode;
+                }
+            } catch (e) {
+                console.warn("Local storage access restricted:", e);
+            }
+        }
+
+        function saveFavorites() {
+            try {
+                localStorage.setItem("shortcutAtlas_favorites", JSON.stringify([...state.favorites]));
+            } catch (e) {}
+        }
+
+        function saveRecent() {
+            try {
+                localStorage.setItem("shortcutAtlas_recent", JSON.stringify(state.recentlyViewed.slice(0, 8)));
+            } catch (e) {}
+        }
+
+        /*************************************************************************
+         * 3. HELPER FUNCTIONS: KEYCAP PARSER & OS MODIFIER DISPLAY
+         *************************************************************************/
+        function getDisplayKeys(shortcut) {
+            if (state.osMode === "mac" && shortcut.macKeys) {
+                return shortcut.macKeys;
+            }
+            return shortcut.keys;
+        }
+
+        function renderKeycapsHTML(keyString) {
+            // Split combinations like "Ctrl + Shift + T" or "Esc then A"
+            const tokens = keyString.split(/(\s+\+\s+|\s+or\s+|\s+then\s+|\s+\/\s+)/i);
+            return tokens.map(token => {
+                const trimmed = token.trim();
+                if (!trimmed) return "";
+                const lower = trimmed.toLowerCase();
+                if (lower === "+" || lower === "or" || lower === "then" || lower === "/") {
+                    return `<span class="text-[11px] font-mono text-slate-400 dark:text-slate-500 px-1">${trimmed}</span>`;
+                }
+                return `<kbd class="keycap">${escapeHTML(trimmed)}</kbd>`;
+            }).join("");
+        }
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        function showToast(message, icon = "check-circle-2") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = "pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 text-xs font-semibold shadow-xl border border-slate-700 dark:border-slate-200 transition-all duration-300 translate-y-2 opacity-0";
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-cyan-400 dark:text-cyan-600 shrink-0"></i><span>${escapeHTML(message)}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons({ nodes: [toast] });
+
+            requestAnimationFrame(() => {
+                toast.classList.remove("translate-y-2", "opacity-0");
+            });
+
+            setTimeout(() => {
+                toast.classList.add("opacity-0", "translate-y-2");
+                setTimeout(() => toast.remove(), 300);
+            }, 2600);
+        }
+
+        function copyToClipboard(text, shortcutObj) {
+            if (shortcutObj) {
+                addToRecentlyViewed(shortcutObj.id);
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(`Copied: ${text}`);
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            try {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+                showToast(`Copied: ${text}`);
+            } catch (err) {
+                showToast("Unable to access clipboard", "alert-circle");
+            }
+        }
+
+        function addToRecentlyViewed(shortcutId) {
+            const exists = SHORTCUTS_DATA.find(s => s.id === shortcutId);
+            if (!exists) return;
+            state.recentlyViewed = [shortcutId, ...state.recentlyViewed.filter(id => id !== shortcutId)].slice(0, 8);
+            saveRecent();
+            renderRecentlyViewed();
+        }
+
+        function toggleFavorite(shortcutId) {
+            if (state.favorites.has(shortcutId)) {
+                state.favorites.delete(shortcutId);
+                showToast("Removed from saved bookmarks", "bookmark-minus");
+            } else {
+                state.favorites.add(shortcutId);
+                showToast("Saved to your shortcut bookmarks!", "bookmark-check");
+            }
+            saveFavorites();
+            updateFavoriteBadge();
+            renderAll();
+        }
+
+        function updateFavoriteBadge() {
+            const badge = document.getElementById("fav-count-badge");
+            const btn = document.getElementById("favorites-toggle-btn");
+            const count = state.favorites.size;
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove("hidden");
+            } else {
+                badge.classList.add("hidden");
+            }
+
+            if (state.onlyFavorites) {
+                btn.classList.add("bg-amber-500/20", "border-amber-500", "text-amber-500");
+            } else {
+                btn.classList.remove("bg-amber-500/20", "border-amber-500", "text-amber-500");
+            }
+        }
+
+        /*************************************************************************
+         * 4. CARD RENDERING COMPONENT
+         *************************************************************************/
+        function createShortcutCardHTML(shortcut, badgeLabel = "") {
+            const isFav = state.favorites.has(shortcut.id);
+            const primaryKeys = getDisplayKeys(shortcut);
+            const secondaryMac = (state.osMode === "all" && shortcut.macKeys && shortcut.macKeys !== shortcut.keys)
+                ? `<div class="mt-1.5 text-[11px] font-mono text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                     <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400">macOS</span>
+                     <span>${escapeHTML(shortcut.macKeys)}</span>
+                   </div>`
+                : "";
+
+            return `
+                <article class="shortcut-card group relative rounded-2xl bg-white dark:bg-[#0f1624] border border-slate-200/90 dark:border-slate-800/90 hover:border-cyan-500/60 dark:hover:border-cyan-500/60 p-4 flex flex-col justify-between shadow-sm hover:shadow-xl hover:shadow-cyan-500/5" data-shortcut-id="${shortcut.id}">
+                    <div>
+                        <!-- Top Row: Key Combination + Action Buttons -->
+                        <div class="flex items-start justify-between gap-2 mb-3">
+                            <div class="flex flex-wrap items-center gap-1">
+                                ${renderKeycapsHTML(primaryKeys)}
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button 
+                                    type="button"
+                                    class="fav-btn p-1.5 rounded-lg text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition ${isFav ? 'text-amber-500' : ''}" 
+                                    data-fav-id="${shortcut.id}"
+                                    title="${isFav ? 'Remove Bookmark' : 'Bookmark Shortcut'}"
+                                    aria-label="Bookmark ${escapeHTML(shortcut.action)}"
+                                >
+                                    <i data-lucide="bookmark" class="w-4 h-4 ${isFav ? 'fill-amber-500' : ''}"></i>
+                                </button>
+                                <button 
+                                    type="button"
+                                    class="copy-btn p-1.5 rounded-lg text-slate-400 hover:text-cyan-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" 
+                                    data-copy-id="${shortcut.id}"
+                                    title="Copy Shortcut Details"
+                                    aria-label="Copy ${escapeHTML(shortcut.action)}"
+                                >
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${secondaryMac}
+
+                        <!-- Action Title & Explanation -->
+                        <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white mt-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition">
+                            ${escapeHTML(shortcut.action)}
+                        </h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                            ${escapeHTML(shortcut.description)}
+                        </p>
+                    </div>
+
+                    <!-- Footer Metadata Badges -->
+                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 font-medium">
+                                ${escapeHTML(shortcut.app)}
+                            </span>
+                            ${badgeLabel ? `<span class="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-mono">${escapeHTML(badgeLabel)}</span>` : ""}
+                        </div>
+                        <span class="font-mono text-slate-400 dark:text-slate-500">
+                            ${escapeHTML(shortcut.platform)}
+                        </span>
+                    </div>
+                </article>
+            `;
+        }
+
+        /*************************************************************************
+         * 5. FILTERING ENGINE
+         *************************************************************************/
+        function matchesGlobalFilters(shortcut) {
+            if (state.onlyFavorites && !state.favorites.has(shortcut.id)) {
+                return false;
+            }
+            if (state.selectedCategory !== "all" && shortcut.category !== state.selectedCategory) {
+                return false;
+            }
+            if (state.selectedPlatform !== "all") {
+                const platLower = shortcut.platform.toLowerCase();
+                const targetLower = state.selectedPlatform.toLowerCase();
+                if (!platLower.includes(targetLower) && !platLower.includes("universal")) {
+                    return false;
+                }
+            }
+            if (state.selectedApp !== "all" && shortcut.app !== state.selectedApp) {
+                return false;
+            }
+            if (state.searchQuery.trim() !== "") {
+                const q = state.searchQuery.toLowerCase().trim();
+                const normalizedQueryNoSpaces = q.replace(/\s+/g, "");
+                const catMeta = CATEGORIES_META.find(c => c.id === shortcut.category);
+                const catName = catMeta ? catMeta.name.toLowerCase() : "";
+
+                const haystack = [
+                    shortcut.keys,
+                    shortcut.macKeys || "",
+                    shortcut.action,
+                    shortcut.description,
+                    shortcut.app,
+                    shortcut.platform,
+                    catName,
+                    ...(shortcut.tags || [])
+                ].join(" ").toLowerCase();
+
+                const haystackNoSpaces = haystack.replace(/\s+/g, "");
+                if (!haystack.includes(q) && !haystackNoSpaces.includes(normalizedQueryNoSpaces)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /*************************************************************************
+         * 6. SECTION RENDERERS
+         *************************************************************************/
+        function renderFrontShelf() {
+            const container = document.getElementById("front-shelf-grid");
+            const featuredList = SHORTCUTS_DATA.filter(s => s.featured);
+            container.innerHTML = featuredList.map(s => createShortcutCardHTML(s, "Essential")).join("");
+        }
+
+        function renderWhatsAppSpotlight() {
+            const container = document.getElementById("whatsapp-spotlight-grid");
+            const waShortcuts = SHORTCUTS_DATA.filter(s => {
+                if (s.category !== "whatsapp") return false;
+                if (state.waFilter === "desktop") return s.waType === "desktop" || s.waType === "both";
+                if (state.waFilter === "web") return s.waType === "web" || s.waType === "both";
+                return true;
+            });
+            container.innerHTML = waShortcuts.map(s => {
+                const tag = s.waType === "web" ? "Web Only" : (s.waType === "desktop" ? "Desktop App" : "Desktop & Web");
+                return createShortcutCardHTML(s, tag);
+            }).join("");
+        }
+
+        function renderRecentlyViewed() {
+            const section = document.getElementById("recently-viewed-section");
+            const listEl = document.getElementById("recently-viewed-list");
+            if (state.recentlyViewed.length === 0) {
+                section.classList.add("hidden");
+                return;
+            }
+            section.classList.remove("hidden");
+            listEl.innerHTML = state.recentlyViewed.map(id => {
+                const item = SHORTCUTS_DATA.find(s => s.id === id);
+                if (!item) return "";
+                return `
+                    <button type="button" data-recent-id="${item.id}" class="recent-pill inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs hover:border-cyan-500 transition">
+                        <span class="font-mono font-bold text-cyan-600 dark:text-cyan-400">${escapeHTML(getDisplayKeys(item))}</span>
+                        <span class="text-slate-700 dark:text-slate-300">${escapeHTML(item.action)}</span>
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function renderSidebarDirectory(filteredShortcuts) {
+            const sidebarList = document.getElementById("category-sidebar-list");
+            const catQuery = (document.getElementById("sidebar-cat-search")?.value || "").toLowerCase().trim();
+
+            const countsByCat = {};
+            CATEGORIES_META.forEach(c => countsByCat[c.id] = 0);
+            filteredShortcuts.forEach(s => {
+                if (countsByCat[s.category] !== undefined) {
+                    countsByCat[s.category]++;
+                }
+            });
+
+            const visibleCategories = CATEGORIES_META.filter(cat => {
+                if (catQuery && !cat.name.toLowerCase().includes(catQuery)) return false;
+                return true;
+            });
+
+            sidebarList.innerHTML = visibleCategories.map(cat => {
+                const count = countsByCat[cat.id] || 0;
+                const isSelected = state.selectedCategory === cat.id;
+                return `
+                    <a href="#cat-${cat.id}" data-sidebar-cat="${cat.id}" class="sidebar-cat-link flex items-center justify-between px-2.5 py-2 rounded-xl transition ${isSelected ? 'bg-cyan-500/15 text-cyan-500 font-semibold border border-cyan-500/30' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white'}">
+                        <div class="flex items-center gap-2 truncate pr-2">
+                            <i data-lucide="${cat.icon}" class="w-3.5 h-3.5 shrink-0 text-cyan-500"></i>
+                            <span class="truncate">${escapeHTML(cat.name)}</span>
+                        </div>
+                        <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shrink-0">${count}</span>
+                    </a>
+                `;
+            }).join("");
+        }
+
+        function renderMainLibrary() {
+            const shelvesContainer = document.getElementById("categories-shelves-container");
+            const emptyState = document.getElementById("empty-search-state");
+            const activeFilterBar = document.getElementById("active-filter-bar");
+            const filterSummary = document.getElementById("filter-results-summary");
+
+            const filtered = SHORTCUTS_DATA.filter(matchesGlobalFilters);
+            renderSidebarDirectory(filtered);
+
+            const isFiltered = state.searchQuery.trim() !== "" ||
+                state.selectedCategory !== "all" ||
+                state.selectedPlatform !== "all" ||
+                state.selectedApp !== "all" ||
+                state.onlyFavorites;
+
+            if (isFiltered) {
+                activeFilterBar.classList.remove("hidden");
+                filterSummary.textContent = `Showing ${filtered.length} matching shortcut${filtered.length === 1 ? '' : 's'} ${state.onlyFavorites ? '(Bookmarked Only)' : ''}`;
+            } else {
+                activeFilterBar.classList.add("hidden");
+            }
+
+            if (filtered.length === 0) {
+                shelvesContainer.innerHTML = "";
+                emptyState.classList.remove("hidden");
+                lucide.createIcons();
+                return;
+            }
+            emptyState.classList.add("hidden");
+
+            const htmlBlocks = CATEGORIES_META.map(cat => {
+                const catShortcuts = filtered.filter(s => s.category === cat.id);
+                if (catShortcuts.length === 0) return "";
+
+                const localFilter = (state.categoryLocalSearch[cat.id] || "").toLowerCase().trim();
+                const displayedShortcuts = localFilter
+                    ? catShortcuts.filter(s =>
+                        (s.keys + " " + s.action + " " + s.description + " " + s.app).toLowerCase().includes(localFilter)
+                      )
+                    : catShortcuts;
+
+                const isCollapsed = state.collapsedCategories.has(cat.id);
+
+                return `
+                    <section id="cat-${cat.id}" class="rounded-2xl bg-white dark:bg-[#0b101d] border border-slate-200 dark:border-slate-800/90 overflow-hidden shadow-sm transition">
+                        <!-- Category Shelf Header -->
+                        <div class="p-4 sm:px-6 bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+                            <button type="button" data-toggle-cat="${cat.id}" class="cat-collapse-btn flex items-center gap-3 text-left group focus:outline-none">
+                                <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-500 group-hover:scale-105 transition">
+                                    <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-cyan-500 transition">
+                                            ${escapeHTML(cat.name)}
+                                        </h3>
+                                        <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                                            ${catShortcuts.length} ${catShortcuts.length === 1 ? 'shortcut' : 'shortcuts'}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">${escapeHTML(cat.group)} Shelf</p>
+                                </div>
+                            </button>
+
+                            <div class="flex items-center gap-2">
+                                <!-- Per-Category Instant Filter -->
+                                <div class="relative hidden sm:block">
+                                    <input 
+                                        type="text" 
+                                        data-cat-search-input="${cat.id}"
+                                        value="${escapeHTML(state.categoryLocalSearch[cat.id] || '')}"
+                                        placeholder="Filter shelf..." 
+                                        class="cat-local-input w-40 text-xs px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:border-cyan-500"
+                                    >
+                                </div>
+                                <button type="button" data-toggle-cat="${cat.id}" class="cat-collapse-btn p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" aria-label="Toggle Category">
+                                    <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Category Cards Grid -->
+                        <div class="${isCollapsed ? 'hidden' : 'p-4 sm:p-6'}">
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                ${displayedShortcuts.map(s => createShortcutCardHTML(s)).join("")}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }).join("");
+
+            shelvesContainer.innerHTML = htmlBlocks;
+        }
+
+        function renderAll() {
+            renderFrontShelf();
+            renderWhatsAppSpotlight();
+            renderRecentlyViewed();
+            renderMainLibrary();
+            lucide.createIcons();
+        }
+
+        /*************************************************************************
+         * 7. POPULATE FILTER DROPDOWNS & STATS
+         *************************************************************************/
+        function initializeDropdownsAndStats() {
+            // Update Hero Live Counter
+            const totalShortcuts = SHORTCUTS_DATA.length;
+            const totalCategories = CATEGORIES_META.length;
+            document.getElementById("hero-stats-text").textContent =
+                `Indexing ${totalShortcuts} Verified Shortcuts across ${totalCategories} Categories`;
+            document.getElementById("sidebar-cat-count").textContent = totalCategories;
+
+            // Populate Category Select
+            const catSelect = document.getElementById("filter-category-select");
+            catSelect.innerHTML = `<option value="all">All ${totalCategories} Categories</option>` +
+                CATEGORIES_META.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join("");
+
+            // Populate Application Select
+            const uniqueApps = [...new Set(SHORTCUTS_DATA.map(s => s.app))].sort();
+            const appSelect = document.getElementById("filter-app-select");
+            appSelect.innerHTML = `<option value="all">All Applications (${uniqueApps.length})</option>` +
+                uniqueApps.map(app => `<option value="${escapeHTML(app)}">${escapeHTML(app)}</option>`).join("");
+        }
+
+        /*************************************************************************
+         * 8. INTERACTIVE PRACTICE QUIZ ENGINE
+         *************************************************************************/
+        function startQuiz() {
+            state.quiz.score = 0;
+            state.quiz.streak = 0;
+            state.quiz.questionIndex = 1;
+            updateQuizScoreboard();
+            generateQuizQuestion();
+        }
+
+        function updateQuizScoreboard() {
+            document.getElementById("quiz-score").textContent = state.quiz.score;
+            document.getElementById("quiz-streak").textContent = `${state.quiz.streak} 🔥`;
+            document.getElementById("quiz-q-number").textContent = `${state.quiz.questionIndex} / ${state.quiz.totalQuestions}`;
+        }
+
+        function generateQuizQuestion() {
+            state.quiz.answered = false;
+            document.getElementById("quiz-feedback").classList.add("hidden");
+
+            const pool = SHORTCUTS_DATA;
+            const correctItem = pool[Math.floor(Math.random() * pool.length)];
+            state.quiz.currentQuestion = correctItem;
+
+            // Pick 3 distinct distractor key combinations
+            const distractors = [];
+            const usedKeys = new Set([correctItem.keys]);
+            while (distractors.length < 3) {
+                const candidate = pool[Math.floor(Math.random() * pool.length)];
+                if (!usedKeys.has(candidate.keys)) {
+                    usedKeys.add(candidate.keys);
+                    distractors.push(candidate);
+                }
+            }
+
+            const options = [correctItem, ...distractors].sort(() => Math.random() - 0.5);
+
+            document.getElementById("quiz-app-badge").textContent = correctItem.app;
+            document.getElementById("quiz-platform-badge").textContent = correctItem.platform;
+            document.getElementById("quiz-prompt-action").textContent = correctItem.action;
+            document.getElementById("quiz-prompt-desc").textContent = correctItem.description;
+
+            const optionsGrid = document.getElementById("quiz-options-grid");
+            optionsGrid.innerHTML = options.map(opt => `
+                <button 
+                    type="button"
+                    data-quiz-option="${opt.id}"
+                    class="quiz-opt-btn p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 hover:border-cyan-500 text-left transition flex items-center justify-between group"
+                >
+                    <div class="flex flex-wrap items-center gap-1">
+                        ${renderKeycapsHTML(getDisplayKeys(opt))}
+                    </div>
+                    <i data-lucide="circle" class="w-4 h-4 text-slate-400 group-hover:text-cyan-400 shrink-0"></i>
+                </button>
+            `).join("");
+
+            lucide.createIcons({ nodes: [optionsGrid] });
+        }
+
+        function handleQuizAnswer(selectedId, btnEl) {
+            if (state.quiz.answered) return;
+            state.quiz.answered = true;
+
+            const correct = state.quiz.currentQuestion;
+            const isCorrect = selectedId === correct.id;
+            const feedbackBox = document.getElementById("quiz-feedback");
+            const feedbackText = document.getElementById("quiz-feedback-text");
+
+            document.querySelectorAll(".quiz-opt-btn").forEach(btn => {
+                const optId = btn.getAttribute("data-quiz-option");
+                if (optId === correct.id) {
+                    btn.classList.add("border-emerald-500", "bg-emerald-500/10");
+                } else if (btn === btnEl && !isCorrect) {
+                    btn.classList.add("border-rose-500", "bg-rose-500/10");
+                }
+            });
+
+            if (isCorrect) {
+                state.quiz.score += 10;
+                state.quiz.streak += 1;
+                feedbackBox.className = "p-3.5 rounded-xl text-xs sm:text-sm font-medium mb-4 flex items-center justify-between bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30";
+                feedbackText.textContent = `Correct! ${getDisplayKeys(correct)} performs "${correct.action}".`;
+            } else {
+                state.quiz.streak = 0;
+                feedbackBox.className = "p-3.5 rounded-xl text-xs sm:text-sm font-medium mb-4 flex items-center justify-between bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30";
+                feedbackText.textContent = `Not quite! The right shortcut is ${getDisplayKeys(correct)}.`;
+            }
+
+            updateQuizScoreboard();
+        }
+
+        /*************************************************************************
+         * 9. EVENT LISTENERS & INITIALIZATION
+         *************************************************************************/
+        function resetAllFilters() {
+            state.searchQuery = "";
+            state.selectedCategory = "all";
+            state.selectedPlatform = "all";
+            state.selectedApp = "all";
+            state.onlyFavorites = false;
+            state.categoryLocalSearch = {};
+
+            document.getElementById("global-search-input").value = "";
+            document.getElementById("clear-search-btn").classList.add("hidden");
+            document.getElementById("filter-category-select").value = "all";
+            document.getElementById("filter-platform-select").value = "all";
+            document.getElementById("filter-app-select").value = "all";
+
+            updateFavoriteBadge();
+            renderAll();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains("dark");
+            document.getElementById("theme-icon-dark").classList.toggle("hidden", !isDark);
+            document.getElementById("theme-icon-light").classList.toggle("hidden", isDark);
+        }
+
+        function updateOsButtonsUI() {
+            document.querySelectorAll(".os-mode-btn").forEach(btn => {
+                const mode = btn.getAttribute("data-os-mode");
+                if (mode === state.osMode) {
+                    btn.className = "os-mode-btn px-2.5 py-1 rounded-lg text-xs bg-cyan-500 text-slate-950 font-semibold shadow-sm transition";
+                } else {
+                    btn.className = "os-mode-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadPersistedState();
+            updateThemeIcons();
+            updateOsButtonsUI();
+            initializeDropdownsAndStats();
+            updateFavoriteBadge();
+            renderAll();
+
+            // Global Search Input
+            const searchInput = document.getElementById("global-search-input");
+            const clearSearchBtn = document.getElementById("clear-search-btn");
+
+            searchInput.addEventListener("input", (e) => {
+                state.searchQuery = e.target.value;
+                clearSearchBtn.classList.toggle("hidden", !state.searchQuery);
+                renderMainLibrary();
+                lucide.createIcons();
+            });
+
+            clearSearchBtn.addEventListener("click", () => {
+                state.searchQuery = "";
+                searchInput.value = "";
+                clearSearchBtn.classList.add("hidden");
+                renderMainLibrary();
+                lucide.createIcons();
+                searchInput.focus();
+            });
+
+            // Press '/' anywhere to focus search
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+                if (e.key === "Escape") {
+                    const quizModal = document.getElementById("quiz-modal");
+                    if (!quizModal.classList.contains("hidden")) {
+                        quizModal.classList.add("hidden");
+                        quizModal.classList.remove("flex");
+                    }
+                }
+            });
+
+            // Dropdown Filters
+            document.getElementById("filter-category-select").addEventListener("change", (e) => {
+                state.selectedCategory = e.target.value;
+                renderMainLibrary();
+                lucide.createIcons();
+            });
+
+            document.getElementById("filter-platform-select").addEventListener("change", (e) => {
+                state.selectedPlatform = e.target.value;
+                renderMainLibrary();
+                lucide.createIcons();
+            });
+
+            document.getElementById("filter-app-select").addEventListener("change", (e) => {
+                state.selectedApp = e.target.value;
+                renderMainLibrary();
+                lucide.createIcons();
+            });
+
+            // Quick Search Chips
+            document.querySelectorAll(".quick-chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const q = chip.getAttribute("data-quick-query");
+                    state.searchQuery = q;
+                    searchInput.value = q;
+                    clearSearchBtn.classList.remove("hidden");
+                    renderMainLibrary();
+                    lucide.createIcons();
+                    document.getElementById("main-library").scrollIntoView({ behavior: "smooth" });
+                });
+            });
+
+            // OS Perspective Switcher
+            document.querySelectorAll(".os-mode-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    state.osMode = btn.getAttribute("data-os-mode");
+                    try { localStorage.setItem("shortcutAtlas_osMode", state.osMode); } catch (e) {}
+                    updateOsButtonsUI();
+                    renderAll();
+                });
+            });
+
+            // WhatsApp Spotlight Sub-tabs
+            document.querySelectorAll(".wa-tab-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    state.waFilter = btn.getAttribute("data-wa-tab");
+                    document.querySelectorAll(".wa-tab-btn").forEach(b => {
+                        if (b.getAttribute("data-wa-tab") === state.waFilter) {
+                            b.className = "wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition";
+                        } else {
+                            b.className = "wa-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition";
+                        }
+                    });
+                    renderWhatsAppSpotlight();
+                    lucide.createIcons();
+                });
+            });
+
+            // Favorites Filter Toggle
+            document.getElementById("favorites-toggle-btn").addEventListener("click", () => {
+                state.onlyFavorites = !state.onlyFavorites;
+                updateFavoriteBadge();
+                renderMainLibrary();
+                lucide.createIcons();
+                if (state.onlyFavorites) {
+                    document.getElementById("main-library").scrollIntoView({ behavior: "smooth" });
+                }
+            });
+
+            // Reset Filters Buttons
+            document.getElementById("reset-all-filters-btn").addEventListener("click", resetAllFilters);
+            document.getElementById("empty-reset-btn").addEventListener("click", resetAllFilters);
+
+            // Expand / Collapse All Categories
+            document.getElementById("expand-all-btn").addEventListener("click", () => {
+                state.collapsedCategories.clear();
+                renderMainLibrary();
+                lucide.createIcons();
+            });
+
+            document.getElementById("collapse-all-btn").addEventListener("click", () => {
+                CATEGORIES_META.forEach(c => state.collapsedCategories.add(c.id));
+                renderMainLibrary();
+                lucide.createIcons();
+            });
+
+            // Sidebar Category Filter Input
+            document.getElementById("sidebar-cat-search").addEventListener("input", () => {
+                renderSidebarDirectory(SHORTCUTS_DATA.filter(matchesGlobalFilters));
+                lucide.createIcons();
+            });
+
+            // Clear Recent History
+            document.getElementById("clear-recent-btn").addEventListener("click", () => {
+                state.recentlyViewed = [];
+                saveRecent();
+                renderRecentlyViewed();
+            });
+
+            // Theme Toggle
+            document.getElementById("theme-toggle-btn").addEventListener("click", () => {
+                const isDark = document.documentElement.classList.toggle("dark");
+                try {
+                    localStorage.setItem("shortcutAtlas_theme", isDark ? "dark" : "light");
+                } catch (e) {}
+                updateThemeIcons();
+            });
+
+            // Event Delegation for Copy, Favorite, Category Collapse, Local Shelf Search
+            document.body.addEventListener("click", (e) => {
+                // Copy Button
+                const copyBtn = e.target.closest(".copy-btn");
+                if (copyBtn) {
+                    const id = copyBtn.getAttribute("data-copy-id");
+                    const item = SHORTCUTS_DATA.find(s => s.id === id);
+                    if (item) {
+                        const formatted = `${getDisplayKeys(item)} — ${item.action} (${item.app})`;
+                        copyToClipboard(formatted, item);
+                    }
+                    return;
+                }
+
+                // Favorite Button
+                const favBtn = e.target.closest(".fav-btn");
+                if (favBtn) {
+                    const id = favBtn.getAttribute("data-fav-id");
+                    toggleFavorite(id);
+                    return;
+                }
+
+                // Category Collapse Toggle
+                const collapseBtn = e.target.closest(".cat-collapse-btn");
+                if (collapseBtn) {
+                    const catId = collapseBtn.getAttribute("data-toggle-cat");
+                    if (state.collapsedCategories.has(catId)) {
+                        state.collapsedCategories.delete(catId);
+                    } else {
+                        state.collapsedCategories.add(catId);
+                    }
+                    renderMainLibrary();
+                    lucide.createIcons();
+                    return;
+                }
+
+                // Recently Viewed Pill Click
+                const recentPill = e.target.closest(".recent-pill");
+                if (recentPill) {
+                    const id = recentPill.getAttribute("data-recent-id");
+                    const item = SHORTCUTS_DATA.find(s => s.id === id);
+                    if (item) {
+                        copyToClipboard(`${getDisplayKeys(item)} — ${item.action}`, item);
+                    }
+                    return;
+                }
+
+                // Quiz Answer Selection
+                const quizOpt = e.target.closest(".quiz-opt-btn");
+                if (quizOpt) {
+                    const optId = quizOpt.getAttribute("data-quiz-option");
+                    handleQuizAnswer(optId, quizOpt);
+                    return;
+                }
+            });
+
+            // Per-Category Shelf Search Input Delegation
+            document.getElementById("categories-shelves-container").addEventListener("input", (e) => {
+                const input = e.target.closest(".cat-local-input");
+                if (input) {
+                    const catId = input.getAttribute("data-cat-search-input");
+                    const cursorPos = input.selectionStart;
+                    state.categoryLocalSearch[catId] = input.value;
+                    renderMainLibrary();
+                    lucide.createIcons();
+                    // Restore focus to that shelf's input
+                    const restoredInput = document.querySelector(`[data-cat-search-input="${catId}"]`);
+                    if (restoredInput) {
+                        restoredInput.focus();
+                        restoredInput.setSelectionRange(cursorPos, cursorPos);
+                    }
+                }
+            });
+
+            // Quiz Modal Controls
+            const quizModal = document.getElementById("quiz-modal");
+            const openQuiz = () => {
+                quizModal.classList.remove("hidden");
+                quizModal.classList.add("flex");
+                startQuiz();
+            };
+
+            document.getElementById("nav-quiz-btn").addEventListener("click", openQuiz);
+            document.getElementById("mobile-quiz-btn").addEventListener("click", openQuiz);
+            document.getElementById("close-quiz-btn").addEventListener("click", () => {
+                quizModal.classList.add("hidden");
+                quizModal.classList.remove("flex");
+            });
+            document.getElementById("quiz-next-btn").addEventListener("click", () => {
+                if (state.quiz.questionIndex < state.quiz.totalQuestions) {
+                    state.quiz.questionIndex++;
+                } else {
+                    state.quiz.questionIndex = 1;
+                    state.quiz.score = 0;
+                }
+                updateQuizScoreboard();
+                generateQuizQuestion();
+            });
+            document.getElementById("quiz-restart-btn").addEventListener("click", startQuiz);
+        });
+    </script>
+</body>
+</html>
