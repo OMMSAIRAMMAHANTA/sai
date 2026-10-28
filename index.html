@@ -381,6 +381,31 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
 }
 @media(hover:none){.gamekey-label small .kb-hint{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* MOBILE STABILITY PATCH: reduce repaint-heavy effects that can flicker on phones */
+@media (hover: none), (max-width: 768px) {
+  html { scroll-behavior: auto !important; }
+  body { background-attachment: scroll !important; }
+  .page-section { min-height: 100svh; animation: none !important; filter: none !important; }
+  .orb { animation: none !important; }
+  .ambient-particle { display: none !important; }
+  .cursor-glow, #reptileCanvas { display: none !important; }
+  .avatar-wrap { animation: none !important; transform: none !important; transition: none !important; }
+  .avatar-wrap *, .hero-image-container { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+  .hero-content, .hero-image-container { animation: none !important; }
+  .hero-content > *:not(h1) { opacity: 1 !important; animation: none !important; transform: none !important; }
+  .status-pill i, .music-btn.playing, .gamekey .keycap { animation: none !important; }
+  .skill-badge { animation: none !important; }
+  .glass-card, .social-overlay, .overlay, .skill-modal-box, .passcode-box {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  * { -webkit-tap-highlight-color: transparent; }
+}
+@media (max-width: 768px) {
+  .page-section { min-height: 100vh; min-height: 100svh; }
+}
+
 </style>
 </head>
 <body>
