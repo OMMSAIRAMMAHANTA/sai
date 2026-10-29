@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SAI | Odisha Festival Calendar</title>
+    
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 45%, #071923 0%, #03060a 100%);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Centered Standalone Calendar Card */
+        .sai-cal-popup {
+            position: relative;
+            width: 390px;
+            max-width: 100%;
+            max-height: calc(100dvh - 40px);
+            background: linear-gradient(165deg, #071118 0%, #050a0f 60%, #030609 100%);
+            border: 1px solid rgba(20, 184, 166, 0.28);
+            border-radius: 22px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88), 0 0 32px rgba(16, 185, 129, 0.14);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: saiCardEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes saiCardEnter {
+            from { opacity: 0; transform: translateY(14px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Header: SAI Brand + Month Navigation + Close to Portfolio */
+        .sai-cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 15px 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .sai-cal-brand {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .sai-cal-logo {
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            padding: 3px 7px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.22), rgba(245, 158, 11, 0.22));
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .sai-cal-month-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sai-cal-nav-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .sai-cal-nav-btn:hover {
+            background: rgba(20, 184, 166, 0.2);
+            border-color: #14b8a6;
+            color: #5eead4;
+        }
+
+        .sai-cal-month-label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #f8fafc;
+            min-width: 118px;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+
+        .sai-cal-close {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .sai-cal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .sai-cal-body {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(20, 184, 166, 0.3) transparent;
+            padding: 12px 14px 14px;
+        }
+
+        /* Animated Month Festival Slideshow */
+        .sai-cal-slideshow {
+            position: relative;
+            width: 100%;
+            height: 176px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #09131c;
+            border: 1px solid rgba(20, 184, 166, 0.24);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.65), 0 0 20px rgba(20, 184, 166, 0.12);
+            margin-bottom: 12px;
+        }
+
+        .sai-cal-slides-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+
+        .sai-cal-slide {
+            position: relative;
+            min-width: 100%;
+            height: 100%;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .sai-cal-slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transform: scale(1.02);
+            transition: transform 3.8s ease-out, opacity 0.35s ease;
+        }
+
+        .sai-cal-slide.is-current .sai-cal-slide-img {
+            transform: scale(1.09);
+        }
+
+        .sai-cal-slide-shade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(4, 9, 14, 0.25) 0%,
+                rgba(4, 9, 14, 0.08) 38%,
+                rgba(4, 9, 14, 0.82) 76%,
+                rgba(3, 7, 12, 0.96) 100%
+            );
+            pointer-events: none;
+        }
+
+        .sai-cal-slide-top {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .sai-cal-loc-pill {
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: #5eead4;
+            background: rgba(6, 24, 34, 0.78);
+            border: 1px solid rgba(20, 184, 166, 0.4);
+            padding: 3px 8px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sai-cal-status-pill {
+            font-size: 0.58rem;
+            font-weight: 600;
+            color: #fde68a;
+            background: rgba(24, 16, 5, 0.78);
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            padding: 2px 7px;
+            border-radius: 999px;
+        }
+
+        .sai-cal-slide-caption {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 24px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .sai-cal-slide-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.22;
+            margin-bottom: 3px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+        }
+
+        .sai-cal-slide-date {
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Prev / Next Slide Arrows */
+        .sai-cal-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(5, 10, 18, 0.65);
+            color: #ffffff;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.25s ease, background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .sai-cal-slideshow:hover .sai-cal-arrow {
+            opacity: 1;
+        }
+
+        .sai-cal-arrow:hover {
+            background: rgba(20, 184, 166, 0.85);
+            border-color: #14b8a6;
+            color: #020617;
+        }
+
+        .sai-cal-arrow.prev { left: 8px; }
+        .sai-cal-arrow.next { right: 8px; }
+
+        /* Slide Pagination Dots */
+        .sai-cal-dots {
+            position: absolute;
+            bottom: 7px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            z-index: 3;
+        }
+
+        .sai-cal-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.32);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: width 0.28s ease, background-color 0.28s ease;
+        }
+
+        .sai-cal-dot.active {
+            width: 16px;
+            background: #14b8a6;
+            box-shadow: 0 0 8px rgba(20, 184, 166, 0.8);
+        }
+
+        /* Compact Monthly Calendar Grid */
+        .sai-cal-grid-wrap {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 10px;
+        }
+
+        .sai-cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 6px;
+            letter-spacing: 0.04em;
+        }
+
+        .sai-cal-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .sai-cal-day {
+            position: relative;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.72rem;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .sai-cal-day.is-empty {
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .sai-cal-day:hover:not(.is-empty) {
+            background: rgba(20, 184, 166, 0.14);
+            border-color: rgba(20, 184, 166, 0.35);
+            color: #ffffff;
+        }
+
+        .sai-cal-day.is-today {
+            border-color: rgba(245, 158, 11, 0.6);
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .sai-cal-day.has-festival {
+            background: rgba(16, 185, 129, 0.1);
+            color: #ecfdf5;
+            font-weight: 700;
+        }
+
+        .sai-cal-day.is-selected {
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.32), rgba(16, 185, 129, 0.25));
+            border-color: #14b8a6;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(20, 184, 166, 0.35);
+        }
+
+        .sai-cal-fest-dots {
+            display: flex;
+            gap: 2px;
+            margin-top: 2px;
+        }
+
+        .sai-cal-fest-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #14b8a6;
+            box-shadow: 0 0 6px #14b8a6;
+        }
+
+        .sai-cal-fest-dot.gold {
+            background: #fbbf24;
+            box-shadow: 0 0 6px #fbbf24;
+        }
+
+        .sai-cal-legend {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.62rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sai-cal-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Date Details View */
+        .sai-cal-detail-view {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            animation: saiFadeIn 0.28s ease;
+        }
+
+        .sai-cal-detail-view.is-active {
+            display: flex;
+        }
+
+        @keyframes saiFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sai-cal-detail-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .sai-cal-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(20, 184, 166, 0.4);
+            background: rgba(20, 184, 166, 0.12);
+            color: #5eead4;
+            font-size: 0.68rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .sai-cal-back-btn:hover {
+            background: rgba(20, 184, 166, 0.25);
+            transform: translateX(-2px);
+        }
+
+        .sai-cal-detail-date-heading {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+
+        .sai-cal-event-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(20, 184, 166, 0.22);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .sai-cal-event-media {
+            position: relative;
+            width: 100%;
+            height: 128px;
+            background: #09131c;
+        }
+
+        .sai-cal-event-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .sai-cal-event-body {
+            padding: 10px 12px 12px;
+        }
+
+        .sai-cal-event-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .sai-cal-event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.65rem;
+            color: #5eead4;
+            margin-bottom: 6px;
+        }
+
+        .sai-cal-event-desc {
+            font-size: 0.72rem;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.75);
+            margin: 0;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+            .sai-cal-arrow {
+                opacity: 0.85;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sai-cal-popup,
+            .sai-cal-slides-track,
+            .sai-cal-slide-img,
+            .sai-cal-dot {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sai-cal-popup" id="saiCalPopup" aria-label="SAI Odisha Festival Calendar">
+        <div class="sai-cal-header">
+            <div class="sai-cal-brand">
+                <a href="index.html" class="sai-cal-logo" title="Back to Portfolio">SAI</a>
+            </div>
+            <div class="sai-cal-month-nav">
+                <button class="sai-cal-nav-btn" id="saiCalPrevMonth" aria-label="Previous Month">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="sai-cal-month-label" id="saiCalMonthLabel">October 2026</div>
+                <button class="sai-cal-nav-btn" id="saiCalNextMonth" aria-label="Next Month">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            <a href="index.html" class="sai-cal-close" id="saiCalClose" aria-label="Close Calendar and Return Home" title="Back to Portfolio">
+                <i class="fa-solid fa-xmark"></i>
+            </a>
+        </div>
+
+        <div class="sai-cal-body">
+            <!-- Overview Mode: Animated Month Slideshow + Calendar Grid -->
+            <div id="saiCalOverview">
+                <div class="sai-cal-slideshow" id="saiCalSlideshow">
+                    <div class="sai-cal-slides-track" id="saiCalSlidesTrack"></div>
+                    <button class="sai-cal-arrow prev" id="saiSlidePrev" aria-label="Previous Festival">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="sai-cal-arrow next" id="saiSlideNext" aria-label="Next Festival">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <div class="sai-cal-dots" id="saiCalDots"></div>
+                </div>
+
+                <div class="sai-cal-grid-wrap">
+                    <div class="sai-cal-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+                    <div class="sai-cal-days" id="saiCalDays"></div>
+                    <div class="sai-cal-legend">
+                        <span class="sai-cal-legend-item"><span class="sai-cal-fest-dot"></span> Festival Date (Tap to view)</span>
+                        <span>Odisha Culture</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Details Mode: Shows all festivals on a tapped date -->
+            <div class="sai-cal-detail-view" id="saiCalDetailView">
+                <div class="sai-cal-detail-bar">
+                    <button class="sai-cal-back-btn" id="saiCalBackBtn">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Month
+                    </button>
+                    <span class="sai-cal-detail-date-heading" id="saiCalDetailHeading"></span>
+                </div>
+                <div id="saiCalDetailList"></div>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        (function initSaiOdishaCalendar() {
+            const YEAR = 2026;
+            const MONTHS = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            // Authentic Odisha Festival Dataset (2026 Solar & Lunar Panjika Schedule)
+            const SAI_ODISHA_FESTIVALS = [
+                // JANUARY (0)
+                {
+                    month: 0, day: 14, endDay: 14,
+                    name: "Makar Sankranti & Makar Mela",
+                    location: "Hatakeshwar (Atri), Kalijai & Konark",
+                    scheduleNote: "14 Jan 2026 • Solar Transit",
+                    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=700&q=80",
+                    desc: "Celebrated across Odisha with freshly harvested Makar Chaula offerings to Lord Jagannath, colorful kite flying, and grand fairs at Kalijai Island (Chilika) and Atri."
+                },
+                {
+                    month: 0, day: 18, endDay: 20,
+                    name: "Mukteswar Dance Festival",
+                    location: "Mukteswar Temple, Bhubaneswar",
+                    scheduleNote: "18–20 Jan • Odisha Tourism Annual",
+                    image: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=700&q=80",
+                    desc: "A spellbinding three-day Odissi classical dance festival staged in front of the 10th-century sculpted torana archway of Mukteswar Temple."
+                },
+                {
+                    month: 0, day: 23, endDay: 23,
+                    name: "Vasant Panchami (Saraswati Puja)",
+                    location: "Puri & Statewide",
+                    scheduleNote: "23 Jan 2026 • Lunar Tithi",
+                    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=700&q=80",
+                    desc: "Marks the arrival of spring, the worship of Goddess Saraswati in schools and homes, and the traditional consecration of wooden logs (Ratha Katha) for Puri Ratha Jatra."
+                },
+                // FEBRUARY (1)
+                {
+                    month: 1, day: 1, endDay: 8,
+                    name: "Khandagiri Kumbha Mela (Magha Saptami)",
+                    location: "Khandagiri & Udayagiri Hills, Bhubaneswar",
+                    scheduleNote: "Begins 1 Feb 2026 • Lunar Schedule",
+                    image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=700&q=80",
+                    desc: "Ascetics, sadhus, and thousands of devotees gather at the ancient twin hills of Khandagiri and Udayagiri for sacred chants and rituals."
+                },
+                {
+                    month: 1, day: 15, endDay: 15,
+                    name: "Maha Shivaratri (Jagar Yatra)",
+                    location: "Lingaraj Temple, Bhubaneswar & Kapilash",
+                    scheduleNote: "15 Feb 2026 • Lunar Tithi",
+                    image: "https://images.unsplash.com/photo-1604608672516-f1b9b1d37076?auto=format&fit=crop&w=700&q=80",
+                    desc: "Devotees keep an all-night vigil lighting earthen lamps as the sacred Mahadeepa is raised atop the 11th-century Lingaraj Temple spire."
+                },
+                // MARCH (2)
+                {
+                    month: 2, day: 3, endDay: 4,
+                    name: "Dola Purnima & Melana",
+                    location: "Puri, Harirajpur & Coastal Odisha",
+                    scheduleNote: "3–4 Mar 2026 • Lunar Purnima",
+                    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=700&q=80",
+                    desc: "Ornate palanquins (Vimanas) carrying village deities process through vibrant Abira colors to gather at grand Melana grounds."
+                },
+                {
+                    month: 2, day: 21, endDay: 21,
+                    name: "Ashokashtami Car Festival",
+                    location: "Lingaraj Temple, Bhubaneswar",
+                    scheduleNote: "21 Mar 2026 • Chaitra Shukla Ashtami",
+                    image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=700&q=80",
+                    desc: "The annual Rukuna Ratha Jatra where the bronze idol of Lord Lingaraj travels in a grand wooden chariot to the Rameshwar Temple."
+                },
+                // APRIL (3)
+                {
+                    month: 3, day: 1, endDay: 1,
+                    name: "Utkala Dibasa (Odisha Day)",
+                    location: "Bhubaneswar, Cuttack & Statewide",
+                    scheduleNote: "1 Apr • Fixed State Celebration",
+                    image: "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&w=700&q=80",
+                    desc: "Commemorates the formation of Odisha as a separate province on April 1, 1936, celebrated with heritage illuminations, Odia literature, and cultural pageants."
+                },
+                {
+                    month: 3, day: 14, endDay: 14,
+                    name: "Maha Vishuba Pana Sankranti",
+                    location: "Sarala, Charchika & Statewide",
+                    scheduleNote: "14 Apr 2026 • Odia New Year",
+                    image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=700&q=80",
+                    desc: "The traditional Odia New Year and start of the new Panjika almanac, marked by sweet Bela Pana offerings, Jhamu Yatra, and Danda Nata."
+                },
+                {
+                    month: 3, day: 20, endDay: 20,
+                    name: "Akshaya Tritiya & Chandan Yatra",
+                    location: "Narendra Tank, Puri & Farmlands",
+                    scheduleNote: "20 Apr 2026 • Lunar Tithi",
+                    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=700&q=80",
+                    desc: "Farmers perform Akhi Muthi Anukula (sowing the first paddy seeds) while chariot construction and the 21-day Chandan Yatra boat festival begin in Puri."
+                },
+                // MAY (4)
+                {
+                    month: 4, day: 1, endDay: 10,
+                    name: "Chandan Yatra (Narendra Pushkarini)",
+                    location: "Puri",
+                    scheduleNote: "May 2026 • 21-Day Water Festival",
+                    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80",
+                    desc: "Representative deities cruise across the sacred Narendra Tank in swan-shaped Nanda and Bhadra boats amid evening lamps and Odissi music."
+                },
+                {
+                    month: 4, day: 25, endDay: 25,
+                    name: "Savitri Brata",
+                    location: "Statewide across Odisha",
+                    scheduleNote: "25 May 2026 • Jyeshtha Amavasya",
+                    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=700&q=80",
+                    desc: "Married Odia women observe a sacred fast with seasonal summer fruits—mangoes, jackfruit, and palm fruit—praying for family well-being."
+                },
+                // JUNE (5)
+                {
+                    month: 5, day: 14, endDay: 16,
+                    name: "Raja Parba (Mithuna Sankranti)",
+                    location: "Statewide across Odisha",
+                    scheduleNote: "14–16 Jun 2026 • Pahili, Raja & Bhuin Daana",
+                    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80",
+                    desc: "Odisha's joyous three-day festival honoring Mother Earth and womanhood with decorated Doli swings, Poda Pitha delicacies, and Mitha Paan."
+                },
+                {
+                    month: 5, day: 29, endDay: 29,
+                    name: "Devasnana Purnima (Hati Besha)",
+                    location: "Snana Mandapa, Puri",
+                    scheduleNote: "29 Jun 2026 • Jyeshtha Purnima",
+                    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=700&q=80",
+                    desc: "The Holy Trinity is bathed with 108 pitchers of aromatic water and adorned in the magnificent Ganesha (Hati) Besha before entering Anasara."
+                },
+                // JULY (6)
+                {
+                    month: 6, day: 16, endDay: 24,
+                    name: "Puri Ratha Jatra (Festival of Chariots)",
+                    location: "Bada Danda (Grand Road), Puri",
+                    scheduleNote: "16 Jul 2026 • Ashadha Shukla Dwitiya",
+                    image: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=700&q=80",
+                    desc: "Lord Jagannath, Lord Balabhadra, and Devi Subhadra journey to the Gundicha Temple aboard the colossal Nandighosa, Taladhwaja, and Darpadalana chariots."
+                },
+                {
+                    month: 6, day: 25, endDay: 25,
+                    name: "Suna Besha (Golden Attire)",
+                    location: "Singhadwara, Puri",
+                    scheduleNote: "25 Jul 2026 • Ashadha Ekadashi",
+                    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=700&q=80",
+                    desc: "Following Bahuda Jatra, the deities are adorned aboard their chariots in resplendent royal gold ornaments weighing over 200 kilograms."
+                },
+                // AUGUST (7)
+                {
+                    month: 7, day: 23, endDay: 27,
+                    name: "Jhulana Jatra",
+                    location: "Puri Temples & Mathas",
+                    scheduleNote: "23–27 Aug 2026 • Shravana Ekadashi–Purnima",
+                    image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=700&q=80",
+                    desc: "The monsoon swing festival where deities are placed on flower-decked swings accompanied by Gotipua dance and classical Odissi music."
+                },
+                {
+                    month: 7, day: 28, endDay: 28,
+                    name: "Gamha Purnima & Balabhadra Janma",
+                    location: "Statewide across Odisha",
+                    scheduleNote: "28 Aug 2026 • Shravana Purnima",
+                    image: "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=700&q=80",
+                    desc: "Celebrates the birth of Lord Balabhadra and honors cattle and agrarian tools with Manda Pitha and Chhena Poda delicacies."
+                },
+                // SEPTEMBER (8)
+                {
+                    month: 8, day: 4, endDay: 4,
+                    name: "Sri Krishna Janmashtami",
+                    location: "Puri, Bhubaneswar & Statewide",
+                    scheduleNote: "4 Sep 2026 • Bhadraba Krishna Ashtami",
+                    image: "https://images.unsplash.com/photo-1567591414240-e9c1e59f3e06?auto=format&fit=crop&w=700&q=80",
+                    desc: "Midnight birth rituals of Lord Krishna celebrated with special Niti at Jagannath Temple and devotional Bhagabata recitals in village Tungis."
+                },
+                {
+                    month: 8, day: 14, endDay: 14,
+                    name: "Ganesh Puja",
+                    location: "Bhubaneswar, Jatni, Cuttack & Statewide",
+                    scheduleNote: "14 Sep 2026 • Bhadraba Shukla Chaturthi",
+                    image: "https://images.unsplash.com/photo-1567591370504-80142b28f1c1?auto=format&fit=crop&w=700&q=80",
+                    desc: "Educational institutions and youth clubs erect artistic pandals honoring Lord Ganesha as the remover of obstacles and patron of learning."
+                },
+                {
+                    month: 8, day: 15, endDay: 15,
+                    name: "Nuakhai Juhar",
+                    location: "Sambalpur, Bargarh, Balangir & Western Odisha",
+                    scheduleNote: "15 Sep 2026 • Bhadraba Shukla Panchami",
+                    image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=700&q=80",
+                    desc: "Western Odisha's grand agrarian festival offering the season's first Nabanna (new rice) to Maa Samaleswari, followed by Nuakhai Bhetghat and Sambalpuri folk dances."
+                },
+                // OCTOBER (9)
+                {
+                    month: 9, day: 17, endDay: 20,
+                    name: "Durga Puja (Chandi & Suna Medha)",
+                    location: "Cuttack & Bhubaneswar",
+                    scheduleNote: "17–20 Oct 2026 • Ashwina Saptami–Dashami",
+                    image: "https://images.unsplash.com/photo-1601931935821-5fbe71157695?auto=format&fit=crop&w=700&q=80",
+                    desc: "Famous for Cuttack's filigree silver (Chandi Medha) and gold backdrops, towering illuminated gates in Bhubaneswar, and Shakti Peetha rituals."
+                },
+                {
+                    month: 9, day: 25, endDay: 25,
+                    name: "Kumar Purnima & Gajalakshmi Puja",
+                    location: "Dhenkanal, Kendrapara & Statewide",
+                    scheduleNote: "25 Oct 2026 • Ashwina Purnima",
+                    image: "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?auto=format&fit=crop&w=700&q=80",
+                    desc: "Unmarried girls worship the autumn full moon and Chanda Chakata while Dhenkanal and Kendrapara host grand 11-day Gajalakshmi Puja celebrations."
+                },
+                // NOVEMBER (10)
+                {
+                    month: 10, day: 8, endDay: 8,
+                    name: "Kali Puja & Deepabali (Bada Badua Daka)",
+                    location: "Bhadrak, Jajpur & Puri",
+                    scheduleNote: "8 Nov 2026 • Kartika Amavasya",
+                    image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=700&q=80",
+                    desc: "Odia families light jute sticks (Kaunriya Kathi) invoking ancestors with the chant 'Bada Badua Ho, Andhara Re Asa Alua Re Jao'."
+                },
+                {
+                    month: 10, day: 24, endDay: 24,
+                    name: "Kartika Purnima (Boita Bandana)",
+                    location: "Mahanadi, Bindu Sagar & Puri",
+                    scheduleNote: "24 Nov 2026 • Kartika Purnima",
+                    image: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=700&q=80",
+                    desc: "At dawn, people float miniature banana-stem boats lit with lamps singing 'Aa Ka Ma Boi', honoring Kalinga's ancient Sadhaba maritime traders."
+                },
+                {
+                    month: 10, day: 24, endDay: 30,
+                    name: "Historic Cuttack Bali Jatra",
+                    location: "Gadagadia Ghata, Mahanadi Riverbed, Cuttack",
+                    scheduleNote: "Begins 24 Nov 2026 • 8-Day Mega Trade Fair",
+                    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=700&q=80",
+                    desc: "One of Asia's largest open-air fairs on the banks of the Mahanadi featuring handicrafts, cultural stages, and famous Cuttack Dahibara Aloodum."
+                },
+                // DECEMBER (11)
+                {
+                    month: 11, day: 1, endDay: 5,
+                    name: "Konark Dance & International Sand Art Festival",
+                    location: "Konark Sun Temple & Chandrabhaga Beach",
+                    scheduleNote: "1–5 Dec • Official Odisha Tourism Schedule",
+                    image: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=700&q=80",
+                    desc: "Classical dance maestros perform under the stars beside the Konark Sun Temple while international sand artists sculpt masterpieces on Chandrabhaga Beach."
+                },
+                {
+                    month: 11, day: 10, endDay: 10,
+                    name: "Prathamastami",
+                    location: "Statewide across Odisha",
+                    scheduleNote: "Dec 2026 • Margashira Krishna Ashtami",
+                    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=700&q=80",
+                    desc: "Honors the firstborn child (Podhuan) of the family with new attire, aarti, and aromatic turmeric-leaf steamed Enduri Pitha."
+                },
+                {
+                    month: 11, day: 15, endDay: 31,
+                    name: "Bargarh Dhanu Jatra",
+                    location: "Bargarh (Open-Air Theatre)",
+                    scheduleNote: "Late Dec–Jan • Annual Lunar Schedule",
+                    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=700&q=80",
+                    desc: "The world's largest open-air theatrical festival where the entire town of Bargarh transforms into Mathura and Ambapali becomes Gopapura."
+                }
+            ];
+
+            // SVG Fallback Data URI in case an external image fails to load
+            function createFallbackArtwork(title) {
+                const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+                    <defs>
+                        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0f3d3e"/>
+                            <stop offset="50%" stop-color="#091926"/>
+                            <stop offset="100%" stop-color="#04070d"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="600" height="360" fill="url(#g)"/>
+                    <circle cx="300" cy="150" r="70" fill="none" stroke="#14b8a6" stroke-width="2" stroke-dasharray="6 6" opacity="0.5"/>
+                    <text x="300" y="155" text-anchor="middle" fill="#fbbf24" font-family="sans-serif" font-size="20" font-weight="700">SAI • ODISHA</text>
+                    <text x="300" y="185" text-anchor="middle" fill="#e2e8f0" font-family="sans-serif" font-size="15">${safeTitle}</text>
+                </svg>`;
+                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+            }
+
+            // DOM Elements
+            const prevMonthBtn = document.getElementById('saiCalPrevMonth');
+            const nextMonthBtn = document.getElementById('saiCalNextMonth');
+            const monthLabel = document.getElementById('saiCalMonthLabel');
+
+            const overviewBox = document.getElementById('saiCalOverview');
+            const slideshowEl = document.getElementById('saiCalSlideshow');
+            const slidesTrack = document.getElementById('saiCalSlidesTrack');
+            const slidePrevBtn = document.getElementById('saiSlidePrev');
+            const slideNextBtn = document.getElementById('saiSlideNext');
+            const dotsContainer = document.getElementById('saiCalDots');
+            const daysGrid = document.getElementById('saiCalDays');
+
+            const detailView = document.getElementById('saiCalDetailView');
+            const backBtn = document.getElementById('saiCalBackBtn');
+            const detailHeading = document.getElementById('saiCalDetailHeading');
+            const detailList = document.getElementById('saiCalDetailList');
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const now = new Date();
+            let currentMonth = now.getMonth();
+            let currentSlideIdx = 0;
+            let currentMonthFestivals = [];
+            let slideTimer = null;
+            let isPaused = false;
+            let selectedDay = null;
+
+            function getFestivalsForMonth(monthIndex) {
+                return SAI_ODISHA_FESTIVALS.filter(f => f.month === monthIndex);
+            }
+
+            function getFestivalsForDate(monthIndex, dayNum) {
+                return SAI_ODISHA_FESTIVALS.filter(f =>
+                    f.month === monthIndex && dayNum >= f.day && dayNum <= (f.endDay || f.day)
+                );
+            }
+
+            function renderSlideshow() {
+                currentMonthFestivals = getFestivalsForMonth(currentMonth);
+                currentSlideIdx = 0;
+                slidesTrack.innerHTML = '';
+                dotsContainer.innerHTML = '';
+
+                currentMonthFestivals.forEach((fest, idx) => {
+                    const slide = document.createElement('div');
+                    slide.className = 'sai-cal-slide' + (idx === 0 ? ' is-current' : '');
+                    const img = document.createElement('img');
+                    img.className = 'sai-cal-slide-img';
+                    img.src = fest.image;
+                    img.alt = fest.name;
+                    img.loading = 'lazy';
+                    img.onerror = function () {
+                        this.onerror = null;
+                        this.src = createFallbackArtwork(fest.name);
+                    };
+
+                    slide.innerHTML = `
+                        <div class="sai-cal-slide-shade"></div>
+                        <div class="sai-cal-slide-top">
+                            <span class="sai-cal-loc-pill">
+                                <i class="fa-solid fa-location-dot"></i> ${fest.location.split(',')[0]}
+                            </span>
+                            <span class="sai-cal-status-pill">${fest.scheduleNote.split('•')[1] || 'Verified'}</span>
+                        </div>
+                        <div class="sai-cal-slide-caption">
+                            <div class="sai-cal-slide-title">${fest.name}</div>
+                            <div class="sai-cal-slide-date">
+                                <i class="fa-regular fa-calendar"></i> ${fest.scheduleNote.split('•')[0].trim()}
+                            </div>
+                        </div>
+                    `;
+                    slide.prepend(img);
+
+                    slide.addEventListener('click', () => {
+                        openDateDetail(fest.day);
+                    });
+
+                    slidesTrack.appendChild(slide);
+
+                    const dot = document.createElement('button');
+                    dot.className = 'sai-cal-dot' + (idx === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', `Slide ${idx + 1}: ${fest.name}`);
+                    dot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        goToSlide(idx);
+                    });
+                    dotsContainer.appendChild(dot);
+                });
+
+                const showControls = currentMonthFestivals.length > 1;
+                slidePrevBtn.style.display = showControls ? 'flex' : 'none';
+                slideNextBtn.style.display = showControls ? 'flex' : 'none';
+                dotsContainer.style.display = showControls ? 'flex' : 'none';
+
+                updateSlidePosition();
+                restartAutoSlide();
+            }
+
+            function updateSlidePosition() {
+                slidesTrack.style.transform = `translateX(-${currentSlideIdx * 100}%)`;
+                const slides = slidesTrack.querySelectorAll('.sai-cal-slide');
+                const dots = dotsContainer.querySelectorAll('.sai-cal-dot');
+                slides.forEach((s, i) => s.classList.toggle('is-current', i === currentSlideIdx));
+                dots.forEach((d, i) => d.classList.toggle('active', i === currentSlideIdx));
+            }
+
+            function goToSlide(idx) {
+                if (!currentMonthFestivals.length) return;
+                currentSlideIdx = (idx + currentMonthFestivals.length) % currentMonthFestivals.length;
+                updateSlidePosition();
+            }
+
+            function restartAutoSlide() {
+                clearInterval(slideTimer);
+                if (prefersReducedMotion || currentMonthFestivals.length <= 1) return;
+                slideTimer = setInterval(() => {
+                    if (!isPaused && !detailView.classList.contains('is-active')) {
+                        goToSlide(currentSlideIdx + 1);
+                    }
+                }, 3800);
+            }
+
+            function renderCalendarGrid() {
+                monthLabel.textContent = `${MONTHS[currentMonth]} ${YEAR}`;
+                daysGrid.innerHTML = '';
+
+                const firstDayOfWeek = new Date(YEAR, currentMonth, 1).getDay();
+                const totalDays = new Date(YEAR, currentMonth + 1, 0).getDate();
+
+                for (let i = 0; i < firstDayOfWeek; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'sai-cal-day is-empty';
+                    daysGrid.appendChild(emptyCell);
+                }
+
+                for (let day = 1; day <= totalDays; day++) {
+                    const festsOnDay = getFestivalsForDate(currentMonth, day);
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'sai-cal-day';
+
+                    if (now.getMonth() === currentMonth && now.getDate() === day) {
+                        btn.classList.add('is-today');
+                    }
+
+                    if (festsOnDay.length > 0) {
+                        btn.classList.add('has-festival');
+                        btn.title = festsOnDay.map(f => f.name).join(' • ');
+                    }
+
+                    if (selectedDay === day) {
+                        btn.classList.add('is-selected');
+                    }
+
+                    let dotsHtml = '';
+                    if (festsOnDay.length > 0) {
+                        const dots = festsOnDay.slice(0, 3).map((_, idx) =>
+                            `<span class="sai-cal-fest-dot ${idx % 2 === 1 ? 'gold' : ''}"></span>`
+                        ).join('');
+                        dotsHtml = `<div class="sai-cal-fest-dots">${dots}</div>`;
+                    }
+
+                    btn.innerHTML = `<span>${day}</span>${dotsHtml}`;
+                    btn.addEventListener('click', () => openDateDetail(day));
+                    daysGrid.appendChild(btn);
+                }
+            }
+
+            function openDateDetail(dayNum) {
+                selectedDay = dayNum;
+                renderCalendarGrid();
+
+                const dateEvents = getFestivalsForDate(currentMonth, dayNum);
+                const eventsToShow = dateEvents.length > 0 ? dateEvents : currentMonthFestivals;
+
+                detailHeading.textContent = dateEvents.length > 0
+                    ? `${dayNum} ${MONTHS[currentMonth]} ${YEAR}`
+                    : `${dayNum} ${MONTHS[currentMonth]} • Month Highlights`;
+
+                detailList.innerHTML = '';
+                eventsToShow.forEach(fest => {
+                    const card = document.createElement('div');
+                    card.className = 'sai-cal-event-card';
+                    const img = document.createElement('img');
+                    img.src = fest.image;
+                    img.alt = fest.name;
+                    img.loading = 'lazy';
+                    img.onerror = function () {
+                        this.onerror = null;
+                        this.src = createFallbackArtwork(fest.name);
+                    };
+
+                    const mediaDiv = document.createElement('div');
+                    mediaDiv.className = 'sai-cal-event-media';
+                    mediaDiv.appendChild(img);
+
+                    const bodyDiv = document.createElement('div');
+                    bodyDiv.className = 'sai-cal-event-body';
+                    bodyDiv.innerHTML = `
+                        <div class="sai-cal-event-title">${fest.name}</div>
+                        <div class="sai-cal-event-meta">
+                            <span><i class="fa-regular fa-calendar"></i> ${fest.scheduleNote}</span>
+                            <span><i class="fa-solid fa-location-dot"></i> ${fest.location}</span>
+                        </div>
+                        <p class="sai-cal-event-desc">${fest.desc}</p>
+                    `;
+
+                    card.appendChild(mediaDiv);
+                    card.appendChild(bodyDiv);
+                    detailList.appendChild(card);
+                });
+
+                overviewBox.style.display = 'none';
+                detailView.classList.add('is-active');
+            }
+
+            function closeDateDetail() {
+                selectedDay = null;
+                detailView.classList.remove('is-active');
+                overviewBox.style.display = 'block';
+                renderCalendarGrid();
+            }
+
+            function switchMonth(delta) {
+                currentMonth = (currentMonth + delta + 12) % 12;
+                selectedDay = null;
+                closeDateDetail();
+                renderSlideshow();
+                renderCalendarGrid();
+            }
+
+            prevMonthBtn.addEventListener('click', () => switchMonth(-1));
+            nextMonthBtn.addEventListener('click', () => switchMonth(1));
+            slidePrevBtn.addEventListener('click', (e) => { e.stopPropagation(); goToSlide(currentSlideIdx - 1); });
+            slideNextBtn.addEventListener('click', (e) => { e.stopPropagation(); goToSlide(currentSlideIdx + 1); });
+            backBtn.addEventListener('click', closeDateDetail);
+
+            // Escape key support: closes detail view or returns to index.html
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (detailView.classList.contains('is-active')) {
+                        closeDateDetail();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }
+            });
+
+            // Pause on Hover
+            slideshowEl.addEventListener('mouseenter', () => { isPaused = true; });
+            slideshowEl.addEventListener('mouseleave', () => { isPaused = false; });
+
+            // Mobile Touch Swipe Support on Slideshow
+            let touchStartX = 0;
+            slideshowEl.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                isPaused = true;
+            }, { passive: true });
+
+            slideshowEl.addEventListener('touchend', (e) => {
+                const diffX = e.changedTouches[0].screenX - touchStartX;
+                if (Math.abs(diffX) > 36) {
+                    goToSlide(diffX < 0 ? currentSlideIdx + 1 : currentSlideIdx - 1);
+                }
+                isPaused = false;
+            }, { passive: true });
+
+            // Initialize Calendar & Slideshow
+            renderSlideshow();
+            renderCalendarGrid();
+        })();
+    </script>
+</body>
+</html>
