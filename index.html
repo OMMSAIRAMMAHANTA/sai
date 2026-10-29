@@ -109,6 +109,48 @@ h1,h2,h3,p{margin:0}
   }
 }
 
+/* ---------- SAI Calendar Top-Left Link Button ---------- */
+#sai-calendar-btn {
+  --sai-gold: #d9b66f;
+  --sai-green: #102b29;
+  position: fixed;
+  top: 34px;
+  left: 40px;
+  z-index: 10000;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1.5px solid var(--sai-gold);
+  background: var(--sai-green);
+  color: var(--sai-gold);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, .35), 0 0 15px rgba(217, 182, 111, .2);
+  transition: transform .3s cubic-bezier(.175, .885, .32, 1.275), background .25s, box-shadow .25s;
+}
+
+#sai-calendar-btn:hover {
+  transform: scale(1.1) translateY(-2px);
+  background: #19433e;
+  box-shadow: 0 0 25px rgba(217, 182, 111, .55);
+}
+
+@media (max-width: 600px) {
+  #sai-calendar-btn {
+    top: 22px;
+    left: 20px;
+    width: 46px;
+    height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sai-calendar-btn { transition: none; }
+}
+
+/* ---------- Full Menu ---------- */
 .full-menu{position:fixed;inset:0;background:rgba(3,5,10,.97);backdrop-filter:blur(25px);z-index:9999;
   display:flex;flex-direction:column;justify-content:center;align-items:center;gap:30px;opacity:0;pointer-events:none;transition:opacity .5s}
 .full-menu.open{opacity:1;pointer-events:all}
@@ -297,11 +339,9 @@ footer b{color:var(--accent);font-weight:600}
   background:rgba(25,30,40,.45);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border:1.5px solid rgba(255,255,255,.2);
   box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 2px rgba(255,255,255,.1),0 0 28px var(--brand-glow);
   transform-style:preserve-3d;transition:transform .4s cubic-bezier(.25,1,.5,1);will-change:transform;
-  /* Scrollbar hide start */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-/* Scrollbar hide for Chrome, Safari and Opera */
 .glass-card::-webkit-scrollbar {
   display: none;
 }
@@ -356,16 +396,14 @@ footer b{color:var(--accent);font-weight:600}
 .prank-btn{padding:10px 24px;border:none;border-radius:30px;color:#fff;font:700 .9rem 'Poppins',sans-serif;cursor:pointer;background:var(--brand-grad,linear-gradient(45deg,#00eaff,#3b82f6));
   box-shadow:0 0 15px var(--brand-glow,rgba(0,234,255,.4));transition:transform .3s}
 .prank-btn:hover{transform:scale(1.06)}
-/* Lock page behind the modal so nothing scrolls or shifts */
+
 html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;height:100%;}
 .social-overlay{overscroll-behavior:contain;touch-action:none}
 .glass-card{touch-action:pan-y;overscroll-behavior:contain}
 
-/* Phone: compact, fixed-size card that always fits the screen */
 @media(max-width:768px){
   .social-overlay{padding:12px; display:flex; align-items:center; justify-content:center;}
   .social-stage{transform:none!important;transition:none; display:flex; align-items:center; justify-content:center;}
-  /* Proportionally reduced max-width and paddings to prevent internal scroll bar and fit on small screens securely */
   .glass-card{width:100%;max-width:320px;max-height:85vh;padding:1.2rem;border-radius:20px;transform:none!important;margin:auto; display:flex; flex-direction:column;}
   .gc-head{margin-bottom:.6rem}
   .gc-user{font-size:.95rem}
@@ -388,7 +426,6 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
   .prank-emoji{font-size:2.2rem}
   .prank-box h3{font-size:.9rem;margin-bottom:14px}
 }
-/* Short screens (landscape phones) */
 @media(max-height:560px){
   .glass-card{max-height:calc(100dvh - 24px);padding:.8rem}
   .gc-profile{margin-bottom:.5rem}
@@ -396,7 +433,7 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
   .close-modal-btn{top:8px;right:8px;width:34px;height:34px}
 }
 
-/* ---------- Performance tuning: keep the visual style, reduce paint cost ---------- */
+/* ---------- Performance tuning ---------- */
 @media (max-width: 768px), (hover: none) {
   body { background-attachment: scroll; }
   .cursor-glow { display: none; }
@@ -432,7 +469,7 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
 @media(hover:none){.gamekey-label small .kb-hint{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-/* MOBILE STABILITY PATCH: reduce repaint-heavy effects that can flicker on phones */
+/* MOBILE STABILITY PATCH */
 @media (hover: none), (max-width: 768px) {
   html { scroll-behavior: auto !important; }
   body { background-attachment: scroll !important; }
@@ -455,7 +492,6 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
 @media (max-width: 768px) {
   .page-section { min-height: 100vh; min-height: 100svh; }
 }
-
 </style>
 </head>
 <body>
@@ -469,6 +505,16 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
 <canvas id="reptileCanvas"></canvas>
 
 <audio id="bgMusic" loop><source src="dreamss.mp3" type="audio/mpeg"></audio>
+
+<!-- 📅 SAI Calendar Top-Left Link Button (Opens calendar.html) -->
+<a href="calendar.html" id="sai-calendar-btn" aria-label="Open calendar" title="SAI Calendar">
+  <svg viewBox="0 0 24 24" width="23" height="23" fill="none"
+       stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <rect x="3" y="5" width="18" height="16" rx="3"/>
+    <path d="M16 3v4M8 3v4M3 10h18"/>
+    <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
+  </svg>
+</a>
 
 <div class="round-btn hamburger-btn" onclick="toggleMenu()" role="button" aria-label="Open menu"><i class="fa-solid fa-bars" id="menu-icon"></i></div>
 <div class="round-btn music-btn" id="musicBtn" onclick="toggleMusic()" title="Play/Pause Background Music" role="button" aria-label="Toggle music"><i class="fa-solid fa-volume-xmark" id="music-icon"></i></div>
@@ -538,7 +584,6 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none;he
       </div>
 
       <div class="hero-socials">
-        <!-- Replaced FB with Email & arranged strictly as YouTube, Instagram, WhatsApp, Email as requested -->
         <a href="https://www.youtube.com/@Lostt426" onclick="openSocial('youtube',event)" aria-label="YouTube" title="YouTube"><i class="fab fa-youtube"></i></a>
         <a href="https://www.instagram.com/s_ensei_426" onclick="openSocial('instagram',event)" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
         <a href="https://wa.me/917849025583" onclick="openSocial('whatsapp',event)" aria-label="WhatsApp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
@@ -746,7 +791,9 @@ document.addEventListener('keydown',e=>{
   const tag=(e.target.tagName||'').toLowerCase();
   if(tag==='input'||tag==='textarea'||e.ctrlKey||e.metaKey||e.altKey) return;
   const k=e.key.toLowerCase();
-  if(k==='escape'){ closePrank(); closeSocial(); closePasscodeUI(); closeSkillModal(); closeGlitchNotice(); toggleMenu(false); }
+  if(k==='escape'){
+    closePrank(); closeSocial(); closePasscodeUI(); closeSkillModal(); closeGlitchNotice(); toggleMenu(false);
+  }
   else if(k==='m'){ toggleMenu(); }
   else if(k==='g'){
     const gk=$('gameKey'); gk.classList.add('pressed');
@@ -754,7 +801,7 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ---------- Avatar 3D tilt + cursor glow (throttled to one update/frame) ---------- */
+/* ---------- Avatar 3D tilt + cursor glow ---------- */
 const wrap=$('avatarWrap'), glow=$('cursorGlow');
 const canUsePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 let pointerFrame = 0, pointerX = innerWidth / 2, pointerY = innerHeight / 2;
@@ -828,7 +875,6 @@ const platforms={
     chips:[['fa-bolt','Quick replies']],
     link:{text:'Chat on WhatsApp',href:'https://wa.me/917849025583',icon:'fa-brands fa-whatsapp'}
   },
-  /* Added Email Platform Configurations */
   email:{
     name:'Omm Sairam Mahanta',icon:'fa-solid fa-envelope',brand:'#ea4335',
     grad:'linear-gradient(45deg,#ea4335,#fbbc05)',glow:'rgba(234,67,53,.4)',
@@ -917,7 +963,7 @@ socialOverlay.addEventListener('mousemove',e=>{
   }
 });
 
-/* ---------- Reptile cursor trail: adaptive, capped-DPI, pause when hidden ---------- */
+/* ---------- Reptile cursor trail ---------- */
 const rCanvas=$('reptileCanvas');
 const rCtx=rCanvas.getContext('2d', { alpha:true, desynchronized:true });
 const trailEnabled = matchMedia('(hover: hover) and (pointer: fine)').matches &&
@@ -950,7 +996,6 @@ function drawBody(s,i){
   const hue=190+i*2;
   rCtx.strokeStyle=`hsl(${hue},100%,50%)`;
   rCtx.lineWidth=1.4;
-  /* Keep the neon trail, but reserve stronger blur for only the front segments. */
   rCtx.shadowBlur=i<7?4:0;
   rCtx.shadowColor=`hsl(${hue},100%,50%)`;
   const bW=Math.sin(i/SEG*Math.PI)*18;
@@ -997,7 +1042,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 startTrail();
 
-/* ---------- Draggable key button (mouse + touch, position remembered) ---------- */
+/* ---------- Draggable key button ---------- */
 (function(){
   const btn = document.getElementById('keyBtn');
   if(!btn) return;
@@ -1044,11 +1089,9 @@ startTrail();
   btn.addEventListener('pointerup', end);
   btn.addEventListener('pointercancel', end);
 
-  /* A drag should not open the link; a plain tap still does */
   btn.addEventListener('click', e => { if(moved){ e.preventDefault(); moved = false; } });
   btn.addEventListener('dragstart', e => e.preventDefault());
 
-  /* Keep it on screen when the window resizes or the phone rotates */
   window.addEventListener('resize', () => {
     if(btn.style.left){
       const r = btn.getBoundingClientRect();
